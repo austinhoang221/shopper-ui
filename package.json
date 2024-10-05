@@ -9,16 +9,21 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@ant-design/nextjs-registry": "^1.0.1",
-    "antd": "^5.20.6",
+    "@nextui-org/react": "^2.4.8",
+    "accept-language": "^3.0.20",
+    "framer-motion": "^11.10.0",
+    "i18next": "^23.15.1",
+    "i18next-resources-to-backend": "^1.2.1",
     "next": "14.2.9",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "react-i18next": "^15.0.2"
   },
   "devDependencies": {
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "autoprefixer": "^10.4.20",
     "eslint": "^8",
     "eslint-config-next": "14.2.9",
     "postcss": "^8",
