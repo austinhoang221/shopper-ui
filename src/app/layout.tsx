@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import Header from "@/components/header/Header";
 import Footer from "@/components/footer/Footer";
-import { NextUIProvider } from "@nextui-org/react";
-import { Inter } from "next/font/google";
-import "./globals.scss";
+import "./globals.css";
 import { languages } from "./i18n/setting";
+import Menu from "@/components/menu/Menu";
+import { Inter } from "next/font/google";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -18,11 +18,10 @@ export default function RootLayout({ children, params: { lng } }: A) {
   return (
     <html lang={lng}>
       <body className={inter.className}>
-        <NextUIProvider>
-          <Header language={lng}></Header>
-          {children}
-          <Footer></Footer>
-        </NextUIProvider>
+        <Header language={lng}></Header>
+        <Menu language={undefined} />
+        {children}
+        <Footer></Footer>
       </body>
     </html>
   );

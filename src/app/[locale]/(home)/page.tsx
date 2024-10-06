@@ -1,5 +1,5 @@
 import { useTranslation } from "@/app/i18n";
-import { Button } from "@nextui-org/react";
+import { Button } from "@/components/ui/button";
 import React from "react";
 
 const Home = async ({ params: { locale } }) => {
@@ -7,9 +7,7 @@ const Home = async ({ params: { locale } }) => {
   return (
     <main>
       <h1>{t("hello")}</h1>
-      <Button radius="sm" color="primary">
-        Button
-      </Button>
+      <Button color="primary">Button</Button>
     </main>
   );
 };
