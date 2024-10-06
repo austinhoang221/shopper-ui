@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "generate:api": "nswag run nswag.json"
   },
   "dependencies": {
     "@nextui-org/react": "^2.4.8",
@@ -15,6 +16,7 @@
     "i18next": "^23.15.1",
     "i18next-resources-to-backend": "^1.2.1",
     "next": "14.2.9",
+    "nswag": "^14.1.0",
     "react": "^18",
     "react-dom": "^18",
     "react-i18next": "^15.0.2"
