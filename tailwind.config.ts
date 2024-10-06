@@ -23,7 +23,11 @@ const config: Config = {
       addCommonColors: false, // override common colors (e.g. "blue", "green", "pink").
       defaultTheme: "light", // default theme from the themes object
       defaultExtendTheme: "light", // default theme to extend on custom themes
-      layout: {}, // common layout tokens (applied to all themes)
+      layout: {
+        fontSize: {
+          medium: "0.875rem",
+        },
+      }, // common layout tokens (applied to all themes)
       themes: {
         light: {
           layout: {}, // light theme layout tokens

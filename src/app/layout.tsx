@@ -5,7 +5,6 @@ import { NextUIProvider } from "@nextui-org/react";
 import { Inter } from "next/font/google";
 import "./globals.scss";
 import { languages } from "./i18n/setting";
-import { dir } from "i18next";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -17,10 +16,10 @@ export async function generateStaticParams() {
 const inter = Inter({ subsets: ["latin"] });
 export default function RootLayout({ children, params: { lng } }: A) {
   return (
-    <html lang={lng} dir={dir(lng)}>
+    <html lang={lng}>
       <body className={inter.className}>
         <NextUIProvider>
-          <Header></Header>
+          <Header language={lng}></Header>
           {children}
           <Footer></Footer>
         </NextUIProvider>
