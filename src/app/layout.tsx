@@ -19,8 +19,8 @@ export default function RootLayout({ children, params: { lng } }: A) {
     <html lang={lng}>
       <body className={inter.className}>
         <Header language={lng}></Header>
-        <Menu language={undefined} />
-        {children}
+        <Menu language={lng} />
+        <main className="container">{children}</main>
         <Footer></Footer>
       </body>
     </html>

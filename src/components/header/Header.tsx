@@ -28,7 +28,7 @@ import { useRouter } from "next/navigation";
 const Header = ({ language }) => {
   const router = useRouter();
   return (
-    <nav className=" w-full border-b  bg-white ">
+    <nav className=" w-full  bg-white ">
       <div className="container mx-auto items-center flex h-14 justify-between gap-3">
         <div className="flex justify-start">
           <Link href="/" className="mr-4">
@@ -59,6 +59,7 @@ const Header = ({ language }) => {
                   className="text-primary"
                 />
               }
+              className="h-"
               type="search"
               startContent={
                 <DropdownMenu>
