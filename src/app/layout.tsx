@@ -3,8 +3,10 @@ import Header from "@/components/header/Header";
 import Footer from "@/components/footer/Footer";
 import "./globals.css";
 import { languages } from "./i18n/setting";
-import Menu from "@/components/menu/Menu";
 import { Inter } from "next/font/google";
+import ErrorBoundary from "next/dist/client/components/error-boundary";
+import Error from "./error";
+import Menu from "@/components/menu/Menu";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -17,12 +19,7 @@ const inter = Inter({ subsets: ["latin"] });
 export default function RootLayout({ children, params: { lng } }: A) {
   return (
     <html lang={lng}>
-      <body className={inter.className}>
-        <Header language={lng}></Header>
-        <Menu language={lng} />
-        <main className="container">{children}</main>
-        <Footer></Footer>
-      </body>
+      <body className={inter.className}>{children}</body>
     </html>
   );
 }

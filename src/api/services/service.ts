@@ -9,7 +9,7 @@ const authorizedFetchFunction = (
   const controller: AbortController = new AbortController();
   const signal: AbortSignal = controller.signal;
   const headers = {
-    Authorization: `Bearer ${Context.token}`,
+    // Authorization: `Bearer ${Context.token}`,
     signal,
   };
   init = init || {};
@@ -41,7 +41,7 @@ const handleServiceError = (error: A) => {
   // Handle service error
   switch (error.status) {
     case HTTPStatusCodeType.UNAUTHORIZED:
-      break;
+      throw new Error("unauthorized");
     case HTTPStatusCodeType.BAD_REQUEST:
       throw new Error(error?.errors?.[0].message);
     case HTTPStatusCodeType.INTERNAL_SERVER_ERROR:
