@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
-import Header from "@/components/header/Header";
-import Footer from "@/components/footer/Footer";
+
 import "./globals.css";
 import { languages } from "./i18n/setting";
 import { Inter } from "next/font/google";
-import ErrorBoundary from "next/dist/client/components/error-boundary";
-import Error from "./error";
-import Menu from "@/components/menu/Menu";
+import { config } from "@fortawesome/fontawesome-svg-core";
+import "@fortawesome/fontawesome-svg-core/styles.css";
+config.autoAddCss = false;
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -15,6 +14,7 @@ export const metadata: Metadata = {
 export async function generateStaticParams() {
   return languages.map((lng) => ({ lng }));
 }
+
 const inter = Inter({ subsets: ["latin"] });
 export default function RootLayout({ children, params: { lng } }: A) {
   return (

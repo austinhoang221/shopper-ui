@@ -12,6 +12,9 @@ const config: Config = {
     "./src/@/components/**/*.{ts,tsx}",
   ],
   theme: {
+    container: {
+      center: true,
+    },
     extend: {
       colors: {
         background: "var(--background)",

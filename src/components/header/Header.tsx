@@ -24,70 +24,27 @@ import {
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
 import { useRouter } from "next/navigation";
+import SearchBox from "./SearchBox";
+import Menu from "../menu/Menu";
+import DeliverTo from "./DeliverTo";
 
 const Header = ({ language }) => {
   const router = useRouter();
   return (
-    <nav className=" w-full  bg-white ">
+    <nav className=" w-full px-2 bg-white ">
       <div className="container mx-auto items-center flex h-14 justify-between gap-3">
-        <div className="flex justify-start">
+        <div className="flex justify-start items-center">
+          <Menu language={language} />
           <Link href="/" className="mr-4">
             <p className="font-bold text-inherit">LOGO</p>
           </Link>
         </div>
         <div className="basis-full flex justify-center">
           <div className="w-full flex gap-3 items-center basis-full">
-            <div className="items-center gap-1 hidden sm:flex">
-              <FontAwesomeIcon
-                icon={faLocationDot}
-                width={18}
-                height={18}
-                className="text-primary"
-              />
-              <div className="flex-col leading-4 flex">
-                <span className="text-xs">Deliver to</span>
-                <span className="text-primary font-bold">Vietnam</span>
-              </div>
+            <div className="hidden md:block">
+              <DeliverTo />
             </div>
-            <Input
-              placeholder="Type to search..."
-              endContent={
-                <FontAwesomeIcon
-                  icon={faSearch}
-                  width={18}
-                  height={18}
-                  className="text-primary"
-                />
-              }
-              className="h-"
-              type="search"
-              startContent={
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <FontAwesomeIcon
-                      icon={faChevronCircleDown}
-                      width={18}
-                      height={18}
-                      className="text-primary cursor-pointer"
-                    />
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent aria-label="Static Actions">
-                    <DropdownMenuGroup>
-                      <DropdownMenuItem key="new">New file</DropdownMenuItem>
-                      <DropdownMenuItem key="copy">Copy link</DropdownMenuItem>
-                      <DropdownMenuItem key="edit">Edit file</DropdownMenuItem>
-                      <DropdownMenuItem
-                        key="delete"
-                        className="text-danger"
-                        color="danger"
-                      >
-                        Delete file
-                      </DropdownMenuItem>
-                    </DropdownMenuGroup>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              }
-            />
+            <SearchBox className="hidden md:block basis-full" />
           </div>
         </div>
         <div className="flex justify-end items-center">
