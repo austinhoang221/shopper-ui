@@ -1,3 +1,4 @@
+"use client";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
@@ -10,6 +11,8 @@ import {
 import { Button } from "../ui/button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCartShopping } from "@fortawesome/free-solid-svg-icons";
+import { useAppDispatch } from "@/hooks/reduxHooks";
+import { addToCart } from "@/reduxConfig/cartSlice";
 
 export interface DummyProductResponse {
   products: DummyProduct[];
@@ -22,10 +25,15 @@ export interface DummyProduct {
   id: number;
   title: string;
   images: string[];
-  price: string;
+  price: number;
 }
 
 export default function Product({ product }: { product: DummyProduct }) {
+  const dispatch = useAppDispatch();
+
+  const onAddToCart = (item: DummyProduct) => {
+    dispatch(addToCart(item));
+  };
   return (
     <div className="bg-white shadow-lg rounded-lg p-4">
       <Link href={product.title}>
@@ -51,17 +59,20 @@ export default function Product({ product }: { product: DummyProduct }) {
         </Tooltip>
       </TooltipProvider>
 
-      <div className="flex items-center justify-between">
-        <p className="font-bold">{product.price}$</p>
-        <Button size="icon" variant="ghost">
-          <FontAwesomeIcon
-            icon={faCartShopping}
-            className="text-primary cursor-pointer"
-            width={18}
-            height={18}
-          />
-        </Button>
-      </div>
+      <p className="font-bold">{product.price}$</p>
+      <Button
+        className="w-full mt-2 transform transition duration-300 ease-in-out active:animate-bounce-in-cart"
+        variant="secondary"
+        onClick={() => onAddToCart(product)}
+      >
+        <span className="mr-2">Add to cart</span>
+        <FontAwesomeIcon
+          icon={faCartShopping}
+          className="text-primary cursor-pointer"
+          width={18}
+          height={18}
+        />
+      </Button>
     </div>
   );
 }

@@ -4,6 +4,9 @@ import Footer from "@/components/footer/Footer";
 import Menu from "@/components/menu/Menu";
 import SearchBox from "@/components/header/SearchBox";
 import DeliverTo from "@/components/header/DeliverTo";
+import StoreProvider from "@/reduxConfig/StoreProvider";
+import { AppStore } from "@/reduxConfig/store";
+import React from "react";
 
 export const metadata: Metadata = {
   title: "Create Next App",

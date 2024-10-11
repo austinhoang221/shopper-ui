@@ -77,7 +77,7 @@ const ListCategory = (props: Props) => {
   library.add(faUser);
 
   return (
-    <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-x-12 gap-y-2 mt-6">
+    <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-x-12 gap-y-4 mt-6">
       {categories.map((category) => {
         return (
           <div className="text-center" key={category.id}>
@@ -87,7 +87,7 @@ const ListCategory = (props: Props) => {
             >
               <FontAwesomeIcon icon="user" className="text-primary" size="xl" />
             </Link>
-            <span className="text-primary">{category.name}</span>
+            <span className="text-primary font-bold">{category.name}</span>
           </div>
         );
       })}

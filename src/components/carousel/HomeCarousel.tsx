@@ -28,7 +28,8 @@ const HomeCarousel = (props: Props) => {
         {Array.from({ length: 5 }).map((_, index) => (
           <CarouselItem key={index}>
             <img
-              className="embla__slide__img embla__parallax__img"
+              className="embla__slide"
+              width="100%"
               src={`https://picsum.photos/600/350?v=${index}`}
               alt="Your alt text"
             />

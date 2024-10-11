@@ -35,7 +35,7 @@ const ListProduct = (props: Props) => {
   };
   return (
     // <div className="max-h-[300px] w-full overflow-y-auto px-10">
-    <div className="grid sm:grid-cols-1 lg:grid-cols-4 md:gap-y-1 sm:gap-4 mt-6">
+    <div className="grid grid-cols-2 lg:grid-cols-4 md:gap-y-4 gap-4 mt-6">
       {products.map((product) => (
         <Product key={product.id} product={product} />
       ))}

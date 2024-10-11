@@ -1,19 +1,13 @@
 "use client";
 import { languages } from "@/app/i18n/setting";
 import {
-  faCartShopping,
-  faChevronCircleDown,
   faGlobe,
   faHeadphones,
-  faLocationDot,
-  faSearch,
   faUser,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
-
 import React from "react";
-import { Input } from "../ui/input";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,11 +21,12 @@ import { useRouter } from "next/navigation";
 import SearchBox from "./SearchBox";
 import Menu from "../menu/Menu";
 import DeliverTo from "./DeliverTo";
+import Cart from "./Cart";
 
 const Header = ({ language }) => {
   const router = useRouter();
   return (
-    <nav className=" w-full px-2 bg-white ">
+    <nav className=" w-full px-2 bg-white/90 sticky top-0 z-40 backdrop-blur-sm border-b flex-none transition-colors duration-500  ">
       <div className="container mx-auto items-center flex h-14 justify-between gap-3">
         <div className="flex justify-start items-center">
           <Menu language={language} />
@@ -48,14 +43,7 @@ const Header = ({ language }) => {
           </div>
         </div>
         <div className="flex justify-end items-center">
-          <Button size="icon" variant="ghost">
-            <FontAwesomeIcon
-              icon={faCartShopping}
-              className="text-primary cursor-pointer"
-              width={18}
-              height={18}
-            />
-          </Button>
+          <Cart />
           <Separator orientation="vertical" className="h-1/2 " />
           <div className="hidden sm:block">
             <Button size="icon" variant="ghost">

@@ -5,6 +5,8 @@ import { languages } from "./i18n/setting";
 import { Inter } from "next/font/google";
 import { config } from "@fortawesome/fontawesome-svg-core";
 import "@fortawesome/fontawesome-svg-core/styles.css";
+import StoreProvider from "@/reduxConfig/StoreProvider";
+import ScrollContainer from "@/utils/ScrollContainer";
 config.autoAddCss = false;
 
 export const metadata: Metadata = {
@@ -19,7 +21,11 @@ const inter = Inter({ subsets: ["latin"] });
 export default function RootLayout({ children, params: { lng } }: A) {
   return (
     <html lang={lng}>
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <StoreProvider>
+          <ScrollContainer>{children}</ScrollContainer>
+        </StoreProvider>
+      </body>
     </html>
   );
 }
