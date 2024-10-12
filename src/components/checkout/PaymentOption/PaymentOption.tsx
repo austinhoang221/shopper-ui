@@ -9,29 +9,30 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 const PaymentOption = () => {
   return (
     <Card>
-      <div className="text-bolder text-2xl p-4">Payment Option</div>
+      <CardHeader>
+        <CardTitle>Payment Option</CardTitle>
+      </CardHeader>
       <Tabs defaultValue="paypal" className="w-full">
         <TabsList className="grid w-full grid-cols-2 bg-transparent">
           <TabsTrigger value="cash" className="flex flex-col items-center">
-              <FontAwesomeIcon
-                icon={faMoneyBills}
-                className="text-primary"
-                size="xl"
-              />
-              <span>Cash on Delivery</span>
+            <FontAwesomeIcon
+              icon={faMoneyBills}
+              className="text-primary"
+              size="xl"
+            />
+            <span>Cash on Delivery</span>
           </TabsTrigger>
           <TabsTrigger value="paypal" className="flex flex-col items-center">
-              <FontAwesomeIcon
-                icon={faCcPaypal}
-                className="text-primary"
-                size="xl"
-              />
-              <span>Paypal</span>
+            <FontAwesomeIcon
+              icon={faCcPaypal}
+              className="text-primary"
+              size="xl"
+            />
+            <span>Paypal</span>
           </TabsTrigger>
         </TabsList>
         <TabsContent value="paypal">
-          <CardHeader>
-          </CardHeader>
+          <CardHeader></CardHeader>
           <CardContent className="space-y-2">
             <div className="space-y-1">
               <Label htmlFor="name">Name on Card</Label>
