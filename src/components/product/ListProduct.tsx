@@ -2,7 +2,7 @@
 import React from "react";
 import InfiniteScroll from "@/components/ui/infinite-scroll";
 import { Loader2 } from "lucide-react";
-import Product, { DummyProduct, DummyProductResponse } from "./Product";
+import Product, { DummyProduct } from "./Product";
 import { getProducts } from "./GetProducts";
 
 type Props = {

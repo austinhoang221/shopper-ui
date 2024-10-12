@@ -6,6 +6,7 @@ import { Inter } from "next/font/google";
 import { config } from "@fortawesome/fontawesome-svg-core";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import StoreProvider from "@/reduxConfig/StoreProvider";
+import { cn } from "@/lib/utils";
 config.autoAddCss = false;
 
 export const metadata: Metadata = {
@@ -16,11 +17,24 @@ export async function generateStaticParams() {
   return languages.map((lng) => ({ lng }));
 }
 
-const inter = Inter({ subsets: ["latin"] });
+const fontHeading = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-heading",
+});
+
+const fontBody = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-body",
+});
+
 export default function RootLayout({ children, params: { lng } }: A) {
   return (
     <html lang={lng}>
-      <body className={inter.className}>
+      <body
+        className={cn("antialiased", fontHeading.variable, fontBody.variable)}
+      >
         <StoreProvider>{children}</StoreProvider>
       </body>
     </html>

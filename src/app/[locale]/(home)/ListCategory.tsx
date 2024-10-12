@@ -1,9 +1,4 @@
-import {
-  IconLookup,
-  IconDefinition,
-  findIconDefinition,
-  library,
-} from "@fortawesome/fontawesome-svg-core";
+import { library } from "@fortawesome/fontawesome-svg-core";
 import { faCableCar, faUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
