@@ -4,11 +4,7 @@ import React from "react";
 import Image from "next/image";
 import { Button } from "../ui/button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faCartShopping,
-  faTrashCan,
-  faXmark,
-} from "@fortawesome/free-solid-svg-icons";
+import { faCartShopping, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import {
@@ -19,14 +15,14 @@ import {
 } from "../ui/tooltip";
 import Link from "next/link";
 import {
-  CartItem,
   removeFromCart,
   toggle,
   toggleCheckAll,
 } from "@/reduxConfig/cartSlice";
 import { Separator } from "../ui/separator";
 import { Checkbox } from "../ui/checkbox";
-import ReactLenis from "@studio-freight/react-lenis";
+import EmptyCart from "@/public/imgs/empty-cart.png";
+import { usePathname } from "next/navigation";
 
 type Props = {};
 
@@ -34,7 +30,7 @@ const Cart = (props: Props) => {
   const { cartItems } = useAppSelector((state) => state.cart);
   const [checkAll, setCheckAll] = React.useState(true);
   const dispatch = useAppDispatch();
-
+  const location = usePathname();
   const onRemoveFromCart = (id: string) => {
     dispatch(removeFromCart(id));
   };
@@ -73,10 +69,7 @@ const Cart = (props: Props) => {
       <PopoverContent className="w-[25rem] ">
         {cartItems.length > 0 ? (
           <>
-            <ReactLenis
-              options={{ lerp: 0.1, duration: 1.5, syncTouch: true }}
-              className="max-h-[25rem] gap-4 overflow-y-scroll overflow-x-hidden"
-            >
+            <div className="max-h-[25rem] gap-4 overflow-y-scroll overflow-x-hidden">
               {cartItems.map((cartItem) => {
                 return (
                   <div
@@ -148,7 +141,7 @@ const Cart = (props: Props) => {
                   </div>
                 );
               })}
-            </ReactLenis>
+            </div>
             <Separator className="bg-[#d5dbdb]" />
             <div className="flex justify-between items-center my-4">
               <div className="flex justify-between items-center space-x-2">
@@ -166,15 +159,28 @@ const Cart = (props: Props) => {
               </div>
               <span>
                 Total:{" "}
-                <span className="text-lg font-bold">{calculateTotal()}$</span>
+                <span className="text-lg font-bold">
+                  {calculateTotal().toFixed(2)}$
+                </span>
               </span>
             </div>
             <Button className="w-full">
-              <Link href={"1231"}>View cart</Link>
+              <Link href={`${location}/cart`}>View cart</Link>
             </Button>
           </>
         ) : (
-          <></>
+          <div className="h-[18rem] text-center font-bold flex flex-col justify-center items-center">
+            <div className="mb-6 rounded-full text-lg w-[12rem] h-[12rem] mx-auto bg-[#f4f3f1] p-4 ">
+              <Image
+                src={EmptyCart}
+                alt="Empty cart"
+                width={200}
+                height={200}
+                className=" mx-auto"
+              />
+            </div>
+            <span>Your cart is empty</span>
+          </div>
         )}
       </PopoverContent>
     </Popover>

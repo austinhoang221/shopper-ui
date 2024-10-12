@@ -29,7 +29,7 @@ const PrallaxCarousel = (props: Props) => {
         {Array.from({ length: 5 }).map((_, index) => (
           <CarouselItem
             key={index}
-            className="embla__slide basis-1/4 md:basis-2/3"
+            className="embla__slide basis-full md:basis-1/4"
           >
             <div className="embla__parallax">
               <div className="embla__parallax__layer">

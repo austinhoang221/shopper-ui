@@ -61,7 +61,7 @@ export default function Product({ product }: { product: DummyProduct }) {
 
       <p className="font-bold">{product.price}$</p>
       <Button
-        className="w-full mt-2 transform transition duration-300 ease-in-out active:animate-bounce-in-cart"
+        className="w-full mt-2"
         variant="secondary"
         onClick={() => onAddToCart(product)}
       >
