@@ -23,6 +23,7 @@ import { Separator } from "../ui/separator";
 import { Checkbox } from "../ui/checkbox";
 import EmptyCart from "@/public/imgs/empty-cart.png";
 import { usePathname } from "next/navigation";
+import { useUtils } from "@/hooks/use-utils";
 
 type Props = {};
 
@@ -31,16 +32,9 @@ const Cart = (props: Props) => {
   const [checkAll, setCheckAll] = React.useState(true);
   const dispatch = useAppDispatch();
   const location = usePathname();
+  const { calculateTotalCart } = useUtils();
   const onRemoveFromCart = (id: string) => {
     dispatch(removeFromCart(id));
-  };
-
-  const calculateTotal = () => {
-    return cartItems.reduce((currentValue, product) => {
-      if (product.select)
-        return currentValue + product.item.price * product.quantity;
-      else return currentValue;
-    }, 0);
   };
 
   const onCheckAll = (checked: boolean | string) => {
@@ -109,9 +103,6 @@ const Cart = (props: Props) => {
                               >
                                 {cartItem.item.title}
                               </Link>
-                              <span className="w-[2.25rem] text-center">
-                                x{cartItem.quantity}
-                              </span>
                             </div>
                           </TooltipTrigger>
                           <TooltipContent align="start">
@@ -121,7 +112,12 @@ const Cart = (props: Props) => {
                       </TooltipProvider>
 
                       <div className="flex justify-between items-center">
-                        <p className="font-bold">{cartItem.item.price}$</p>
+                        <span className="text-center flex">
+                          <span>{cartItem.quantity} x </span>
+                          <p className="font-bold ml-1">
+                            {cartItem.item.price}$
+                          </p>
+                        </span>
                         <Button
                           size="icon"
                           variant="ghost"
@@ -159,9 +155,7 @@ const Cart = (props: Props) => {
               </div>
               <span>
                 Total:{" "}
-                <span className="text-lg font-bold">
-                  {calculateTotal().toFixed(2)}$
-                </span>
+                <span className="text-lg font-bold">{calculateTotalCart}$</span>
               </span>
             </div>
             <Button className="w-full">

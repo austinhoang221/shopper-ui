@@ -354,7 +354,7 @@ export function CheckoutForm() {
               <span>Total</span>
               <span className="text-right">$357.99USD</span>
             </div>
-            <Button className="w-full btn-place-order p-4">
+            <Button className="w-full bg-tertiary text-tertiary-foreground p-4">
               PLACE ORDER &nbsp;&#8594;
             </Button>
           </CardContent>
