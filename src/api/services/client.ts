@@ -9,2100 +9,1342 @@
 // ReSharper disable InconsistentNaming
 
 export class Client {
-  private http: {
-    fetch(url: RequestInfo, init?: RequestInit): Promise<Response>;
-  };
-  private baseUrl: string;
-  protected jsonParseReviver: ((key: string, value: any) => any) | undefined =
-    undefined;
+    private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
 
-  constructor(
-    baseUrl?: string,
-    http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }
-  ) {
-    this.http = http ? http : (window as any);
-    this.baseUrl = baseUrl ?? "";
-  }
-
-  /**
-   * (Auth)
-   * @return OK
-   */
-  productCategoriesAll(): Promise<ListProductCategoryResponse[]> {
-    let url_ = this.baseUrl + "/api/v1/product-categories";
-    url_ = url_.replace(/[?&]$/, "");
-
-    let options_: RequestInit = {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-      },
-    };
-
-    return this.http.fetch(url_, options_).then((_response: Response) => {
-      return this.processProductCategoriesAll(_response);
-    });
-  }
-
-  protected processProductCategoriesAll(
-    response: Response
-  ): Promise<ListProductCategoryResponse[]> {
-    const status = response.status;
-    debugger;
-    let _headers: any = {};
-    if (response.headers && response.headers.forEach) {
-      response.headers.forEach((v: any, k: any) => (_headers[k] = v));
+    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }) {
+        this.http = http ? http : window as any;
+        this.baseUrl = baseUrl ?? "";
     }
-    if (status === 200) {
-      return response.text().then((_responseText) => {
-        let result200: any = null;
-        let resultData200 =
-          _responseText === ""
-            ? null
-            : JSON.parse(_responseText, this.jsonParseReviver);
-        if (Array.isArray(resultData200)) {
-          result200 = [] as any;
-          for (let item of resultData200)
-            result200!.push(ListProductCategoryResponse.fromJS(item));
-        } else {
-          result200 = <any>null;
+
+    /**
+     * @return OK
+     */
+    productCategoriesAll(): Promise<ListProductCategoryResponse[]> {
+        let url_ = this.baseUrl + "/api/v1/product-categories";
+        console.log(url_);
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "GET",
+            headers: {
+                "Accept": "application/json"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processProductCategoriesAll(_response);
+        });
+    }
+
+    protected processProductCategoriesAll(response: Response): Promise<ListProductCategoryResponse[]> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(ListProductCategoryResponse.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
+            return result200;
+            });
+        } else if (status === 400) {
+            return response.text().then((_responseText) => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
         }
-        return result200;
-      });
-    } else if (status === 400) {
-      return response.text().then((_responseText) => {
-        let result400: any = null;
-        let resultData400 =
-          _responseText === ""
-            ? null
-            : JSON.parse(_responseText, this.jsonParseReviver);
-        result400 = ProblemDetails.fromJS(resultData400);
-        return throwException(
-          "Bad Request",
-          status,
-          _responseText,
-          _headers,
-          result400
-        );
-      });
-    } else if (status === 401) {
-      return response.text().then((_responseText) => {
-        return throwException("Unauthorized", status, _responseText, _headers);
-      });
-    } else if (status === 403) {
-      return response.text().then((_responseText) => {
-        return throwException("Forbidden", status, _responseText, _headers);
-      });
-    } else if (status !== 200 && status !== 204) {
-      return response.text().then((_responseText) => {
-        return throwException(
-          "An unexpected server error occurred.",
-          status,
-          _responseText,
-          _headers
-        );
-      });
+        return Promise.resolve<ListProductCategoryResponse[]>(null as any);
     }
-    return Promise.resolve<ListProductCategoryResponse[]>(null as any);
-  }
 
-  /**
-   * (Auth)
-   * @param body (optional)
-   * @return Created
-   */
-  productCategoriesPOST(
-    body: CreateProductCategoryRequest | undefined
-  ): Promise<CreateProductCategoryResponse> {
-    let url_ = this.baseUrl + "/api/v1/product-categories";
-    url_ = url_.replace(/[?&]$/, "");
+    /**
+     * @return OK
+     */
+    productCategories(id: Ulid): Promise<GetProductCategoryResponse> {
+        let url_ = this.baseUrl + "/api/v1/product-categories/{id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
 
-    const content_ = JSON.stringify(body);
+        let options_: RequestInit = {
+            method: "GET",
+            headers: {
+                "Accept": "application/json"
+            }
+        };
 
-    let options_: RequestInit = {
-      body: content_,
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    };
-
-    return this.http.fetch(url_, options_).then((_response: Response) => {
-      return this.processProductCategoriesPOST(_response);
-    });
-  }
-
-  protected processProductCategoriesPOST(
-    response: Response
-  ): Promise<CreateProductCategoryResponse> {
-    const status = response.status;
-    let _headers: any = {};
-    if (response.headers && response.headers.forEach) {
-      response.headers.forEach((v: any, k: any) => (_headers[k] = v));
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processProductCategories(_response);
+        });
     }
-    if (status === 201) {
-      return response.text().then((_responseText) => {
-        let result201: any = null;
-        let resultData201 =
-          _responseText === ""
-            ? null
-            : JSON.parse(_responseText, this.jsonParseReviver);
-        result201 = CreateProductCategoryResponse.fromJS(resultData201);
-        return result201;
-      });
-    } else if (status === 400) {
-      return response.text().then((_responseText) => {
-        let result400: any = null;
-        let resultData400 =
-          _responseText === ""
-            ? null
-            : JSON.parse(_responseText, this.jsonParseReviver);
-        result400 = ProblemDetails.fromJS(resultData400);
-        return throwException(
-          "Bad Request",
-          status,
-          _responseText,
-          _headers,
-          result400
-        );
-      });
-    } else if (status === 401) {
-      return response.text().then((_responseText) => {
-        return throwException("Unauthorized", status, _responseText, _headers);
-      });
-    } else if (status === 403) {
-      return response.text().then((_responseText) => {
-        return throwException("Forbidden", status, _responseText, _headers);
-      });
-    } else if (status !== 200 && status !== 204) {
-      return response.text().then((_responseText) => {
-        return throwException(
-          "An unexpected server error occurred.",
-          status,
-          _responseText,
-          _headers
-        );
-      });
-    }
-    return Promise.resolve<CreateProductCategoryResponse>(null as any);
-  }
 
-  /**
-   * (Auth)
-   * @return OK
-   */
-  productCategoriesGET(id: string): Promise<GetProductCategoryResponse> {
-    let url_ = this.baseUrl + "/api/v1/product-categories/{id}";
-    if (id === undefined || id === null)
-      throw new Error("The parameter 'id' must be defined.");
-    url_ = url_.replace("{id}", encodeURIComponent("" + id));
-    url_ = url_.replace(/[?&]$/, "");
-
-    let options_: RequestInit = {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-      },
-    };
-
-    return this.http.fetch(url_, options_).then((_response: Response) => {
-      return this.processProductCategoriesGET(_response);
-    });
-  }
-
-  protected processProductCategoriesGET(
-    response: Response
-  ): Promise<GetProductCategoryResponse> {
-    const status = response.status;
-    let _headers: any = {};
-    if (response.headers && response.headers.forEach) {
-      response.headers.forEach((v: any, k: any) => (_headers[k] = v));
-    }
-    if (status === 200) {
-      return response.text().then((_responseText) => {
-        let result200: any = null;
-        let resultData200 =
-          _responseText === ""
-            ? null
-            : JSON.parse(_responseText, this.jsonParseReviver);
-        result200 = GetProductCategoryResponse.fromJS(resultData200);
-        return result200;
-      });
-    } else if (status === 404) {
-      return response.text().then((_responseText) => {
-        let result404: any = null;
-        let resultData404 =
-          _responseText === ""
-            ? null
-            : JSON.parse(_responseText, this.jsonParseReviver);
-        result404 = ProblemDetails.fromJS(resultData404);
-        return throwException(
-          "Not Found",
-          status,
-          _responseText,
-          _headers,
-          result404
-        );
-      });
-    } else if (status === 401) {
-      return response.text().then((_responseText) => {
-        return throwException("Unauthorized", status, _responseText, _headers);
-      });
-    } else if (status === 403) {
-      return response.text().then((_responseText) => {
-        return throwException("Forbidden", status, _responseText, _headers);
-      });
-    } else if (status !== 200 && status !== 204) {
-      return response.text().then((_responseText) => {
-        return throwException(
-          "An unexpected server error occurred.",
-          status,
-          _responseText,
-          _headers
-        );
-      });
-    }
-    return Promise.resolve<GetProductCategoryResponse>(null as any);
-  }
-
-  /**
-   * (Auth)
-   * @param body (optional)
-   * @return OK
-   */
-  productCategoriesPUT(
-    id: string,
-    body: UpdateProductCategoryRequest | undefined
-  ): Promise<UpdateProductCategoryResponse> {
-    let url_ = this.baseUrl + "/api/v1/product-categories/{id}";
-    if (id === undefined || id === null)
-      throw new Error("The parameter 'id' must be defined.");
-    url_ = url_.replace("{id}", encodeURIComponent("" + id));
-    url_ = url_.replace(/[?&]$/, "");
-
-    const content_ = JSON.stringify(body);
-
-    let options_: RequestInit = {
-      body: content_,
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    };
-
-    return this.http.fetch(url_, options_).then((_response: Response) => {
-      return this.processProductCategoriesPUT(_response);
-    });
-  }
-
-  protected processProductCategoriesPUT(
-    response: Response
-  ): Promise<UpdateProductCategoryResponse> {
-    const status = response.status;
-    let _headers: any = {};
-    if (response.headers && response.headers.forEach) {
-      response.headers.forEach((v: any, k: any) => (_headers[k] = v));
-    }
-    if (status === 200) {
-      return response.text().then((_responseText) => {
-        let result200: any = null;
-        let resultData200 =
-          _responseText === ""
-            ? null
-            : JSON.parse(_responseText, this.jsonParseReviver);
-        result200 = UpdateProductCategoryResponse.fromJS(resultData200);
-        return result200;
-      });
-    } else if (status === 400) {
-      return response.text().then((_responseText) => {
-        let result400: any = null;
-        let resultData400 =
-          _responseText === ""
-            ? null
-            : JSON.parse(_responseText, this.jsonParseReviver);
-        result400 = ProblemDetails.fromJS(resultData400);
-        return throwException(
-          "Bad Request",
-          status,
-          _responseText,
-          _headers,
-          result400
-        );
-      });
-    } else if (status === 401) {
-      return response.text().then((_responseText) => {
-        return throwException("Unauthorized", status, _responseText, _headers);
-      });
-    } else if (status === 403) {
-      return response.text().then((_responseText) => {
-        return throwException("Forbidden", status, _responseText, _headers);
-      });
-    } else if (status !== 200 && status !== 204) {
-      return response.text().then((_responseText) => {
-        return throwException(
-          "An unexpected server error occurred.",
-          status,
-          _responseText,
-          _headers
-        );
-      });
-    }
-    return Promise.resolve<UpdateProductCategoryResponse>(null as any);
-  }
-
-  /**
-   * (Auth)
-   * @return No Content
-   */
-  productCategoriesDELETE(id: string): Promise<NoContent> {
-    let url_ = this.baseUrl + "/api/v1/product-categories/{id}";
-    if (id === undefined || id === null)
-      throw new Error("The parameter 'id' must be defined.");
-    url_ = url_.replace("{id}", encodeURIComponent("" + id));
-    url_ = url_.replace(/[?&]$/, "");
-
-    let options_: RequestInit = {
-      method: "DELETE",
-      headers: {
-        Accept: "application/json",
-      },
-    };
-
-    return this.http.fetch(url_, options_).then((_response: Response) => {
-      return this.processProductCategoriesDELETE(_response);
-    });
-  }
-
-  protected processProductCategoriesDELETE(
-    response: Response
-  ): Promise<NoContent> {
-    const status = response.status;
-    let _headers: any = {};
-    if (response.headers && response.headers.forEach) {
-      response.headers.forEach((v: any, k: any) => (_headers[k] = v));
-    }
-    if (status === 204) {
-      return response.text().then((_responseText) => {
-        let result204: any = null;
-        let resultData204 =
-          _responseText === ""
-            ? null
-            : JSON.parse(_responseText, this.jsonParseReviver);
-        result204 = NoContent.fromJS(resultData204);
-        return result204;
-      });
-    } else if (status === 400) {
-      return response.text().then((_responseText) => {
-        let result400: any = null;
-        let resultData400 =
-          _responseText === ""
-            ? null
-            : JSON.parse(_responseText, this.jsonParseReviver);
-        result400 = ProblemDetails.fromJS(resultData400);
-        return throwException(
-          "Bad Request",
-          status,
-          _responseText,
-          _headers,
-          result400
-        );
-      });
-    } else if (status === 401) {
-      return response.text().then((_responseText) => {
-        return throwException("Unauthorized", status, _responseText, _headers);
-      });
-    } else if (status === 403) {
-      return response.text().then((_responseText) => {
-        return throwException("Forbidden", status, _responseText, _headers);
-      });
-    } else if (status !== 200 && status !== 204) {
-      return response.text().then((_responseText) => {
-        return throwException(
-          "An unexpected server error occurred.",
-          status,
-          _responseText,
-          _headers
-        );
-      });
-    }
-    return Promise.resolve<NoContent>(null as any);
-  }
-
-  /**
-   * (Auth)
-   * @return OK
-   */
-  productsAll(): Promise<ListProductResponse[]> {
-    let url_ = this.baseUrl + "/api/v1/products";
-    url_ = url_.replace(/[?&]$/, "");
-
-    let options_: RequestInit = {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-      },
-    };
-
-    return this.http.fetch(url_, options_).then((_response: Response) => {
-      return this.processProductsAll(_response);
-    });
-  }
-
-  protected processProductsAll(
-    response: Response
-  ): Promise<ListProductResponse[]> {
-    const status = response.status;
-    let _headers: any = {};
-    if (response.headers && response.headers.forEach) {
-      response.headers.forEach((v: any, k: any) => (_headers[k] = v));
-    }
-    if (status === 200) {
-      return response.text().then((_responseText) => {
-        let result200: any = null;
-        let resultData200 =
-          _responseText === ""
-            ? null
-            : JSON.parse(_responseText, this.jsonParseReviver);
-        if (Array.isArray(resultData200)) {
-          result200 = [] as any;
-          for (let item of resultData200)
-            result200!.push(ListProductResponse.fromJS(item));
-        } else {
-          result200 = <any>null;
+    protected processProductCategories(response: Response): Promise<GetProductCategoryResponse> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetProductCategoryResponse.fromJS(resultData200);
+            return result200;
+            });
+        } else if (status === 404) {
+            return response.text().then((_responseText) => {
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = ProblemDetails.fromJS(resultData404);
+            return throwException("Not Found", status, _responseText, _headers, result404);
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
         }
-        return result200;
-      });
-    } else if (status === 400) {
-      return response.text().then((_responseText) => {
-        let result400: any = null;
-        let resultData400 =
-          _responseText === ""
-            ? null
-            : JSON.parse(_responseText, this.jsonParseReviver);
-        result400 = ProblemDetails.fromJS(resultData400);
-        return throwException(
-          "Bad Request",
-          status,
-          _responseText,
-          _headers,
-          result400
-        );
-      });
-    } else if (status === 401) {
-      return response.text().then((_responseText) => {
-        return throwException("Unauthorized", status, _responseText, _headers);
-      });
-    } else if (status === 403) {
-      return response.text().then((_responseText) => {
-        return throwException("Forbidden", status, _responseText, _headers);
-      });
-    } else if (status !== 200 && status !== 204) {
-      return response.text().then((_responseText) => {
-        return throwException(
-          "An unexpected server error occurred.",
-          status,
-          _responseText,
-          _headers
-        );
-      });
+        return Promise.resolve<GetProductCategoryResponse>(null as any);
     }
-    return Promise.resolve<ListProductResponse[]>(null as any);
-  }
 
-  /**
-   * (Auth)
-   * @param body (optional)
-   * @return Created
-   */
-  productsPOST(
-    body: CreateProductRequest | undefined
-  ): Promise<CreateProductResponse> {
-    let url_ = this.baseUrl + "/api/v1/products";
-    url_ = url_.replace(/[?&]$/, "");
+    /**
+     * @return OK
+     */
+    productsAll(): Promise<ListProductResponse[]> {
+        let url_ = this.baseUrl + "/api/v1/products";
+        url_ = url_.replace(/[?&]$/, "");
 
-    const content_ = JSON.stringify(body);
+        let options_: RequestInit = {
+            method: "GET",
+            headers: {
+                "Accept": "application/json"
+            }
+        };
 
-    let options_: RequestInit = {
-      body: content_,
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    };
-
-    return this.http.fetch(url_, options_).then((_response: Response) => {
-      return this.processProductsPOST(_response);
-    });
-  }
-
-  protected processProductsPOST(
-    response: Response
-  ): Promise<CreateProductResponse> {
-    const status = response.status;
-    let _headers: any = {};
-    if (response.headers && response.headers.forEach) {
-      response.headers.forEach((v: any, k: any) => (_headers[k] = v));
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processProductsAll(_response);
+        });
     }
-    if (status === 201) {
-      return response.text().then((_responseText) => {
-        let result201: any = null;
-        let resultData201 =
-          _responseText === ""
-            ? null
-            : JSON.parse(_responseText, this.jsonParseReviver);
-        result201 = CreateProductResponse.fromJS(resultData201);
-        return result201;
-      });
-    } else if (status === 400) {
-      return response.text().then((_responseText) => {
-        let result400: any = null;
-        let resultData400 =
-          _responseText === ""
-            ? null
-            : JSON.parse(_responseText, this.jsonParseReviver);
-        result400 = ProblemDetails.fromJS(resultData400);
-        return throwException(
-          "Bad Request",
-          status,
-          _responseText,
-          _headers,
-          result400
-        );
-      });
-    } else if (status === 401) {
-      return response.text().then((_responseText) => {
-        return throwException("Unauthorized", status, _responseText, _headers);
-      });
-    } else if (status === 403) {
-      return response.text().then((_responseText) => {
-        return throwException("Forbidden", status, _responseText, _headers);
-      });
-    } else if (status !== 200 && status !== 204) {
-      return response.text().then((_responseText) => {
-        return throwException(
-          "An unexpected server error occurred.",
-          status,
-          _responseText,
-          _headers
-        );
-      });
+
+    protected processProductsAll(response: Response): Promise<ListProductResponse[]> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(ListProductResponse.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
+            return result200;
+            });
+        } else if (status === 400) {
+            return response.text().then((_responseText) => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<ListProductResponse[]>(null as any);
     }
-    return Promise.resolve<CreateProductResponse>(null as any);
-  }
 
-  /**
-   * (Auth)
-   * @return OK
-   */
-  productsGET(id: string): Promise<GetProductResponse> {
-    let url_ = this.baseUrl + "/api/v1/products/{id}";
-    if (id === undefined || id === null)
-      throw new Error("The parameter 'id' must be defined.");
-    url_ = url_.replace("{id}", encodeURIComponent("" + id));
-    url_ = url_.replace(/[?&]$/, "");
+    /**
+     * @return OK
+     */
+    products(id: Ulid): Promise<GetProductResponse> {
+        let url_ = this.baseUrl + "/api/v1/products/{id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
 
-    let options_: RequestInit = {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-      },
-    };
+        let options_: RequestInit = {
+            method: "GET",
+            headers: {
+                "Accept": "application/json"
+            }
+        };
 
-    return this.http.fetch(url_, options_).then((_response: Response) => {
-      return this.processProductsGET(_response);
-    });
-  }
-
-  protected processProductsGET(
-    response: Response
-  ): Promise<GetProductResponse> {
-    const status = response.status;
-    let _headers: any = {};
-    if (response.headers && response.headers.forEach) {
-      response.headers.forEach((v: any, k: any) => (_headers[k] = v));
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processProducts(_response);
+        });
     }
-    if (status === 200) {
-      return response.text().then((_responseText) => {
-        let result200: any = null;
-        let resultData200 =
-          _responseText === ""
-            ? null
-            : JSON.parse(_responseText, this.jsonParseReviver);
-        result200 = GetProductResponse.fromJS(resultData200);
-        return result200;
-      });
-    } else if (status === 404) {
-      return response.text().then((_responseText) => {
-        let result404: any = null;
-        let resultData404 =
-          _responseText === ""
-            ? null
-            : JSON.parse(_responseText, this.jsonParseReviver);
-        result404 = ProblemDetails.fromJS(resultData404);
-        return throwException(
-          "Not Found",
-          status,
-          _responseText,
-          _headers,
-          result404
-        );
-      });
-    } else if (status === 401) {
-      return response.text().then((_responseText) => {
-        return throwException("Unauthorized", status, _responseText, _headers);
-      });
-    } else if (status === 403) {
-      return response.text().then((_responseText) => {
-        return throwException("Forbidden", status, _responseText, _headers);
-      });
-    } else if (status !== 200 && status !== 204) {
-      return response.text().then((_responseText) => {
-        return throwException(
-          "An unexpected server error occurred.",
-          status,
-          _responseText,
-          _headers
-        );
-      });
+
+    protected processProducts(response: Response): Promise<GetProductResponse> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetProductResponse.fromJS(resultData200);
+            return result200;
+            });
+        } else if (status === 404) {
+            return response.text().then((_responseText) => {
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = ProblemDetails.fromJS(resultData404);
+            return throwException("Not Found", status, _responseText, _headers, result404);
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<GetProductResponse>(null as any);
     }
-    return Promise.resolve<GetProductResponse>(null as any);
-  }
 
-  /**
-   * (Auth)
-   * @param body (optional)
-   * @return OK
-   */
-  productsPUT(
-    id: string,
-    body: UpdateProductRequest | undefined
-  ): Promise<UpdateProductResponse> {
-    let url_ = this.baseUrl + "/api/v1/products/{id}";
-    if (id === undefined || id === null)
-      throw new Error("The parameter 'id' must be defined.");
-    url_ = url_.replace("{id}", encodeURIComponent("" + id));
-    url_ = url_.replace(/[?&]$/, "");
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    offset(body: ProductOffsetPageStaticQuery | undefined): Promise<ProductOffsetPageStaticResponseOffsetPageResponse> {
+        let url_ = this.baseUrl + "/api/v1/products/offset";
+        url_ = url_.replace(/[?&]$/, "");
 
-    const content_ = JSON.stringify(body);
+        const content_ = JSON.stringify(body);
 
-    let options_: RequestInit = {
-      body: content_,
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    };
+        let options_: RequestInit = {
+            body: content_,
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            }
+        };
 
-    return this.http.fetch(url_, options_).then((_response: Response) => {
-      return this.processProductsPUT(_response);
-    });
-  }
-
-  protected processProductsPUT(
-    response: Response
-  ): Promise<UpdateProductResponse> {
-    const status = response.status;
-    let _headers: any = {};
-    if (response.headers && response.headers.forEach) {
-      response.headers.forEach((v: any, k: any) => (_headers[k] = v));
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processOffset(_response);
+        });
     }
-    if (status === 200) {
-      return response.text().then((_responseText) => {
-        let result200: any = null;
-        let resultData200 =
-          _responseText === ""
-            ? null
-            : JSON.parse(_responseText, this.jsonParseReviver);
-        result200 = UpdateProductResponse.fromJS(resultData200);
-        return result200;
-      });
-    } else if (status === 400) {
-      return response.text().then((_responseText) => {
-        let result400: any = null;
-        let resultData400 =
-          _responseText === ""
-            ? null
-            : JSON.parse(_responseText, this.jsonParseReviver);
-        result400 = ProblemDetails.fromJS(resultData400);
-        return throwException(
-          "Bad Request",
-          status,
-          _responseText,
-          _headers,
-          result400
-        );
-      });
-    } else if (status === 401) {
-      return response.text().then((_responseText) => {
-        return throwException("Unauthorized", status, _responseText, _headers);
-      });
-    } else if (status === 403) {
-      return response.text().then((_responseText) => {
-        return throwException("Forbidden", status, _responseText, _headers);
-      });
-    } else if (status !== 200 && status !== 204) {
-      return response.text().then((_responseText) => {
-        return throwException(
-          "An unexpected server error occurred.",
-          status,
-          _responseText,
-          _headers
-        );
-      });
+
+    protected processOffset(response: Response): Promise<ProductOffsetPageStaticResponseOffsetPageResponse> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ProductOffsetPageStaticResponseOffsetPageResponse.fromJS(resultData200);
+            return result200;
+            });
+        } else if (status === 400) {
+            return response.text().then((_responseText) => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<ProductOffsetPageStaticResponseOffsetPageResponse>(null as any);
     }
-    return Promise.resolve<UpdateProductResponse>(null as any);
-  }
 
-  /**
-   * (Auth)
-   * @return No Content
-   */
-  productsDELETE(id: string): Promise<NoContent> {
-    let url_ = this.baseUrl + "/api/v1/products/{id}";
-    if (id === undefined || id === null)
-      throw new Error("The parameter 'id' must be defined.");
-    url_ = url_.replace("{id}", encodeURIComponent("" + id));
-    url_ = url_.replace(/[?&]$/, "");
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    login(body: UserLoginRequest | undefined): Promise<UserLoginResponse> {
+        let url_ = this.baseUrl + "/api/v1/users/login";
+        url_ = url_.replace(/[?&]$/, "");
 
-    let options_: RequestInit = {
-      method: "DELETE",
-      headers: {
-        Accept: "application/json",
-      },
-    };
+        const content_ = JSON.stringify(body);
 
-    return this.http.fetch(url_, options_).then((_response: Response) => {
-      return this.processProductsDELETE(_response);
-    });
-  }
+        let options_: RequestInit = {
+            body: content_,
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            }
+        };
 
-  protected processProductsDELETE(response: Response): Promise<NoContent> {
-    const status = response.status;
-    let _headers: any = {};
-    if (response.headers && response.headers.forEach) {
-      response.headers.forEach((v: any, k: any) => (_headers[k] = v));
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processLogin(_response);
+        });
     }
-    if (status === 204) {
-      return response.text().then((_responseText) => {
-        let result204: any = null;
-        let resultData204 =
-          _responseText === ""
-            ? null
-            : JSON.parse(_responseText, this.jsonParseReviver);
-        result204 = NoContent.fromJS(resultData204);
-        return result204;
-      });
-    } else if (status === 400) {
-      return response.text().then((_responseText) => {
-        let result400: any = null;
-        let resultData400 =
-          _responseText === ""
-            ? null
-            : JSON.parse(_responseText, this.jsonParseReviver);
-        result400 = ProblemDetails.fromJS(resultData400);
-        return throwException(
-          "Bad Request",
-          status,
-          _responseText,
-          _headers,
-          result400
-        );
-      });
-    } else if (status === 401) {
-      return response.text().then((_responseText) => {
-        return throwException("Unauthorized", status, _responseText, _headers);
-      });
-    } else if (status === 403) {
-      return response.text().then((_responseText) => {
-        return throwException("Forbidden", status, _responseText, _headers);
-      });
-    } else if (status !== 200 && status !== 204) {
-      return response.text().then((_responseText) => {
-        return throwException(
-          "An unexpected server error occurred.",
-          status,
-          _responseText,
-          _headers
-        );
-      });
+
+    protected processLogin(response: Response): Promise<UserLoginResponse> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = UserLoginResponse.fromJS(resultData200);
+            return result200;
+            });
+        } else if (status === 400) {
+            return response.text().then((_responseText) => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<UserLoginResponse>(null as any);
     }
-    return Promise.resolve<NoContent>(null as any);
-  }
 
-  /**
-   * @param body (optional)
-   * @return OK
-   */
-  login(body: UserLoginRequest | undefined): Promise<UserLoginResponse> {
-    let url_ = this.baseUrl + "/api/v1/users/login";
-    url_ = url_.replace(/[?&]$/, "");
+    /**
+     * @param body (optional) 
+     * @return Created
+     */
+    register(body: UserRegisterRequest | undefined): Promise<UserRegisterResponse> {
+        let url_ = this.baseUrl + "/api/v1/users/register";
+        url_ = url_.replace(/[?&]$/, "");
 
-    const content_ = JSON.stringify(body);
+        const content_ = JSON.stringify(body);
 
-    let options_: RequestInit = {
-      body: content_,
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    };
+        let options_: RequestInit = {
+            body: content_,
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            }
+        };
 
-    return this.http.fetch(url_, options_).then((_response: Response) => {
-      return this.processLogin(_response);
-    });
-  }
-
-  protected processLogin(response: Response): Promise<UserLoginResponse> {
-    const status = response.status;
-    let _headers: any = {};
-    if (response.headers && response.headers.forEach) {
-      response.headers.forEach((v: any, k: any) => (_headers[k] = v));
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processRegister(_response);
+        });
     }
-    if (status === 200) {
-      return response.text().then((_responseText) => {
-        let result200: any = null;
-        let resultData200 =
-          _responseText === ""
-            ? null
-            : JSON.parse(_responseText, this.jsonParseReviver);
-        result200 = UserLoginResponse.fromJS(resultData200);
-        return result200;
-      });
-    } else if (status === 400) {
-      return response.text().then((_responseText) => {
-        let result400: any = null;
-        let resultData400 =
-          _responseText === ""
-            ? null
-            : JSON.parse(_responseText, this.jsonParseReviver);
-        result400 = ProblemDetails.fromJS(resultData400);
-        return throwException(
-          "Bad Request",
-          status,
-          _responseText,
-          _headers,
-          result400
-        );
-      });
-    } else if (status !== 200 && status !== 204) {
-      return response.text().then((_responseText) => {
-        return throwException(
-          "An unexpected server error occurred.",
-          status,
-          _responseText,
-          _headers
-        );
-      });
+
+    protected processRegister(response: Response): Promise<UserRegisterResponse> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 201) {
+            return response.text().then((_responseText) => {
+            let result201: any = null;
+            let resultData201 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result201 = UserRegisterResponse.fromJS(resultData201);
+            return result201;
+            });
+        } else if (status === 400) {
+            return response.text().then((_responseText) => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<UserRegisterResponse>(null as any);
     }
-    return Promise.resolve<UserLoginResponse>(null as any);
-  }
 
-  /**
-   * @param body (optional)
-   * @return Created
-   */
-  register(
-    body: UserRegisterRequest | undefined
-  ): Promise<UserRegisterResponse> {
-    let url_ = this.baseUrl + "/api/v1/users/register";
-    url_ = url_.replace(/[?&]$/, "");
+    /**
+     * (Auth)
+     * @return OK
+     */
+    users(id: string): Promise<GetUserResponse> {
+        let url_ = this.baseUrl + "/api/v1/users/{id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
 
-    const content_ = JSON.stringify(body);
+        let options_: RequestInit = {
+            method: "GET",
+            headers: {
+                "Accept": "application/json"
+            }
+        };
 
-    let options_: RequestInit = {
-      body: content_,
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    };
-
-    return this.http.fetch(url_, options_).then((_response: Response) => {
-      return this.processRegister(_response);
-    });
-  }
-
-  protected processRegister(response: Response): Promise<UserRegisterResponse> {
-    const status = response.status;
-    let _headers: any = {};
-    if (response.headers && response.headers.forEach) {
-      response.headers.forEach((v: any, k: any) => (_headers[k] = v));
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processUsers(_response);
+        });
     }
-    if (status === 201) {
-      return response.text().then((_responseText) => {
-        let result201: any = null;
-        let resultData201 =
-          _responseText === ""
-            ? null
-            : JSON.parse(_responseText, this.jsonParseReviver);
-        result201 = UserRegisterResponse.fromJS(resultData201);
-        return result201;
-      });
-    } else if (status === 400) {
-      return response.text().then((_responseText) => {
-        let result400: any = null;
-        let resultData400 =
-          _responseText === ""
-            ? null
-            : JSON.parse(_responseText, this.jsonParseReviver);
-        result400 = ProblemDetails.fromJS(resultData400);
-        return throwException(
-          "Bad Request",
-          status,
-          _responseText,
-          _headers,
-          result400
-        );
-      });
-    } else if (status !== 200 && status !== 204) {
-      return response.text().then((_responseText) => {
-        return throwException(
-          "An unexpected server error occurred.",
-          status,
-          _responseText,
-          _headers
-        );
-      });
+
+    protected processUsers(response: Response): Promise<GetUserResponse> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetUserResponse.fromJS(resultData200);
+            return result200;
+            });
+        } else if (status === 400) {
+            return response.text().then((_responseText) => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+            });
+        } else if (status === 401) {
+            return response.text().then((_responseText) => {
+            return throwException("Unauthorized", status, _responseText, _headers);
+            });
+        } else if (status === 403) {
+            return response.text().then((_responseText) => {
+            return throwException("Forbidden", status, _responseText, _headers);
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<GetUserResponse>(null as any);
     }
-    return Promise.resolve<UserRegisterResponse>(null as any);
-  }
-
-  /**
-   * (Auth)
-   * @return OK
-   */
-  users(id: string): Promise<GetUserResponse> {
-    let url_ = this.baseUrl + "/api/v1/users/{id}";
-    if (id === undefined || id === null)
-      throw new Error("The parameter 'id' must be defined.");
-    url_ = url_.replace("{id}", encodeURIComponent("" + id));
-    url_ = url_.replace(/[?&]$/, "");
-
-    let options_: RequestInit = {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-      },
-    };
-
-    return this.http.fetch(url_, options_).then((_response: Response) => {
-      return this.processUsers(_response);
-    });
-  }
-
-  protected processUsers(response: Response): Promise<GetUserResponse> {
-    const status = response.status;
-    let _headers: any = {};
-    if (response.headers && response.headers.forEach) {
-      response.headers.forEach((v: any, k: any) => (_headers[k] = v));
-    }
-    if (status === 200) {
-      return response.text().then((_responseText) => {
-        let result200: any = null;
-        let resultData200 =
-          _responseText === ""
-            ? null
-            : JSON.parse(_responseText, this.jsonParseReviver);
-        result200 = GetUserResponse.fromJS(resultData200);
-        return result200;
-      });
-    } else if (status === 400) {
-      return response.text().then((_responseText) => {
-        let result400: any = null;
-        let resultData400 =
-          _responseText === ""
-            ? null
-            : JSON.parse(_responseText, this.jsonParseReviver);
-        result400 = ProblemDetails.fromJS(resultData400);
-        return throwException(
-          "Bad Request",
-          status,
-          _responseText,
-          _headers,
-          result400
-        );
-      });
-    } else if (status === 401) {
-      return response.text().then((_responseText) => {
-        return throwException("Unauthorized", status, _responseText, _headers);
-      });
-    } else if (status === 403) {
-      return response.text().then((_responseText) => {
-        return throwException("Forbidden", status, _responseText, _headers);
-      });
-    } else if (status !== 200 && status !== 204) {
-      return response.text().then((_responseText) => {
-        return throwException(
-          "An unexpected server error occurred.",
-          status,
-          _responseText,
-          _headers
-        );
-      });
-    }
-    return Promise.resolve<GetUserResponse>(null as any);
-  }
-}
-
-export class CreateProductCategoryRequest
-  implements ICreateProductCategoryRequest
-{
-  name?: string | undefined;
-  parentId?: string | undefined;
-
-  constructor(data?: ICreateProductCategoryRequest) {
-    if (data) {
-      for (var property in data) {
-        if (data.hasOwnProperty(property))
-          (<any>this)[property] = (<any>data)[property];
-      }
-    }
-  }
-
-  init(_data?: any) {
-    if (_data) {
-      this.name = _data["name"];
-      this.parentId = _data["parentId"];
-    }
-  }
-
-  static fromJS(data: any): CreateProductCategoryRequest {
-    data = typeof data === "object" ? data : {};
-    let result = new CreateProductCategoryRequest();
-    result.init(data);
-    return result;
-  }
-
-  toJSON(data?: any) {
-    data = typeof data === "object" ? data : {};
-    data["name"] = this.name;
-    data["parentId"] = this.parentId;
-    return data;
-  }
-}
-
-export interface ICreateProductCategoryRequest {
-  name?: string | undefined;
-  parentId?: string | undefined;
-}
-
-export class CreateProductCategoryResponse
-  implements ICreateProductCategoryResponse
-{
-  id?: string | undefined;
-  name?: string | undefined;
-  parentId?: string | undefined;
-
-  constructor(data?: ICreateProductCategoryResponse) {
-    if (data) {
-      for (var property in data) {
-        if (data.hasOwnProperty(property))
-          (<any>this)[property] = (<any>data)[property];
-      }
-    }
-  }
-
-  init(_data?: any) {
-    if (_data) {
-      this.id = _data["id"];
-      this.name = _data["name"];
-      this.parentId = _data["parentId"];
-    }
-  }
-
-  static fromJS(data: any): CreateProductCategoryResponse {
-    data = typeof data === "object" ? data : {};
-    let result = new CreateProductCategoryResponse();
-    result.init(data);
-    return result;
-  }
-
-  toJSON(data?: any) {
-    data = typeof data === "object" ? data : {};
-    data["id"] = this.id;
-    data["name"] = this.name;
-    data["parentId"] = this.parentId;
-    return data;
-  }
-}
-
-export interface ICreateProductCategoryResponse {
-  id?: string | undefined;
-  name?: string | undefined;
-  parentId?: string | undefined;
-}
-
-export class CreateProductRequest implements ICreateProductRequest {
-  categoryId?: string | undefined;
-  costPrice?: number;
-  name?: string | undefined;
-  productCd?: string | undefined;
-  sellingPrice?: number;
-  stock?: number;
-  supplierId?: string | undefined;
-  txDesc?: string | undefined;
-  unit?: string | undefined;
-  weight?: number;
-
-  constructor(data?: ICreateProductRequest) {
-    if (data) {
-      for (var property in data) {
-        if (data.hasOwnProperty(property))
-          (<any>this)[property] = (<any>data)[property];
-      }
-    }
-  }
-
-  init(_data?: any) {
-    if (_data) {
-      this.categoryId = _data["categoryId"];
-      this.costPrice = _data["costPrice"];
-      this.name = _data["name"];
-      this.productCd = _data["productCd"];
-      this.sellingPrice = _data["sellingPrice"];
-      this.stock = _data["stock"];
-      this.supplierId = _data["supplierId"];
-      this.txDesc = _data["txDesc"];
-      this.unit = _data["unit"];
-      this.weight = _data["weight"];
-    }
-  }
-
-  static fromJS(data: any): CreateProductRequest {
-    data = typeof data === "object" ? data : {};
-    let result = new CreateProductRequest();
-    result.init(data);
-    return result;
-  }
-
-  toJSON(data?: any) {
-    data = typeof data === "object" ? data : {};
-    data["categoryId"] = this.categoryId;
-    data["costPrice"] = this.costPrice;
-    data["name"] = this.name;
-    data["productCd"] = this.productCd;
-    data["sellingPrice"] = this.sellingPrice;
-    data["stock"] = this.stock;
-    data["supplierId"] = this.supplierId;
-    data["txDesc"] = this.txDesc;
-    data["unit"] = this.unit;
-    data["weight"] = this.weight;
-    return data;
-  }
-}
-
-export interface ICreateProductRequest {
-  categoryId?: string | undefined;
-  costPrice?: number;
-  name?: string | undefined;
-  productCd?: string | undefined;
-  sellingPrice?: number;
-  stock?: number;
-  supplierId?: string | undefined;
-  txDesc?: string | undefined;
-  unit?: string | undefined;
-  weight?: number;
-}
-
-export class CreateProductResponse implements ICreateProductResponse {
-  id?: string | undefined;
-  categoryId?: string | undefined;
-  costPrice?: number;
-  name?: string | undefined;
-  productCd?: string | undefined;
-  sellingPrice?: number;
-  stock?: number;
-  supplierId?: string | undefined;
-  txDesc?: string | undefined;
-  unit?: string | undefined;
-  weight?: number;
-
-  constructor(data?: ICreateProductResponse) {
-    if (data) {
-      for (var property in data) {
-        if (data.hasOwnProperty(property))
-          (<any>this)[property] = (<any>data)[property];
-      }
-    }
-  }
-
-  init(_data?: any) {
-    if (_data) {
-      this.id = _data["id"];
-      this.categoryId = _data["categoryId"];
-      this.costPrice = _data["costPrice"];
-      this.name = _data["name"];
-      this.productCd = _data["productCd"];
-      this.sellingPrice = _data["sellingPrice"];
-      this.stock = _data["stock"];
-      this.supplierId = _data["supplierId"];
-      this.txDesc = _data["txDesc"];
-      this.unit = _data["unit"];
-      this.weight = _data["weight"];
-    }
-  }
-
-  static fromJS(data: any): CreateProductResponse {
-    data = typeof data === "object" ? data : {};
-    let result = new CreateProductResponse();
-    result.init(data);
-    return result;
-  }
-
-  toJSON(data?: any) {
-    data = typeof data === "object" ? data : {};
-    data["id"] = this.id;
-    data["categoryId"] = this.categoryId;
-    data["costPrice"] = this.costPrice;
-    data["name"] = this.name;
-    data["productCd"] = this.productCd;
-    data["sellingPrice"] = this.sellingPrice;
-    data["stock"] = this.stock;
-    data["supplierId"] = this.supplierId;
-    data["txDesc"] = this.txDesc;
-    data["unit"] = this.unit;
-    data["weight"] = this.weight;
-    return data;
-  }
-}
-
-export interface ICreateProductResponse {
-  id?: string | undefined;
-  categoryId?: string | undefined;
-  costPrice?: number;
-  name?: string | undefined;
-  productCd?: string | undefined;
-  sellingPrice?: number;
-  stock?: number;
-  supplierId?: string | undefined;
-  txDesc?: string | undefined;
-  unit?: string | undefined;
-  weight?: number;
 }
 
 export class GetProductCategoryResponse implements IGetProductCategoryResponse {
-  id?: string | undefined;
-  name?: string | undefined;
-  parentId?: string | undefined;
+    id?: Ulid;
+    name?: string | undefined;
+    parentId?: Ulid;
+    icon?: string | undefined;
+    visible?: string | undefined;
 
-  constructor(data?: IGetProductCategoryResponse) {
-    if (data) {
-      for (var property in data) {
-        if (data.hasOwnProperty(property))
-          (<any>this)[property] = (<any>data)[property];
-      }
+    constructor(data?: IGetProductCategoryResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
     }
-  }
 
-  init(_data?: any) {
-    if (_data) {
-      this.id = _data["id"];
-      this.name = _data["name"];
-      this.parentId = _data["parentId"];
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"] ? Ulid.fromJS(_data["id"]) : <any>undefined;
+            this.name = _data["name"];
+            this.parentId = _data["parentId"] ? Ulid.fromJS(_data["parentId"]) : <any>undefined;
+            this.icon = _data["icon"];
+            this.visible = _data["visible"];
+        }
     }
-  }
 
-  static fromJS(data: any): GetProductCategoryResponse {
-    data = typeof data === "object" ? data : {};
-    let result = new GetProductCategoryResponse();
-    result.init(data);
-    return result;
-  }
+    static fromJS(data: any): GetProductCategoryResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetProductCategoryResponse();
+        result.init(data);
+        return result;
+    }
 
-  toJSON(data?: any) {
-    data = typeof data === "object" ? data : {};
-    data["id"] = this.id;
-    data["name"] = this.name;
-    data["parentId"] = this.parentId;
-    return data;
-  }
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id ? this.id.toJSON() : <any>undefined;
+        data["name"] = this.name;
+        data["parentId"] = this.parentId ? this.parentId.toJSON() : <any>undefined;
+        data["icon"] = this.icon;
+        data["visible"] = this.visible;
+        return data;
+    }
 }
 
 export interface IGetProductCategoryResponse {
-  id?: string | undefined;
-  name?: string | undefined;
-  parentId?: string | undefined;
+    id?: Ulid;
+    name?: string | undefined;
+    parentId?: Ulid;
+    icon?: string | undefined;
+    visible?: string | undefined;
 }
 
 export class GetProductResponse implements IGetProductResponse {
-  id?: string | undefined;
-  categoryId?: string | undefined;
-  costPrice?: number;
-  name?: string | undefined;
-  productCd?: string | undefined;
-  sellingPrice?: number;
-  stock?: number;
-  supplierId?: string | undefined;
-  txDesc?: string | undefined;
-  unit?: string | undefined;
-  weight?: number;
+    id?: Ulid;
+    categoryId?: Ulid;
+    costPrice?: number;
+    name?: string | undefined;
+    productCd?: string | undefined;
+    sellingPrice?: number;
+    stock?: number;
+    supplierId?: string | undefined;
+    txDesc?: string | undefined;
+    unit?: string | undefined;
+    weight?: number;
 
-  constructor(data?: IGetProductResponse) {
-    if (data) {
-      for (var property in data) {
-        if (data.hasOwnProperty(property))
-          (<any>this)[property] = (<any>data)[property];
-      }
+    constructor(data?: IGetProductResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
     }
-  }
 
-  init(_data?: any) {
-    if (_data) {
-      this.id = _data["id"];
-      this.categoryId = _data["categoryId"];
-      this.costPrice = _data["costPrice"];
-      this.name = _data["name"];
-      this.productCd = _data["productCd"];
-      this.sellingPrice = _data["sellingPrice"];
-      this.stock = _data["stock"];
-      this.supplierId = _data["supplierId"];
-      this.txDesc = _data["txDesc"];
-      this.unit = _data["unit"];
-      this.weight = _data["weight"];
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"] ? Ulid.fromJS(_data["id"]) : <any>undefined;
+            this.categoryId = _data["categoryId"] ? Ulid.fromJS(_data["categoryId"]) : <any>undefined;
+            this.costPrice = _data["costPrice"];
+            this.name = _data["name"];
+            this.productCd = _data["productCd"];
+            this.sellingPrice = _data["sellingPrice"];
+            this.stock = _data["stock"];
+            this.supplierId = _data["supplierId"];
+            this.txDesc = _data["txDesc"];
+            this.unit = _data["unit"];
+            this.weight = _data["weight"];
+        }
     }
-  }
 
-  static fromJS(data: any): GetProductResponse {
-    data = typeof data === "object" ? data : {};
-    let result = new GetProductResponse();
-    result.init(data);
-    return result;
-  }
+    static fromJS(data: any): GetProductResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetProductResponse();
+        result.init(data);
+        return result;
+    }
 
-  toJSON(data?: any) {
-    data = typeof data === "object" ? data : {};
-    data["id"] = this.id;
-    data["categoryId"] = this.categoryId;
-    data["costPrice"] = this.costPrice;
-    data["name"] = this.name;
-    data["productCd"] = this.productCd;
-    data["sellingPrice"] = this.sellingPrice;
-    data["stock"] = this.stock;
-    data["supplierId"] = this.supplierId;
-    data["txDesc"] = this.txDesc;
-    data["unit"] = this.unit;
-    data["weight"] = this.weight;
-    return data;
-  }
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id ? this.id.toJSON() : <any>undefined;
+        data["categoryId"] = this.categoryId ? this.categoryId.toJSON() : <any>undefined;
+        data["costPrice"] = this.costPrice;
+        data["name"] = this.name;
+        data["productCd"] = this.productCd;
+        data["sellingPrice"] = this.sellingPrice;
+        data["stock"] = this.stock;
+        data["supplierId"] = this.supplierId;
+        data["txDesc"] = this.txDesc;
+        data["unit"] = this.unit;
+        data["weight"] = this.weight;
+        return data;
+    }
 }
 
 export interface IGetProductResponse {
-  id?: string | undefined;
-  categoryId?: string | undefined;
-  costPrice?: number;
-  name?: string | undefined;
-  productCd?: string | undefined;
-  sellingPrice?: number;
-  stock?: number;
-  supplierId?: string | undefined;
-  txDesc?: string | undefined;
-  unit?: string | undefined;
-  weight?: number;
+    id?: Ulid;
+    categoryId?: Ulid;
+    costPrice?: number;
+    name?: string | undefined;
+    productCd?: string | undefined;
+    sellingPrice?: number;
+    stock?: number;
+    supplierId?: string | undefined;
+    txDesc?: string | undefined;
+    unit?: string | undefined;
+    weight?: number;
 }
 
 export class GetUserResponse implements IGetUserResponse {
-  id?: string | undefined;
-  email?: string | undefined;
+    id?: Ulid;
+    email?: string | undefined;
 
-  constructor(data?: IGetUserResponse) {
-    if (data) {
-      for (var property in data) {
-        if (data.hasOwnProperty(property))
-          (<any>this)[property] = (<any>data)[property];
-      }
+    constructor(data?: IGetUserResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
     }
-  }
 
-  init(_data?: any) {
-    if (_data) {
-      this.id = _data["id"];
-      this.email = _data["email"];
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"] ? Ulid.fromJS(_data["id"]) : <any>undefined;
+            this.email = _data["email"];
+        }
     }
-  }
 
-  static fromJS(data: any): GetUserResponse {
-    data = typeof data === "object" ? data : {};
-    let result = new GetUserResponse();
-    result.init(data);
-    return result;
-  }
+    static fromJS(data: any): GetUserResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetUserResponse();
+        result.init(data);
+        return result;
+    }
 
-  toJSON(data?: any) {
-    data = typeof data === "object" ? data : {};
-    data["id"] = this.id;
-    data["email"] = this.email;
-    return data;
-  }
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id ? this.id.toJSON() : <any>undefined;
+        data["email"] = this.email;
+        return data;
+    }
 }
 
 export interface IGetUserResponse {
-  id?: string | undefined;
-  email?: string | undefined;
+    id?: Ulid;
+    email?: string | undefined;
 }
 
-export class ListProductCategoryResponse
-  implements IListProductCategoryResponse
-{
-  id?: string | undefined;
-  name?: string | undefined;
-  parentId?: string | undefined;
+export class ListProductCategoryResponse implements IListProductCategoryResponse {
+    id?: Ulid;
+    name?: string | undefined;
+    parentId?: Ulid;
+    icon?: string | undefined;
+    visible?: string | undefined;
+    children?: ListProductCategoryResponse[] | undefined;
 
-  constructor(data?: IListProductCategoryResponse) {
-    if (data) {
-      for (var property in data) {
-        if (data.hasOwnProperty(property))
-          (<any>this)[property] = (<any>data)[property];
-      }
+    constructor(data?: IListProductCategoryResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
     }
-  }
 
-  init(_data?: any) {
-    if (_data) {
-      this.id = _data["id"];
-      this.name = _data["name"];
-      this.parentId = _data["parentId"];
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"] ? Ulid.fromJS(_data["id"]) : <any>undefined;
+            this.name = _data["name"];
+            this.parentId = _data["parentId"] ? Ulid.fromJS(_data["parentId"]) : <any>undefined;
+            this.icon = _data["icon"];
+            this.visible = _data["visible"];
+            if (Array.isArray(_data["children"])) {
+                this.children = [] as any;
+                for (let item of _data["children"])
+                    this.children!.push(ListProductCategoryResponse.fromJS(item));
+            }
+        }
     }
-  }
 
-  static fromJS(data: any): ListProductCategoryResponse {
-    data = typeof data === "object" ? data : {};
-    let result = new ListProductCategoryResponse();
-    result.init(data);
-    return result;
-  }
+    static fromJS(data: any): ListProductCategoryResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new ListProductCategoryResponse();
+        result.init(data);
+        return result;
+    }
 
-  toJSON(data?: any) {
-    data = typeof data === "object" ? data : {};
-    data["id"] = this.id;
-    data["name"] = this.name;
-    data["parentId"] = this.parentId;
-    return data;
-  }
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id ? this.id.toJSON() : <any>undefined;
+        data["name"] = this.name;
+        data["parentId"] = this.parentId ? this.parentId.toJSON() : <any>undefined;
+        data["icon"] = this.icon;
+        data["visible"] = this.visible;
+        if (Array.isArray(this.children)) {
+            data["children"] = [];
+            for (let item of this.children)
+                data["children"].push(item.toJSON());
+        }
+        return data;
+    }
 }
 
 export interface IListProductCategoryResponse {
-  id?: string | undefined;
-  name?: string | undefined;
-  parentId?: string | undefined;
+    id?: Ulid;
+    name?: string | undefined;
+    parentId?: Ulid;
+    icon?: string | undefined;
+    visible?: string | undefined;
+    children?: ListProductCategoryResponse[] | undefined;
 }
 
 export class ListProductResponse implements IListProductResponse {
-  id?: string | undefined;
-  categoryId?: string | undefined;
-  costPrice?: number;
-  name?: string | undefined;
-  productCd?: string | undefined;
-  sellingPrice?: number;
-  stock?: number;
-  supplierId?: string | undefined;
-  txDesc?: string | undefined;
-  unit?: string | undefined;
-  weight?: number;
+    id?: Ulid;
+    categoryId?: Ulid;
+    costPrice?: number;
+    name?: string | undefined;
+    productCd?: string | undefined;
+    sellingPrice?: number;
+    stock?: number;
+    supplierId?: string | undefined;
+    txDesc?: string | undefined;
+    unit?: string | undefined;
+    weight?: number;
 
-  constructor(data?: IListProductResponse) {
-    if (data) {
-      for (var property in data) {
-        if (data.hasOwnProperty(property))
-          (<any>this)[property] = (<any>data)[property];
-      }
+    constructor(data?: IListProductResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
     }
-  }
 
-  init(_data?: any) {
-    if (_data) {
-      this.id = _data["id"];
-      this.categoryId = _data["categoryId"];
-      this.costPrice = _data["costPrice"];
-      this.name = _data["name"];
-      this.productCd = _data["productCd"];
-      this.sellingPrice = _data["sellingPrice"];
-      this.stock = _data["stock"];
-      this.supplierId = _data["supplierId"];
-      this.txDesc = _data["txDesc"];
-      this.unit = _data["unit"];
-      this.weight = _data["weight"];
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"] ? Ulid.fromJS(_data["id"]) : <any>undefined;
+            this.categoryId = _data["categoryId"] ? Ulid.fromJS(_data["categoryId"]) : <any>undefined;
+            this.costPrice = _data["costPrice"];
+            this.name = _data["name"];
+            this.productCd = _data["productCd"];
+            this.sellingPrice = _data["sellingPrice"];
+            this.stock = _data["stock"];
+            this.supplierId = _data["supplierId"];
+            this.txDesc = _data["txDesc"];
+            this.unit = _data["unit"];
+            this.weight = _data["weight"];
+        }
     }
-  }
 
-  static fromJS(data: any): ListProductResponse {
-    data = typeof data === "object" ? data : {};
-    let result = new ListProductResponse();
-    result.init(data);
-    return result;
-  }
+    static fromJS(data: any): ListProductResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new ListProductResponse();
+        result.init(data);
+        return result;
+    }
 
-  toJSON(data?: any) {
-    data = typeof data === "object" ? data : {};
-    data["id"] = this.id;
-    data["categoryId"] = this.categoryId;
-    data["costPrice"] = this.costPrice;
-    data["name"] = this.name;
-    data["productCd"] = this.productCd;
-    data["sellingPrice"] = this.sellingPrice;
-    data["stock"] = this.stock;
-    data["supplierId"] = this.supplierId;
-    data["txDesc"] = this.txDesc;
-    data["unit"] = this.unit;
-    data["weight"] = this.weight;
-    return data;
-  }
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id ? this.id.toJSON() : <any>undefined;
+        data["categoryId"] = this.categoryId ? this.categoryId.toJSON() : <any>undefined;
+        data["costPrice"] = this.costPrice;
+        data["name"] = this.name;
+        data["productCd"] = this.productCd;
+        data["sellingPrice"] = this.sellingPrice;
+        data["stock"] = this.stock;
+        data["supplierId"] = this.supplierId;
+        data["txDesc"] = this.txDesc;
+        data["unit"] = this.unit;
+        data["weight"] = this.weight;
+        return data;
+    }
 }
 
 export interface IListProductResponse {
-  id?: string | undefined;
-  categoryId?: string | undefined;
-  costPrice?: number;
-  name?: string | undefined;
-  productCd?: string | undefined;
-  sellingPrice?: number;
-  stock?: number;
-  supplierId?: string | undefined;
-  txDesc?: string | undefined;
-  unit?: string | undefined;
-  weight?: number;
+    id?: Ulid;
+    categoryId?: Ulid;
+    costPrice?: number;
+    name?: string | undefined;
+    productCd?: string | undefined;
+    sellingPrice?: number;
+    stock?: number;
+    supplierId?: string | undefined;
+    txDesc?: string | undefined;
+    unit?: string | undefined;
+    weight?: number;
 }
 
-export class NoContent implements INoContent {
-  readonly statusCode?: number;
+export class OffsetPage implements IOffsetPage {
+    pageSize!: number;
+    pageNumber!: number;
 
-  constructor(data?: INoContent) {
-    if (data) {
-      for (var property in data) {
-        if (data.hasOwnProperty(property))
-          (<any>this)[property] = (<any>data)[property];
-      }
+    constructor(data?: IOffsetPage) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
     }
-  }
 
-  init(_data?: any) {
-    if (_data) {
-      (<any>this).statusCode = _data["statusCode"];
+    init(_data?: any) {
+        if (_data) {
+            this.pageSize = _data["pageSize"];
+            this.pageNumber = _data["pageNumber"];
+        }
     }
-  }
 
-  static fromJS(data: any): NoContent {
-    data = typeof data === "object" ? data : {};
-    let result = new NoContent();
-    result.init(data);
-    return result;
-  }
+    static fromJS(data: any): OffsetPage {
+        data = typeof data === 'object' ? data : {};
+        let result = new OffsetPage();
+        result.init(data);
+        return result;
+    }
 
-  toJSON(data?: any) {
-    data = typeof data === "object" ? data : {};
-    data["statusCode"] = this.statusCode;
-    return data;
-  }
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["pageSize"] = this.pageSize;
+        data["pageNumber"] = this.pageNumber;
+        return data;
+    }
 }
 
-export interface INoContent {
-  statusCode?: number;
+export interface IOffsetPage {
+    pageSize: number;
+    pageNumber: number;
 }
 
 export class ProblemDetails implements IProblemDetails {
-  type?: string | undefined;
-  title?: string | undefined;
-  status?: number | undefined;
-  detail?: string | undefined;
-  instance?: string | undefined;
+    type?: string | undefined;
+    title?: string | undefined;
+    status?: number | undefined;
+    detail?: string | undefined;
+    instance?: string | undefined;
 
-  [key: string]: any;
+    [key: string]: any;
 
-  constructor(data?: IProblemDetails) {
-    if (data) {
-      for (var property in data) {
-        if (data.hasOwnProperty(property))
-          (<any>this)[property] = (<any>data)[property];
-      }
+    constructor(data?: IProblemDetails) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
     }
-  }
 
-  init(_data?: any) {
-    if (_data) {
-      for (var property in _data) {
-        if (_data.hasOwnProperty(property)) this[property] = _data[property];
-      }
-      this.type = _data["type"];
-      this.title = _data["title"];
-      this.status = _data["status"];
-      this.detail = _data["detail"];
-      this.instance = _data["instance"];
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.type = _data["type"];
+            this.title = _data["title"];
+            this.status = _data["status"];
+            this.detail = _data["detail"];
+            this.instance = _data["instance"];
+        }
     }
-  }
 
-  static fromJS(data: any): ProblemDetails {
-    data = typeof data === "object" ? data : {};
-    let result = new ProblemDetails();
-    result.init(data);
-    return result;
-  }
-
-  toJSON(data?: any) {
-    data = typeof data === "object" ? data : {};
-    for (var property in this) {
-      if (this.hasOwnProperty(property)) data[property] = this[property];
+    static fromJS(data: any): ProblemDetails {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProblemDetails();
+        result.init(data);
+        return result;
     }
-    data["type"] = this.type;
-    data["title"] = this.title;
-    data["status"] = this.status;
-    data["detail"] = this.detail;
-    data["instance"] = this.instance;
-    return data;
-  }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["type"] = this.type;
+        data["title"] = this.title;
+        data["status"] = this.status;
+        data["detail"] = this.detail;
+        data["instance"] = this.instance;
+        return data;
+    }
 }
 
 export interface IProblemDetails {
-  type?: string | undefined;
-  title?: string | undefined;
-  status?: number | undefined;
-  detail?: string | undefined;
-  instance?: string | undefined;
+    type?: string | undefined;
+    title?: string | undefined;
+    status?: number | undefined;
+    detail?: string | undefined;
+    instance?: string | undefined;
 
-  [key: string]: any;
+    [key: string]: any;
 }
 
-export class UpdateProductCategoryRequest
-  implements IUpdateProductCategoryRequest
-{
-  name?: string | undefined;
-  parentId?: string | undefined;
+export class ProductOffsetPageStaticQuery implements IProductOffsetPageStaticQuery {
+    page?: OffsetPage;
+    filter?: ProductStaticFilter;
+    sortBy?: ProductStaticSortBy;
 
-  constructor(data?: IUpdateProductCategoryRequest) {
-    if (data) {
-      for (var property in data) {
-        if (data.hasOwnProperty(property))
-          (<any>this)[property] = (<any>data)[property];
-      }
+    constructor(data?: IProductOffsetPageStaticQuery) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
     }
-  }
 
-  init(_data?: any) {
-    if (_data) {
-      this.name = _data["name"];
-      this.parentId = _data["parentId"];
+    init(_data?: any) {
+        if (_data) {
+            this.page = _data["page"] ? OffsetPage.fromJS(_data["page"]) : <any>undefined;
+            this.filter = _data["filter"] ? ProductStaticFilter.fromJS(_data["filter"]) : <any>undefined;
+            this.sortBy = _data["sortBy"] ? ProductStaticSortBy.fromJS(_data["sortBy"]) : <any>undefined;
+        }
     }
-  }
 
-  static fromJS(data: any): UpdateProductCategoryRequest {
-    data = typeof data === "object" ? data : {};
-    let result = new UpdateProductCategoryRequest();
-    result.init(data);
-    return result;
-  }
+    static fromJS(data: any): ProductOffsetPageStaticQuery {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProductOffsetPageStaticQuery();
+        result.init(data);
+        return result;
+    }
 
-  toJSON(data?: any) {
-    data = typeof data === "object" ? data : {};
-    data["name"] = this.name;
-    data["parentId"] = this.parentId;
-    return data;
-  }
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["page"] = this.page ? this.page.toJSON() : <any>undefined;
+        data["filter"] = this.filter ? this.filter.toJSON() : <any>undefined;
+        data["sortBy"] = this.sortBy ? this.sortBy.toJSON() : <any>undefined;
+        return data;
+    }
 }
 
-export interface IUpdateProductCategoryRequest {
-  name?: string | undefined;
-  parentId?: string | undefined;
+export interface IProductOffsetPageStaticQuery {
+    page?: OffsetPage;
+    filter?: ProductStaticFilter;
+    sortBy?: ProductStaticSortBy;
 }
 
-export class UpdateProductCategoryResponse
-  implements IUpdateProductCategoryResponse
-{
-  id?: string | undefined;
-  name?: string | undefined;
-  parentId?: string | undefined;
+export class ProductOffsetPageStaticResponse implements IProductOffsetPageStaticResponse {
+    id?: Ulid;
+    categoryId?: Ulid;
+    costPrice?: number;
+    name?: string | undefined;
+    productCd?: string | undefined;
+    sellingPrice?: number;
+    stock?: number;
+    supplierId?: string | undefined;
+    txDesc?: string | undefined;
+    unit?: string | undefined;
+    weight?: number;
 
-  constructor(data?: IUpdateProductCategoryResponse) {
-    if (data) {
-      for (var property in data) {
-        if (data.hasOwnProperty(property))
-          (<any>this)[property] = (<any>data)[property];
-      }
+    constructor(data?: IProductOffsetPageStaticResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
     }
-  }
 
-  init(_data?: any) {
-    if (_data) {
-      this.id = _data["id"];
-      this.name = _data["name"];
-      this.parentId = _data["parentId"];
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"] ? Ulid.fromJS(_data["id"]) : <any>undefined;
+            this.categoryId = _data["categoryId"] ? Ulid.fromJS(_data["categoryId"]) : <any>undefined;
+            this.costPrice = _data["costPrice"];
+            this.name = _data["name"];
+            this.productCd = _data["productCd"];
+            this.sellingPrice = _data["sellingPrice"];
+            this.stock = _data["stock"];
+            this.supplierId = _data["supplierId"];
+            this.txDesc = _data["txDesc"];
+            this.unit = _data["unit"];
+            this.weight = _data["weight"];
+        }
     }
-  }
 
-  static fromJS(data: any): UpdateProductCategoryResponse {
-    data = typeof data === "object" ? data : {};
-    let result = new UpdateProductCategoryResponse();
-    result.init(data);
-    return result;
-  }
+    static fromJS(data: any): ProductOffsetPageStaticResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProductOffsetPageStaticResponse();
+        result.init(data);
+        return result;
+    }
 
-  toJSON(data?: any) {
-    data = typeof data === "object" ? data : {};
-    data["id"] = this.id;
-    data["name"] = this.name;
-    data["parentId"] = this.parentId;
-    return data;
-  }
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id ? this.id.toJSON() : <any>undefined;
+        data["categoryId"] = this.categoryId ? this.categoryId.toJSON() : <any>undefined;
+        data["costPrice"] = this.costPrice;
+        data["name"] = this.name;
+        data["productCd"] = this.productCd;
+        data["sellingPrice"] = this.sellingPrice;
+        data["stock"] = this.stock;
+        data["supplierId"] = this.supplierId;
+        data["txDesc"] = this.txDesc;
+        data["unit"] = this.unit;
+        data["weight"] = this.weight;
+        return data;
+    }
 }
 
-export interface IUpdateProductCategoryResponse {
-  id?: string | undefined;
-  name?: string | undefined;
-  parentId?: string | undefined;
+export interface IProductOffsetPageStaticResponse {
+    id?: Ulid;
+    categoryId?: Ulid;
+    costPrice?: number;
+    name?: string | undefined;
+    productCd?: string | undefined;
+    sellingPrice?: number;
+    stock?: number;
+    supplierId?: string | undefined;
+    txDesc?: string | undefined;
+    unit?: string | undefined;
+    weight?: number;
 }
 
-export class UpdateProductRequest implements IUpdateProductRequest {
-  categoryId?: string | undefined;
-  costPrice?: number;
-  name?: string | undefined;
-  productCd?: string | undefined;
-  sellingPrice?: number;
-  stock?: number;
-  supplierId?: string | undefined;
-  txDesc?: string | undefined;
-  unit?: string | undefined;
-  weight?: number;
+export class ProductOffsetPageStaticResponseOffsetPageResponse implements IProductOffsetPageStaticResponseOffsetPageResponse {
+    readonly items?: ProductOffsetPageStaticResponse[] | undefined;
+    readonly totalItemsCount?: number;
+    readonly totalPages?: number;
+    readonly currentPage?: number;
+    readonly itemsFrom?: number;
+    readonly itemsTo?: number;
+    readonly hasPreviousPage?: boolean;
+    readonly hasNextPage?: boolean;
 
-  constructor(data?: IUpdateProductRequest) {
-    if (data) {
-      for (var property in data) {
-        if (data.hasOwnProperty(property))
-          (<any>this)[property] = (<any>data)[property];
-      }
+    constructor(data?: IProductOffsetPageStaticResponseOffsetPageResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
     }
-  }
 
-  init(_data?: any) {
-    if (_data) {
-      this.categoryId = _data["categoryId"];
-      this.costPrice = _data["costPrice"];
-      this.name = _data["name"];
-      this.productCd = _data["productCd"];
-      this.sellingPrice = _data["sellingPrice"];
-      this.stock = _data["stock"];
-      this.supplierId = _data["supplierId"];
-      this.txDesc = _data["txDesc"];
-      this.unit = _data["unit"];
-      this.weight = _data["weight"];
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["items"])) {
+                (<any>this).items = [] as any;
+                for (let item of _data["items"])
+                    (<any>this).items!.push(ProductOffsetPageStaticResponse.fromJS(item));
+            }
+            (<any>this).totalItemsCount = _data["totalItemsCount"];
+            (<any>this).totalPages = _data["totalPages"];
+            (<any>this).currentPage = _data["currentPage"];
+            (<any>this).itemsFrom = _data["itemsFrom"];
+            (<any>this).itemsTo = _data["itemsTo"];
+            (<any>this).hasPreviousPage = _data["hasPreviousPage"];
+            (<any>this).hasNextPage = _data["hasNextPage"];
+        }
     }
-  }
 
-  static fromJS(data: any): UpdateProductRequest {
-    data = typeof data === "object" ? data : {};
-    let result = new UpdateProductRequest();
-    result.init(data);
-    return result;
-  }
+    static fromJS(data: any): ProductOffsetPageStaticResponseOffsetPageResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProductOffsetPageStaticResponseOffsetPageResponse();
+        result.init(data);
+        return result;
+    }
 
-  toJSON(data?: any) {
-    data = typeof data === "object" ? data : {};
-    data["categoryId"] = this.categoryId;
-    data["costPrice"] = this.costPrice;
-    data["name"] = this.name;
-    data["productCd"] = this.productCd;
-    data["sellingPrice"] = this.sellingPrice;
-    data["stock"] = this.stock;
-    data["supplierId"] = this.supplierId;
-    data["txDesc"] = this.txDesc;
-    data["unit"] = this.unit;
-    data["weight"] = this.weight;
-    return data;
-  }
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        data["totalItemsCount"] = this.totalItemsCount;
+        data["totalPages"] = this.totalPages;
+        data["currentPage"] = this.currentPage;
+        data["itemsFrom"] = this.itemsFrom;
+        data["itemsTo"] = this.itemsTo;
+        data["hasPreviousPage"] = this.hasPreviousPage;
+        data["hasNextPage"] = this.hasNextPage;
+        return data;
+    }
 }
 
-export interface IUpdateProductRequest {
-  categoryId?: string | undefined;
-  costPrice?: number;
-  name?: string | undefined;
-  productCd?: string | undefined;
-  sellingPrice?: number;
-  stock?: number;
-  supplierId?: string | undefined;
-  txDesc?: string | undefined;
-  unit?: string | undefined;
-  weight?: number;
+export interface IProductOffsetPageStaticResponseOffsetPageResponse {
+    items?: ProductOffsetPageStaticResponse[] | undefined;
+    totalItemsCount?: number;
+    totalPages?: number;
+    currentPage?: number;
+    itemsFrom?: number;
+    itemsTo?: number;
+    hasPreviousPage?: boolean;
+    hasNextPage?: boolean;
 }
 
-export class UpdateProductResponse implements IUpdateProductResponse {
-  id?: string | undefined;
-  categoryId?: string | undefined;
-  costPrice?: number;
-  name?: string | undefined;
-  productCd?: string | undefined;
-  sellingPrice?: number;
-  stock?: number;
-  supplierId?: string | undefined;
-  txDesc?: string | undefined;
-  unit?: string | undefined;
-  weight?: number;
+export class ProductStaticFilter implements IProductStaticFilter {
 
-  constructor(data?: IUpdateProductResponse) {
-    if (data) {
-      for (var property in data) {
-        if (data.hasOwnProperty(property))
-          (<any>this)[property] = (<any>data)[property];
-      }
+    constructor(data?: IProductStaticFilter) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
     }
-  }
 
-  init(_data?: any) {
-    if (_data) {
-      this.id = _data["id"];
-      this.categoryId = _data["categoryId"];
-      this.costPrice = _data["costPrice"];
-      this.name = _data["name"];
-      this.productCd = _data["productCd"];
-      this.sellingPrice = _data["sellingPrice"];
-      this.stock = _data["stock"];
-      this.supplierId = _data["supplierId"];
-      this.txDesc = _data["txDesc"];
-      this.unit = _data["unit"];
-      this.weight = _data["weight"];
+    init(_data?: any) {
     }
-  }
 
-  static fromJS(data: any): UpdateProductResponse {
-    data = typeof data === "object" ? data : {};
-    let result = new UpdateProductResponse();
-    result.init(data);
-    return result;
-  }
+    static fromJS(data: any): ProductStaticFilter {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProductStaticFilter();
+        result.init(data);
+        return result;
+    }
 
-  toJSON(data?: any) {
-    data = typeof data === "object" ? data : {};
-    data["id"] = this.id;
-    data["categoryId"] = this.categoryId;
-    data["costPrice"] = this.costPrice;
-    data["name"] = this.name;
-    data["productCd"] = this.productCd;
-    data["sellingPrice"] = this.sellingPrice;
-    data["stock"] = this.stock;
-    data["supplierId"] = this.supplierId;
-    data["txDesc"] = this.txDesc;
-    data["unit"] = this.unit;
-    data["weight"] = this.weight;
-    return data;
-  }
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        return data;
+    }
 }
 
-export interface IUpdateProductResponse {
-  id?: string | undefined;
-  categoryId?: string | undefined;
-  costPrice?: number;
-  name?: string | undefined;
-  productCd?: string | undefined;
-  sellingPrice?: number;
-  stock?: number;
-  supplierId?: string | undefined;
-  txDesc?: string | undefined;
-  unit?: string | undefined;
-  weight?: number;
+export interface IProductStaticFilter {
+}
+
+export class ProductStaticSortBy implements IProductStaticSortBy {
+    name?: SortDirection;
+    schoolCode?: SortDirection;
+    schoolLevelCode?: SortDirection;
+    thenName?: SortDirection;
+    thenSchoolCode?: SortDirection;
+    thenSchoolLevelCode?: SortDirection;
+
+    constructor(data?: IProductStaticSortBy) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.name = _data["name"];
+            this.schoolCode = _data["schoolCode"];
+            this.schoolLevelCode = _data["schoolLevelCode"];
+            this.thenName = _data["thenName"];
+            this.thenSchoolCode = _data["thenSchoolCode"];
+            this.thenSchoolLevelCode = _data["thenSchoolLevelCode"];
+        }
+    }
+
+    static fromJS(data: any): ProductStaticSortBy {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProductStaticSortBy();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["name"] = this.name;
+        data["schoolCode"] = this.schoolCode;
+        data["schoolLevelCode"] = this.schoolLevelCode;
+        data["thenName"] = this.thenName;
+        data["thenSchoolCode"] = this.thenSchoolCode;
+        data["thenSchoolLevelCode"] = this.thenSchoolLevelCode;
+        return data;
+    }
+}
+
+export interface IProductStaticSortBy {
+    name?: SortDirection;
+    schoolCode?: SortDirection;
+    schoolLevelCode?: SortDirection;
+    thenName?: SortDirection;
+    thenSchoolCode?: SortDirection;
+    thenSchoolLevelCode?: SortDirection;
+}
+
+export enum SortDirection {
+    _0 = 0,
+    _1 = 1,
+}
+
+export class Ulid implements IUlid {
+    readonly random?: string | undefined;
+    readonly time?: Date;
+
+    constructor(data?: IUlid) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            (<any>this).random = _data["random"];
+            (<any>this).time = _data["time"] ? new Date(_data["time"].toString()) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): Ulid {
+        data = typeof data === 'object' ? data : {};
+        let result = new Ulid();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["random"] = this.random;
+        data["time"] = this.time ? this.time.toISOString() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IUlid {
+    random?: string | undefined;
+    time?: Date;
 }
 
 export class UserLoginRequest implements IUserLoginRequest {
-  username!: string;
-  password!: string;
+    username!: string;
+    password!: string;
 
-  constructor(data?: IUserLoginRequest) {
-    if (data) {
-      for (var property in data) {
-        if (data.hasOwnProperty(property))
-          (<any>this)[property] = (<any>data)[property];
-      }
+    constructor(data?: IUserLoginRequest) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
     }
-  }
 
-  init(_data?: any) {
-    if (_data) {
-      this.username = _data["username"];
-      this.password = _data["password"];
+    init(_data?: any) {
+        if (_data) {
+            this.username = _data["username"];
+            this.password = _data["password"];
+        }
     }
-  }
 
-  static fromJS(data: any): UserLoginRequest {
-    data = typeof data === "object" ? data : {};
-    let result = new UserLoginRequest();
-    result.init(data);
-    return result;
-  }
+    static fromJS(data: any): UserLoginRequest {
+        data = typeof data === 'object' ? data : {};
+        let result = new UserLoginRequest();
+        result.init(data);
+        return result;
+    }
 
-  toJSON(data?: any) {
-    data = typeof data === "object" ? data : {};
-    data["username"] = this.username;
-    data["password"] = this.password;
-    return data;
-  }
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["username"] = this.username;
+        data["password"] = this.password;
+        return data;
+    }
 }
 
 export interface IUserLoginRequest {
-  username: string;
-  password: string;
+    username: string;
+    password: string;
 }
 
 export class UserLoginResponse implements IUserLoginResponse {
-  id?: string | undefined;
-  accessToken?: string | undefined;
+    id?: Ulid;
+    accessToken?: string | undefined;
 
-  constructor(data?: IUserLoginResponse) {
-    if (data) {
-      for (var property in data) {
-        if (data.hasOwnProperty(property))
-          (<any>this)[property] = (<any>data)[property];
-      }
+    constructor(data?: IUserLoginResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
     }
-  }
 
-  init(_data?: any) {
-    if (_data) {
-      this.id = _data["id"];
-      this.accessToken = _data["accessToken"];
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"] ? Ulid.fromJS(_data["id"]) : <any>undefined;
+            this.accessToken = _data["accessToken"];
+        }
     }
-  }
 
-  static fromJS(data: any): UserLoginResponse {
-    data = typeof data === "object" ? data : {};
-    let result = new UserLoginResponse();
-    result.init(data);
-    return result;
-  }
+    static fromJS(data: any): UserLoginResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new UserLoginResponse();
+        result.init(data);
+        return result;
+    }
 
-  toJSON(data?: any) {
-    data = typeof data === "object" ? data : {};
-    data["id"] = this.id;
-    data["accessToken"] = this.accessToken;
-    return data;
-  }
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id ? this.id.toJSON() : <any>undefined;
+        data["accessToken"] = this.accessToken;
+        return data;
+    }
 }
 
 export interface IUserLoginResponse {
-  id?: string | undefined;
-  accessToken?: string | undefined;
+    id?: Ulid;
+    accessToken?: string | undefined;
 }
 
 export class UserRegisterRequest implements IUserRegisterRequest {
-  email?: string | undefined;
-  password?: string | undefined;
-  confirmPassword?: string | undefined;
+    email?: string | undefined;
+    password?: string | undefined;
+    confirmPassword?: string | undefined;
 
-  constructor(data?: IUserRegisterRequest) {
-    if (data) {
-      for (var property in data) {
-        if (data.hasOwnProperty(property))
-          (<any>this)[property] = (<any>data)[property];
-      }
+    constructor(data?: IUserRegisterRequest) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
     }
-  }
 
-  init(_data?: any) {
-    if (_data) {
-      this.email = _data["email"];
-      this.password = _data["password"];
-      this.confirmPassword = _data["confirmPassword"];
+    init(_data?: any) {
+        if (_data) {
+            this.email = _data["email"];
+            this.password = _data["password"];
+            this.confirmPassword = _data["confirmPassword"];
+        }
     }
-  }
 
-  static fromJS(data: any): UserRegisterRequest {
-    data = typeof data === "object" ? data : {};
-    let result = new UserRegisterRequest();
-    result.init(data);
-    return result;
-  }
+    static fromJS(data: any): UserRegisterRequest {
+        data = typeof data === 'object' ? data : {};
+        let result = new UserRegisterRequest();
+        result.init(data);
+        return result;
+    }
 
-  toJSON(data?: any) {
-    data = typeof data === "object" ? data : {};
-    data["email"] = this.email;
-    data["password"] = this.password;
-    data["confirmPassword"] = this.confirmPassword;
-    return data;
-  }
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["email"] = this.email;
+        data["password"] = this.password;
+        data["confirmPassword"] = this.confirmPassword;
+        return data;
+    }
 }
 
 export interface IUserRegisterRequest {
-  email?: string | undefined;
-  password?: string | undefined;
-  confirmPassword?: string | undefined;
+    email?: string | undefined;
+    password?: string | undefined;
+    confirmPassword?: string | undefined;
 }
 
 export class UserRegisterResponse implements IUserRegisterResponse {
-  id?: string | undefined;
-  accessToken?: string | undefined;
+    id?: Ulid;
+    accessToken?: string | undefined;
 
-  constructor(data?: IUserRegisterResponse) {
-    if (data) {
-      for (var property in data) {
-        if (data.hasOwnProperty(property))
-          (<any>this)[property] = (<any>data)[property];
-      }
+    constructor(data?: IUserRegisterResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
     }
-  }
 
-  init(_data?: any) {
-    if (_data) {
-      this.id = _data["id"];
-      this.accessToken = _data["accessToken"];
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"] ? Ulid.fromJS(_data["id"]) : <any>undefined;
+            this.accessToken = _data["accessToken"];
+        }
     }
-  }
 
-  static fromJS(data: any): UserRegisterResponse {
-    data = typeof data === "object" ? data : {};
-    let result = new UserRegisterResponse();
-    result.init(data);
-    return result;
-  }
+    static fromJS(data: any): UserRegisterResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new UserRegisterResponse();
+        result.init(data);
+        return result;
+    }
 
-  toJSON(data?: any) {
-    data = typeof data === "object" ? data : {};
-    data["id"] = this.id;
-    data["accessToken"] = this.accessToken;
-    return data;
-  }
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id ? this.id.toJSON() : <any>undefined;
+        data["accessToken"] = this.accessToken;
+        return data;
+    }
 }
 
 export interface IUserRegisterResponse {
-  id?: string | undefined;
-  accessToken?: string | undefined;
+    id?: Ulid;
+    accessToken?: string | undefined;
 }
 
 export class ApiException extends Error {
-  message: string;
-  status: number;
-  response: string;
-  headers: { [key: string]: any };
-  result: any;
+    message: string;
+    status: number;
+    response: string;
+    headers: { [key: string]: any; };
+    result: any;
 
-  constructor(
-    message: string,
-    status: number,
-    response: string,
-    headers: { [key: string]: any },
-    result: any
-  ) {
-    super();
+    constructor(message: string, status: number, response: string, headers: { [key: string]: any; }, result: any) {
+        super();
 
-    this.message = message;
-    this.status = status;
-    this.response = response;
-    this.headers = headers;
-    this.result = result;
-  }
+        this.message = message;
+        this.status = status;
+        this.response = response;
+        this.headers = headers;
+        this.result = result;
+    }
 
-  protected isApiException = true;
+    protected isApiException = true;
 
-  static isApiException(obj: any): obj is ApiException {
-    return obj.isApiException === true;
-  }
+    static isApiException(obj: any): obj is ApiException {
+        return obj.isApiException === true;
+    }
 }
 
-function throwException(
-  message: string,
-  status: number,
-  response: string,
-  headers: { [key: string]: any },
-  result?: any
-): any {
-  if (result !== null && result !== undefined) throw result;
-  else throw new ApiException(message, status, response, headers, null);
+function throwException(message: string, status: number, response: string, headers: { [key: string]: any; }, result?: any): any {
+    if (result !== null && result !== undefined)
+        throw result;
+    else
+        throw new ApiException(message, status, response, headers, null);
 }

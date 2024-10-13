@@ -158,7 +158,7 @@ const Cart = (props: Props) => {
               </span>
             </div>
             <Link className="w-full" href={`${location}/cart`}>
-              <Button>View cart</Button>
+              <Button className="w-full">View cart</Button>
             </Link>
           </>
         ) : (
