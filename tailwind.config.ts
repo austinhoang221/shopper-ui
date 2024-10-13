@@ -37,6 +37,8 @@ const config: Config = {
         },
         tertiary: "var(--tertiary)",
         "tertiary-foreground": "var(--tertiary-foreground)",
+        quaternary: "var(--quaternary)",
+        "quaternary-foreground": "var(--quaternary-foreground)",
         muted: {
           DEFAULT: "hsl(var(--muted))",
           foreground: "hsl(var(--muted-foreground))",

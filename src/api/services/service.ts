@@ -13,7 +13,7 @@ const authorizedFetchFunction = (
     signal,
   };
   init = init || {};
-  init.headers = { ...init.headers, ...(headers as any) };
+  init.headers = { ...init.headers, ...(headers as A) };
   return fetch(url, init);
 };
 

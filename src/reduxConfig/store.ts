@@ -1,10 +1,12 @@
 import { configureStore } from "@reduxjs/toolkit";
 import cartSlice from "./cartSlice";
+import breadCrumbSlice from "./breadCrumbSlice";
 
 export const makeStore = () => {
   return configureStore({
     reducer: {
       cart: cartSlice,
+      breadcrumb: breadCrumbSlice,
     },
   });
 };

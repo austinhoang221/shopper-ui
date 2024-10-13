@@ -1,12 +1,9 @@
 import type { Metadata } from "next";
 import Header from "@/components/header/Header";
 import Footer from "@/components/footer/Footer";
-import Menu from "@/components/menu/Menu";
 import SearchBox from "@/components/header/SearchBox";
-import DeliverTo from "@/components/header/DeliverTo";
-import StoreProvider from "@/reduxConfig/StoreProvider";
-import { AppStore } from "@/reduxConfig/store";
 import React from "react";
+import Breadcumb from "@/components/header/Breadcrumb";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -18,9 +15,7 @@ export default function Layout({ children, params: { locale } }: A) {
     <>
       <Header language={locale}></Header>
       <SearchBox className="block md:hidden px-2" />
-      <div className="flex bg-secondary container md:hidden items-center mt-2">
-        <DeliverTo />
-      </div>
+      <Breadcumb language={locale} />
       <main className="container mx-auto md:px-0">{children}</main>
       <Footer></Footer>
     </>

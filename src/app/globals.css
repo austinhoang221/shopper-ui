@@ -26,6 +26,8 @@ body{
     --secondary-foreground: 240 10% 3.9%;
     --tertiary: #AAB396;
     --tertiary-foreground: #fff;
+    --quaternary: #FFF8E8;
+    --quaternary-foreground: #674636;
     --muted: 0 0% 96.1%;
     --muted-foreground: 0 0% 45.1%;
     --accent: 0 0% 96.1%;

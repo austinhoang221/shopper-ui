@@ -1,9 +1,8 @@
 "use client";
-import { DummyProduct } from "@/components/product/Product";
+import { OrderSummary } from "@/components/OrderSummary/OrderSummary";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import InputNumber from "@/components/ui/input-number";
-import { Separator } from "@/components/ui/separator";
 import {
   Table,
   TableBody,
@@ -13,7 +12,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
-import { useUtils } from "@/hooks/use-utils";
 import { CartItem, removeFromCart } from "@/reduxConfig/cartSlice";
 import { faArrowRight, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -24,17 +22,17 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import Image from "next/image";
-import React from "react";
+import { useRouter } from "next/navigation";
 
 type Props = {};
 
 const ListCart = (props: Props) => {
-  const { calculateTotalCart } = useUtils();
   const dispatch = useAppDispatch();
   const { cartItems } = useAppSelector((state) => state.cart);
   const onRemoveFromCart = (id: string) => {
     dispatch(removeFromCart(id));
   };
+  const router = useRouter();
   const columns: ColumnDef<CartItem>[] = [
     {
       accessorKey: "products",
@@ -58,9 +56,13 @@ const ListCart = (props: Props) => {
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
+
+  const goToCheckOut = () => {
+    router.push("cart/checkout");
+  };
   return (
     <div className="grid grid-cols-12 gap-4 mt-4">
-      <Card className="col-span-8">
+      <Card className="col-span-12 md:col-span-8">
         <CardHeader>
           <CardTitle>Shopping Cart</CardTitle>
         </CardHeader>
@@ -137,36 +139,21 @@ const ListCart = (props: Props) => {
           </Table>
         </CardContent>
       </Card>
-      <Card className="col-span-4">
+      <Card className="col-span-12 md:col-span-4">
         <CardHeader>
           <CardTitle>Totals</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Sub-total</span>
-            <span>320$</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Shipping</span>
-            <span>Free</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Discount</span>
-            <span>20$</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Tax</span>
-            <span>15$</span>
-          </div>
-          <Separator className="bg-[#d5dbdb] mt-4" />
-          <div className="flex justify-between items-center my-4">
-            <span>Total: </span>
-            <span className="text-lg font-bold">{calculateTotalCart}$</span>
-          </div>
-          <Button className="w-full bg-tertiary text-tertiary-foreground p-4">
-            PROCEED TO CHECKOUT
-            <FontAwesomeIcon className="ml-2" icon={faArrowRight} />
-          </Button>
+          <OrderSummary>
+            <Button
+              disabled={cartItems.length === 0}
+              className="w-full bg-tertiary text-tertiary-foreground p-4"
+              onClick={() => goToCheckOut()}
+            >
+              PROCEED TO CHECKOUT
+              <FontAwesomeIcon className="ml-2" icon={faArrowRight} />
+            </Button>
+          </OrderSummary>
         </CardContent>
       </Card>
     </div>

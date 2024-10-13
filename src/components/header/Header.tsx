@@ -36,9 +36,7 @@ const Header = ({ language }) => {
         </div>
         <div className="basis-full flex justify-center">
           <div className="w-full flex gap-3 items-center basis-full">
-            <div className="hidden md:block">
-              <DeliverTo />
-            </div>
+            <DeliverTo />
             <SearchBox className="hidden md:block basis-full" />
           </div>
         </div>
