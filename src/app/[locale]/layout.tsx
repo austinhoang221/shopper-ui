@@ -16,7 +16,7 @@ export default function Layout({ children, params: { locale } }: A) {
       <Header language={locale}></Header>
       <SearchBox className="block md:hidden px-2" />
       <Breadcumb language={locale} />
-      <main className="container mx-auto md:px-0">{children}</main>
+      <main className="container mx-auto px-2 md:px-0">{children}</main>
       <Footer></Footer>
     </>
   );

@@ -25,13 +25,13 @@ import { Checkbox } from "../ui/checkbox";
 import { Textarea } from "../ui/textarea";
 import PaymentOption from "./PaymentOption/PaymentOption";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-import ProductOrder, { DummyProduct } from "./ProductOrder/ProductOrder";
+import ProductOrder from "./ProductOrder/ProductOrder";
 import React from "react";
-import { getProducts } from "../product/GetProducts";
 import { OrderSummary } from "../OrderSummary/OrderSummary";
 import { Button } from "../ui/button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
+import { useAppSelector } from "@/hooks/reduxHooks";
 
 const FormSchema = z.object({
   username: z.string().min(2, {
@@ -50,24 +50,7 @@ const FormSchema = z.object({
 });
 
 export function CheckoutForm() {
-  const [products, setProducts] = React.useState<DummyProduct[]>([]);
-  const [hasMore, setHasMore] = React.useState(true);
-
-  React.useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
-    setTimeout(async () => {
-      if (hasMore) {
-        const data = await getProducts(1, 3);
-        if (data.products.length < 4) {
-          setHasMore(false);
-        }
-        setProducts([...data.products]);
-      }
-    }, 800);
-  };
+  const { cartItems } = useAppSelector((state) => state.cart);
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -323,8 +306,8 @@ export function CheckoutForm() {
             <CardTitle>Order Summary</CardTitle>
           </CardHeader>
           <CardContent>
-            {products.map((product) => (
-              <ProductOrder key={product.id} product={product} />
+            {cartItems.map((product) => (
+              <ProductOrder key={product.item.id} product={product} />
             ))}
             <div className="hidden md:block">
               <OrderSummary>{onRenderCheckoutButton()}</OrderSummary>
