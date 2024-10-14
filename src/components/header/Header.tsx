@@ -13,6 +13,7 @@ import {
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { Button } from "../ui/button";
@@ -22,9 +23,21 @@ import SearchBox from "./SearchBox";
 import Menu from "../menu/Menu";
 import DeliverTo from "./DeliverTo";
 import Cart from "./Cart";
+import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
+import { Label } from "../ui/label";
 
 const Header = ({ language }) => {
   const router = useRouter();
+  const onRenderLanguageItem = (lang: string) => {
+    switch (lang) {
+      case "en":
+        return "English - EN";
+      case "fr":
+        return "French - FR";
+      case "vn":
+        return "Vietnamese - VN";
+    }
+  };
   return (
     <nav className=" w-full px-2 bg-white/90 sticky top-0 z-40 backdrop-blur-sm border-b flex-none transition-colors duration-500  ">
       <div className="container mx-auto items-center flex h-14 justify-between gap-3">
@@ -65,18 +78,25 @@ const Header = ({ language }) => {
                 />
               </DropdownMenuTrigger>
               <DropdownMenuContent aria-label="Static Actions">
-                <DropdownMenuGroup>
-                  {languages
-                    .filter((l) => l !== language)
-                    .map((l, index) => (
-                      <DropdownMenuItem
-                        key={index}
-                        onClick={() => router.push(l)}
-                      >
-                        {l.toUpperCase()}
-                      </DropdownMenuItem>
+                <RadioGroup defaultValue={language} className="p-1">
+                  <div className="flex flex-col justify-center p-2 gap-y-2">
+                    <h2>Change language</h2>
+                    <Separator className="bg-[#d5dbdb] " />
+
+                    {languages.map((l, index) => (
+                      <div key={index} className="flex items-center ">
+                        <RadioGroupItem
+                          value={l}
+                          id={`radio-${index}`}
+                          onClick={() => router.push(l)}
+                        />
+                        <Label className="ml-2" htmlFor={`radio-${index}`}>
+                          {onRenderLanguageItem(l)}
+                        </Label>
+                      </div>
                     ))}
-                </DropdownMenuGroup>
+                  </div>
+                </RadioGroup>
               </DropdownMenuContent>
             </DropdownMenu>
           </Button>

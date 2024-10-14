@@ -12,7 +12,7 @@ const authorizedFetchFunction = (
     // Authorization: `Bearer ${Context.token}`,
     signal,
   };
-  init = init || {};
+
   init.headers = { ...init.headers, ...(headers as A) };
   return fetch(url, init);
 };

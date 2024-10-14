@@ -95,7 +95,7 @@ export function CheckoutForm() {
   };
 
   return (
-    <div className="grid grid-cols-12 gap-4">
+    <div className="grid grid-cols-12 gap-4 mt-4">
       <Card className="col-span-12 md:col-span-8 order-2 md:order-1">
         <CardContent>
           <CardHeader>

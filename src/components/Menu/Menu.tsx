@@ -1,3 +1,4 @@
+"use client";
 import { faBars, faCaretDown } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
@@ -9,12 +10,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "../../components/ui/sheet";
-import { service } from "@/api/services/service";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-} from "../../components/ui/accordion";
+
 import {
   Collapsible,
   CollapsibleContent,
@@ -22,6 +18,8 @@ import {
 } from "../ui/collapsible";
 import Link from "next/link";
 import { Separator } from "../ui/separator";
+import { service } from "@/api/services/service";
+import { ListProductCategoryResponse } from "@/api/services/client";
 
 type Props = {
   language: string;
@@ -29,51 +27,17 @@ type Props = {
 };
 
 export default function Menu(props: Props) {
-  const categories = [
-    {
-      id: 1,
-      icon: "fa eyes",
-      name: "fashion",
-      children: [
-        {
-          id: 2,
-          name: "lips",
-          children: [],
-        },
-        {
-          id: 3,
-          name: "clothes",
-          children: [],
-        },
-        {
-          id: 4,
-          name: "shoes",
-          children: [],
-        },
-      ],
-    },
-    {
-      id: 5,
-      name: "sport",
-      children: [
-        {
-          id: 6,
-          name: "football",
-          children: [],
-        },
-        {
-          id: 7,
-          name: "soccer",
-          children: [],
-        },
-        {
-          id: 8,
-          name: "basketball",
-          children: [],
-        },
-      ],
-    },
-  ];
+  const [categories, setCategories] = React.useState<
+    ListProductCategoryResponse[]
+  >([]);
+  React.useEffect(() => {
+    const fetchData = async () => {
+      const data = await service.client.productCategoriesAll();
+      setCategories(data);
+    };
+    fetchData();
+  }, []);
+
   return (
     <div className={props.className}>
       <Sheet>
@@ -88,12 +52,12 @@ export default function Menu(props: Props) {
           </SheetHeader>
           <div className="space-y-4">
             {categories.map((category, index) => (
-              <div key={category.id}>
+              <div key={category.id!.toString()}>
                 <Collapsible>
                   <div className="flex items-center justify-between space-x-4">
                     <Link
-                      href={category.name}
-                      className="text-base font-semibold w-full"
+                      href={category.name!}
+                      className="text-sm font-bold w-full"
                     >
                       {category.name}
                     </Link>
@@ -108,10 +72,10 @@ export default function Menu(props: Props) {
                   </div>
 
                   <CollapsibleContent>
-                    {category.children.map((child) => (
+                    {category.children?.map((child) => (
                       <Link
                         href={`${props.language}/${child.name}`}
-                        key={child.id}
+                        key={child.id?.toString()}
                         className="block px-4 py-2 text-sm "
                       >
                         {child.name}

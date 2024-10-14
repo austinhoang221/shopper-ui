@@ -35,7 +35,7 @@
         "responseClass": "SwaggerResponse",
         "protectedMethods": [],
         "configurationClass": "",
-        "useTransformOptionsMethod": false,
+        "useTransformOptionsMethod": true,
         "useTransformResultMethod": false,
         "generateDtoTypes": true,
         "operationGenerationMode": "MultipleClientsFromOperationId",
@@ -65,8 +65,9 @@
         "templateDirectory": null,
         "serviceHost": null,
         "serviceSchemes": null,
-        "output": "Client.ts",
-        "newLineBehavior": "Auto"
+        "output": "client.ts",
+        "newLineBehavior": "Auto",
+        "responseType": "text"
       }
     }
   }

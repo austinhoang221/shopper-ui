@@ -44,7 +44,7 @@ const Breadcrumb = ({ language }) => {
                       className={`text-primary ${
                         index === pathNames.length - 1 ? "font-bold" : ""
                       }`}
-                      href={href}
+                      href={`/${language}/${href}`}
                     >
                       {itemLink}
                     </BreadcrumbLink>
