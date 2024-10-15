@@ -26,12 +26,18 @@ import { Textarea } from "../ui/textarea";
 import PaymentOption from "./PaymentOption/PaymentOption";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import ProductOrder from "./ProductOrder/ProductOrder";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { OrderSummary } from "../OrderSummary/OrderSummary";
 import { Button } from "../ui/button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { useAppSelector } from "@/hooks/reduxHooks";
+import {
+  getCities,
+  getCountries,
+  getRegions,
+  Place,
+} from "@/api/services/getPlaceData";
 
 const FormSchema = z.object({
   username: z.string().min(2, {
@@ -51,11 +57,46 @@ const FormSchema = z.object({
 
 export function CheckoutForm() {
   const { cartItems } = useAppSelector((state) => state.cart);
+  const [countries, setCountries] = useState<Place[]>([]);
+  const [selectedCountry, setSelectedCountry] = useState<string | null>(null); // Cập nhật state cho selectedCountry
+  const [regions, setRegions] = useState<Place[]>([]);
+  const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
+  const [cities, setCities] = useState<Place[]>([]);
+
+  useEffect(() => {
+    const fetchCountries = async () => {
+      const countryData = await getCountries();
+      setCountries(countryData);
+    };
+
+    fetchCountries();
+  }, []);
+
+  useEffect(() => {
+    if (!selectedCountry) return;
+    const fetchRegions = async () => {
+      const regionData = await getRegions(selectedCountry);
+      setRegions(regionData);
+    };
+
+    fetchRegions();
+  }, [selectedCountry]);
+
+  useEffect(() => {
+    if (!selectedRegion) return;
+    const fetchCities = async () => {
+      const cityData = await getCities(selectedRegion);
+      setCities(cityData);
+    };
+
+    fetchCities();
+  }, [selectedRegion]);
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       username: "",
+      country: "",
     },
   });
 
@@ -78,7 +119,7 @@ export function CheckoutForm() {
   };
 
   return (
-    <div className="grid grid-cols-12 gap-4 mt-4">
+    <div className="grid grid-cols-12 gap-4">
       <Card className="col-span-12 md:col-span-8 order-2 md:order-1">
         <CardContent>
           <CardHeader>
@@ -115,7 +156,10 @@ export function CheckoutForm() {
                     name="company"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Company Name (Optional)</FormLabel>
+                        <FormLabel>
+                          Company Name
+                          <span className="hidden md:inline"> (Optional)</span>
+                        </FormLabel>
                         <FormControl>
                           <Input placeholder="Company" {...field} />
                         </FormControl>
@@ -139,7 +183,7 @@ export function CheckoutForm() {
                   )}
                 />
 
-                <div className="grid grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                   <FormField
                     control={form.control}
                     name="country"
@@ -147,7 +191,10 @@ export function CheckoutForm() {
                       <FormItem>
                         <FormLabel>Country</FormLabel>
                         <Select
-                          onValueChange={field.onChange}
+                          onValueChange={(value) => {
+                            field.onChange(value);
+                            setSelectedCountry(value);
+                          }}
                           defaultValue={field.value}
                         >
                           <FormControl>
@@ -156,9 +203,14 @@ export function CheckoutForm() {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="Vietnam">
-                              Vietnam number one
-                            </SelectItem>
+                            {countries.map((country) => (
+                              <SelectItem
+                                key={country.geonameId}
+                                value={country.geonameId}
+                              >
+                                {country.countryName}
+                              </SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -173,7 +225,10 @@ export function CheckoutForm() {
                       <FormItem>
                         <FormLabel>Region/State</FormLabel>
                         <Select
-                          onValueChange={field.onChange}
+                          onValueChange={(value) => {
+                            field.onChange(value);
+                            setSelectedRegion(value);
+                          }}
                           defaultValue={field.value}
                         >
                           <FormControl>
@@ -182,9 +237,14 @@ export function CheckoutForm() {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="Vietnam">
-                              Vietnam number one
-                            </SelectItem>
+                            {regions.map((region) => (
+                              <SelectItem
+                                key={region.geonameId}
+                                value={region.geonameId}
+                              >
+                                {region.name}
+                              </SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -208,9 +268,14 @@ export function CheckoutForm() {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="Vietnam">
-                              Vietnam number one
-                            </SelectItem>
+                            {cities.map((city) => (
+                              <SelectItem
+                                key={city.geonameId}
+                                value={city.geonameId}
+                              >
+                                {city.name}
+                              </SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                         <FormMessage />
