@@ -6,7 +6,7 @@ import React from "react";
 
 type Props = {};
 
-export default async function ListCategory(props: Props) {
+export default async function ListCategory({ language }) {
   const categories = await service.client.productCategoriesAll();
 
   return (
@@ -16,7 +16,7 @@ export default async function ListCategory(props: Props) {
           <div className="text-center" key={category.id?.toString()}>
             <Link
               className="mx-auto w-20 h-20 mb-2 rounded-full border-2 flex p-3 justify-center items-center bg-secondary border-primary"
-              href={category.name!}
+              href={`${language}/${category.name!}`}
             >
               <Icon iconName={category.icon!} />
             </Link>

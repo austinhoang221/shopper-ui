@@ -26,7 +26,7 @@ const ListProduct = (props: Props) => {
         if (data.products.length < 4) {
           setHasMore(false);
         }
-        setProducts([...data.products]);
+        setProducts((prev) => [...prev, ...data.products]);
         setPage((prev) => prev + 1);
       }
 
@@ -35,10 +35,12 @@ const ListProduct = (props: Props) => {
   };
   return (
     // <div className="max-h-[300px] w-full overflow-y-auto px-10">
-    <div className="grid grid-cols-2 lg:grid-cols-4 md:gap-y-4 gap-4 mt-6">
-      {products.map((product) => (
-        <Product key={product.id} product={product} />
-      ))}
+    <>
+      <div className="grid grid-cols-2 lg:grid-cols-4 md:gap-y-4 gap-4 mt-6">
+        {products.map((product) => (
+          <Product key={product.id} product={product} />
+        ))}
+      </div>
       {props.isInfiniteScroll && (
         <InfiniteScroll
           hasMore={hasMore}
@@ -46,10 +48,14 @@ const ListProduct = (props: Props) => {
           next={fetchData}
           threshold={1}
         >
-          {hasMore && <Loader2 className="my-4 h-8 w-8 animate-spin" />}
+          {hasMore && (
+            <div className="w-full flex justify-center mt-4">
+              <Loader2 className="my-4 text-black h-12 w-12 animate-spin" />
+            </div>
+          )}
         </InfiniteScroll>
       )}
-    </div>
+    </>
     // </div>
   );
 };

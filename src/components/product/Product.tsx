@@ -13,6 +13,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCartShopping } from "@fortawesome/free-solid-svg-icons";
 import { useAppDispatch } from "@/hooks/reduxHooks";
 import { addToCart } from "@/reduxConfig/cartSlice";
+import { usePathname } from "next/navigation";
 
 export interface DummyProductResponse {
   products: DummyProduct[];
@@ -30,13 +31,17 @@ export interface DummyProduct {
 
 export default function Product({ product }: { product: DummyProduct }) {
   const dispatch = useAppDispatch();
-
+  const paths = usePathname();
+  const pathNames = paths
+    .split("/")
+    .filter((path) => path)
+    .join("/");
   const onAddToCart = (item: DummyProduct) => {
     dispatch(addToCart(item));
   };
   return (
     <div className="bg-white shadow-lg rounded-lg p-4">
-      <Link href={product.title}>
+      <Link href={`/${pathNames}/${product.title}`}>
         <Image
           src={product.images[0]}
           alt={product.title}
@@ -49,7 +54,7 @@ export default function Product({ product }: { product: DummyProduct }) {
         <Tooltip>
           <TooltipTrigger asChild>
             <Link
-              href={product.title}
+              href={`${pathNames}/${product.title}`}
               className="text-base font-normal hover:underline block truncate"
             >
               {product.title}

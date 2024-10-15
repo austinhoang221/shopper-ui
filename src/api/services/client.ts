@@ -23,6 +23,7 @@ export class Client {
     this.http = http ? http : (window as any);
     this.baseUrl = baseUrl ?? "";
   }
+
   protected async transformOptions(options: RequestInit): Promise<RequestInit> {
     options.headers = {
       ...options.headers,
@@ -342,7 +343,7 @@ export class Client {
       body: content_,
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "application/json-patch+json",
         Accept: "application/json",
       },
     };
@@ -409,6 +410,88 @@ export class Client {
   }
 
   /**
+   * @param top (optional)
+   * @return OK
+   */
+  bestSellers(
+    top?: number | undefined
+  ): Promise<ListBestSellerProductResponse[]> {
+    let url_ = this.baseUrl + "/api/v1/products/best-sellers?";
+    if (top === null) throw new Error("The parameter 'top' cannot be null.");
+    else if (top !== undefined)
+      url_ += "Top=" + encodeURIComponent("" + top) + "&";
+    url_ = url_.replace(/[?&]$/, "");
+
+    let options_: RequestInit = {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+    };
+
+    return this.transformOptions(options_)
+      .then((transformedOptions_) => {
+        return this.http.fetch(url_, transformedOptions_);
+      })
+      .then((_response: Response) => {
+        return this.processBestSellers(_response);
+      });
+  }
+
+  protected processBestSellers(
+    response: Response
+  ): Promise<ListBestSellerProductResponse[]> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && response.headers.forEach) {
+      response.headers.forEach((v: any, k: any) => (_headers[k] = v));
+    }
+    if (status === 200) {
+      return response.text().then((_responseText) => {
+        let result200: any = null;
+        let resultData200 =
+          _responseText === ""
+            ? null
+            : JSON.parse(_responseText, this.jsonParseReviver);
+        if (Array.isArray(resultData200)) {
+          result200 = [] as any;
+          for (let item of resultData200)
+            result200!.push(ListBestSellerProductResponse.fromJS(item));
+        } else {
+          result200 = <any>null;
+        }
+        return result200;
+      });
+    } else if (status === 400) {
+      return response.text().then((_responseText) => {
+        let result400: any = null;
+        let resultData400 =
+          _responseText === ""
+            ? null
+            : JSON.parse(_responseText, this.jsonParseReviver);
+        result400 = ProblemDetails.fromJS(resultData400);
+        return throwException(
+          "Bad Request",
+          status,
+          _responseText,
+          _headers,
+          result400
+        );
+      });
+    } else if (status !== 200 && status !== 204) {
+      return response.text().then((_responseText) => {
+        return throwException(
+          "An unexpected server error occurred.",
+          status,
+          _responseText,
+          _headers
+        );
+      });
+    }
+    return Promise.resolve<ListBestSellerProductResponse[]>(null as any);
+  }
+
+  /**
    * @param body (optional)
    * @return OK
    */
@@ -422,7 +505,7 @@ export class Client {
       body: content_,
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "application/json-patch+json",
         Accept: "application/json",
       },
     };
@@ -497,7 +580,7 @@ export class Client {
       body: content_,
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "application/json-patch+json",
         Accept: "application/json",
       },
     };
@@ -809,6 +892,88 @@ export class GetUserResponse implements IGetUserResponse {
 export interface IGetUserResponse {
   id?: Ulid;
   email?: string | undefined;
+}
+
+export class ListBestSellerProductResponse
+  implements IListBestSellerProductResponse
+{
+  id?: Ulid;
+  categoryId?: Ulid;
+  costPrice?: number;
+  name?: string | undefined;
+  productCd?: string | undefined;
+  sellingPrice?: number;
+  stock?: number;
+  supplierId?: string | undefined;
+  txDesc?: string | undefined;
+  unit?: string | undefined;
+  weight?: number;
+
+  constructor(data?: IListBestSellerProductResponse) {
+    if (data) {
+      for (var property in data) {
+        if (data.hasOwnProperty(property))
+          (<any>this)[property] = (<any>data)[property];
+      }
+    }
+  }
+
+  init(_data?: any) {
+    if (_data) {
+      this.id = _data["id"] ? Ulid.fromJS(_data["id"]) : <any>undefined;
+      this.categoryId = _data["categoryId"]
+        ? Ulid.fromJS(_data["categoryId"])
+        : <any>undefined;
+      this.costPrice = _data["costPrice"];
+      this.name = _data["name"];
+      this.productCd = _data["productCd"];
+      this.sellingPrice = _data["sellingPrice"];
+      this.stock = _data["stock"];
+      this.supplierId = _data["supplierId"];
+      this.txDesc = _data["txDesc"];
+      this.unit = _data["unit"];
+      this.weight = _data["weight"];
+    }
+  }
+
+  static fromJS(data: any): ListBestSellerProductResponse {
+    data = typeof data === "object" ? data : {};
+    let result = new ListBestSellerProductResponse();
+    result.init(data);
+    return result;
+  }
+
+  toJSON(data?: any) {
+    data = typeof data === "object" ? data : {};
+    data["id"] = this.id ? this.id.toJSON() : <any>undefined;
+    data["categoryId"] = this.categoryId
+      ? this.categoryId.toJSON()
+      : <any>undefined;
+    data["costPrice"] = this.costPrice;
+    data["name"] = this.name;
+    data["productCd"] = this.productCd;
+    data["sellingPrice"] = this.sellingPrice;
+    data["stock"] = this.stock;
+    data["supplierId"] = this.supplierId;
+    data["txDesc"] = this.txDesc;
+    data["unit"] = this.unit;
+    data["weight"] = this.weight;
+    return data;
+  }
+}
+
+export interface IListBestSellerProductResponse {
+  id?: Ulid;
+  categoryId?: Ulid;
+  costPrice?: number;
+  name?: string | undefined;
+  productCd?: string | undefined;
+  sellingPrice?: number;
+  stock?: number;
+  supplierId?: string | undefined;
+  txDesc?: string | undefined;
+  unit?: string | undefined;
+  weight?: number;
 }
 
 export class ListProductCategoryResponse

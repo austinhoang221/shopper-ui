@@ -13,13 +13,14 @@ const Home = async ({ params: { locale } }) => {
   return (
     <LayoutProvider>
       <HomeCarousel />
-      <ListCategory />
+      <ListCategory language={locale} />
       <h1 className="text-center text-bolder text-2xl my-16">
         Best Seller in Fashion
       </h1>
       <PrallaxCarousel />
       <h1 className="text-center text-bolder text-2xl my-16">Spotlight</h1>
       <PrallaxCarousel />
+      <h1 className="text-center text-bolder text-2xl my-16">Products</h1>
       <ListProduct isInfiniteScroll={false} />
     </LayoutProvider>
   );

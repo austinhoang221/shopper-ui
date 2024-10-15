@@ -5,8 +5,6 @@ import {
   CarouselContent,
   CarouselDots,
   CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
 } from "@/components/ui/carousel";
 import "./ParallaxCarousel.scss";
 import Autoplay from "embla-carousel-autoplay";
