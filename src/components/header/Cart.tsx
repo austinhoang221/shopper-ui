@@ -1,30 +1,43 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCartShopping } from "@fortawesome/free-solid-svg-icons";
 import { useAppSelector } from "@/hooks/reduxHooks";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import CartDetail from "./CartDetail";
-import { Drawer, DrawerContent, DrawerTrigger } from "../ui/drawer";
-import useMediaQuery from "../../hooks/use-media";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "../ui/drawer";
 
 const Cart = () => {
   const { cartItems } = useAppSelector((state) => state.cart);
 
-  const [openDrawer, setOpenDrawer] = React.useState(false);
-  const isDesktop = useMediaQuery("(min-width: 768px)");
+  const [openPopover, setOpenPopover] = useState(false);
+  const [openDrawer, setOpenDrawer] = useState(false);
+
   useEffect(() => {
-    if (isDesktop) {
-      setOpenDrawer(false);
-    }
-  }, [isDesktop]);
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setOpenPopover(false);
+      } else {
+        setOpenDrawer(false);
+      }
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   return (
     <>
       <div className="hidden md:block">
-        <Popover>
+        <Popover open={openPopover} onOpenChange={setOpenPopover}>
           <PopoverTrigger asChild>
             <Button size="icon" variant="ghost" className="relative ">
               <FontAwesomeIcon
@@ -55,7 +68,14 @@ const Cart = () => {
             </Button>
           </DrawerTrigger>
           <DrawerContent className="bg-white">
-            <div className="px-4">
+            <DrawerHeader>
+              <DrawerTitle>
+                <FontAwesomeIcon icon={faCartShopping} className="pr-2"/>
+                <span>Shopping Cart</span>
+              </DrawerTitle>
+              <DrawerDescription></DrawerDescription>
+            </DrawerHeader>
+            <div className="p-4">
               <CartDetail />
             </div>
           </DrawerContent>
