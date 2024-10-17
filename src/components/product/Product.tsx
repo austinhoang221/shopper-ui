@@ -13,7 +13,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCartShopping } from "@fortawesome/free-solid-svg-icons";
 import { useAppDispatch } from "@/hooks/reduxHooks";
 import { addToCart } from "@/reduxConfig/cartSlice";
+import { convertStringToHandle } from "@/utils/utils";
 import { usePathname } from "next/navigation";
+import { ProductResponse } from "@/api/services/client";
 
 export interface DummyProductResponse {
   products: DummyProduct[];
@@ -26,25 +28,31 @@ export interface DummyProduct {
   id: number;
   title: string;
   images: string[];
+  sku: string;
+  description: string;
   price: number;
+  availabilityStatus: string;
 }
 
-export default function Product({ product }: { product: DummyProduct }) {
+export default function Product({ product }: { product: ProductResponse }) {
   const dispatch = useAppDispatch();
-  const paths = usePathname();
-  const pathNames = paths
-    .split("/")
-    .filter((path) => path)
-    .join("/");
-  const onAddToCart = (item: DummyProduct) => {
+  const pathname = usePathname();
+  const path = pathname.split("/").slice(0, 2).join("/");
+  console.log(
+    `${path}/${convertStringToHandle(product.name)}-id.${product.id}`
+  );
+  const onAddToCart = (item: ProductResponse) => {
     dispatch(addToCart(item));
   };
+  const href = `${path}/${convertStringToHandle(product.name?.toString())}-p.${
+    product.id
+  }`;
   return (
     <div className="bg-white shadow-lg rounded-lg p-4">
-      <Link href={`/${pathNames}/${product.title}`}>
+      <Link href={href}>
         <Image
-          src={product.images[0]}
-          alt={product.title}
+          src={product.attachments?.[0]?.link ?? ""}
+          alt={product.name ?? ""}
           width={200}
           height={200}
           className="w-full h-56 object-contain rounded-lg mb-4"
@@ -54,17 +62,17 @@ export default function Product({ product }: { product: DummyProduct }) {
         <Tooltip>
           <TooltipTrigger asChild>
             <Link
-              href={`${pathNames}/${product.title}`}
+              href={href}
               className="text-base font-normal hover:underline block truncate"
             >
-              {product.title}
+              {product.name}
             </Link>
           </TooltipTrigger>
-          <TooltipContent align="start">{product.title}</TooltipContent>
+          <TooltipContent align="start">{product.name}</TooltipContent>
         </Tooltip>
       </TooltipProvider>
 
-      <p className="font-bold">{product.price}$</p>
+      <p className="font-bold">{product.sellingPrice}$</p>
       <Button
         className="w-full mt-2"
         variant="secondary"
