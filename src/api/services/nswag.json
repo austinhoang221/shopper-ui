@@ -12,8 +12,11 @@
       "openApiToTypeScriptClient": {
         "className": "{controller}Client",
         "moduleName": "",
+        "typeMappings": {
+        "ULID": "string"
+      },
         "namespace": "",
-        "typeScriptVersion": 2.7,
+        "typeScriptVersion": 3.7,
         "promiseType": "Promise",
         "httpClass": "HttpClient",
         "withCredentials": false,

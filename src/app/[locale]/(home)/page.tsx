@@ -4,11 +4,12 @@ import React from "react";
 import HomeCarousel from "@/components/carousel/HomeCarousel";
 import ListCategory from "./ListCategory";
 import PrallaxCarousel from "@/components/carousel/ParallaxCarousel";
-import ListProduct from "@/components/product/ListProduct";
 import LayoutProvider from "@/app/LayoutProvider";
+import { service } from "@/api/services/service";
 
 const Home = async ({ params: { locale } }) => {
-  const { t } = await useTranslation(locale);
+  const bestSellers = await service.client.bestSellers(6);
+  const flat = bestSellers?.flatMap((item) => item.attachments);
 
   return (
     <LayoutProvider>
@@ -17,11 +18,9 @@ const Home = async ({ params: { locale } }) => {
       <h1 className="text-center text-bolder text-2xl my-16">
         Best Seller in Fashion
       </h1>
-      <PrallaxCarousel />
+      <PrallaxCarousel images={flat.map((image) => image?.link ?? "")} />
       <h1 className="text-center text-bolder text-2xl my-16">Spotlight</h1>
-      <PrallaxCarousel />
-      <h1 className="text-center text-bolder text-2xl my-16">Products</h1>
-      <ListProduct isInfiniteScroll={false} />
+      {/* <ListProduct  isInfiniteScroll={false} /> */}
     </LayoutProvider>
   );
 };

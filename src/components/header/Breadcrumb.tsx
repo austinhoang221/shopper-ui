@@ -11,6 +11,7 @@ import { usePathname } from "next/navigation";
 import { languages } from "@/app/i18n/setting";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHome } from "@fortawesome/free-solid-svg-icons";
+import { convertHandleToString } from "@/utils/utils";
 
 const Breadcrumb = ({ language }) => {
   const paths = usePathname();
@@ -46,7 +47,11 @@ const Breadcrumb = ({ language }) => {
                       }`}
                       href={`/${language}/${href}`}
                     >
-                      {itemLink}
+                      {convertHandleToString(
+                        itemLink.includes("-cat")
+                          ? itemLink.split("-cat")[0]
+                          : itemLink.split("-p")[0]
+                      )}
                     </BreadcrumbLink>
                   </BreadcrumbItem>
                   {index < pathNames.length - 1 && <BreadcrumbSeparator />}

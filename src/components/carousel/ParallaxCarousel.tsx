@@ -8,8 +8,12 @@ import {
 } from "@/components/ui/carousel";
 import "./ParallaxCarousel.scss";
 import Autoplay from "embla-carousel-autoplay";
+import { useDocVisible } from "@/hooks/use-document";
+import Image from "next/image";
 
-type Props = {};
+type Props = {
+  images: string[];
+};
 
 const PrallaxCarousel = (props: Props) => {
   const plugin = React.useRef(
@@ -31,7 +35,9 @@ const PrallaxCarousel = (props: Props) => {
           >
             <div className="embla__parallax">
               <div className="embla__parallax__layer">
-                <img
+                <Image
+                  width={500}
+                  height={500}
                   className="embla__slide__img embla__parallax__img"
                   src={`https://picsum.photos/600/350?v=${index}`}
                   alt="Your alt text"

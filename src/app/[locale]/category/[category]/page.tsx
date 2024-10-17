@@ -7,15 +7,18 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { convertHandleToString } from "@/utils/utils";
 import { faChevronCircleDown } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
 
-const Products = ({ params }: { params: { category: string } }) => {
+const ProductByCategory = ({ params }: { params: { category: string } }) => {
   return (
     <>
       <div className="flex mt-4 justify-between">
-        <h1 className="text-center text-2xl font-bold ">{params.category}</h1>
+        <h1 className="text-center text-2xl font-bold ">
+          {convertHandleToString(params.category.split("-cat")[0])}
+        </h1>
         <DropdownMenu>
           <DropdownMenuTrigger asChild type="button">
             <Button>
@@ -36,9 +39,9 @@ const Products = ({ params }: { params: { category: string } }) => {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <ListProduct isInfiniteScroll />
+      <ListProduct category={params.category} isInfiniteScroll />
     </>
   );
 };
 
-export default Products;
+export default ProductByCategory;

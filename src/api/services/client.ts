@@ -24,6 +24,10 @@ export class Client {
     this.baseUrl = baseUrl ?? "";
   }
 
+  /**
+   * @return OK
+   */
+
   protected async transformOptions(options: RequestInit): Promise<RequestInit> {
     options.headers = {
       ...options.headers,
@@ -31,9 +35,7 @@ export class Client {
     };
     return Promise.resolve(options);
   }
-  /**
-   * @return OK
-   */
+
   productCategoriesAll(): Promise<ListProductCategoryResponse[]> {
     let url_ = this.baseUrl + "/api/v1/product-categories";
     url_ = url_.replace(/[?&]$/, "");
@@ -110,7 +112,7 @@ export class Client {
   /**
    * @return OK
    */
-  productCategories(id: Ulid): Promise<GetProductCategoryResponse> {
+  productCategories(id: Ulid): Promise<ProductCategoryResponse> {
     let url_ = this.baseUrl + "/api/v1/product-categories/{id}";
     if (id === undefined || id === null)
       throw new Error("The parameter 'id' must be defined.");
@@ -135,7 +137,7 @@ export class Client {
 
   protected processProductCategories(
     response: Response
-  ): Promise<GetProductCategoryResponse> {
+  ): Promise<ProductCategoryResponse> {
     const status = response.status;
     let _headers: any = {};
     if (response.headers && response.headers.forEach) {
@@ -148,7 +150,7 @@ export class Client {
           _responseText === ""
             ? null
             : JSON.parse(_responseText, this.jsonParseReviver);
-        result200 = GetProductCategoryResponse.fromJS(resultData200);
+        result200 = ProductCategoryResponse.fromJS(resultData200);
         return result200;
       });
     } else if (status === 404) {
@@ -177,7 +179,7 @@ export class Client {
         );
       });
     }
-    return Promise.resolve<GetProductCategoryResponse>(null as any);
+    return Promise.resolve<ProductCategoryResponse>(null as any);
   }
 
   /**
@@ -259,7 +261,7 @@ export class Client {
   /**
    * @return OK
    */
-  products(id: Ulid): Promise<GetProductResponse> {
+  products(id: Ulid): Promise<ProductResponse> {
     let url_ = this.baseUrl + "/api/v1/products/{id}";
     if (id === undefined || id === null)
       throw new Error("The parameter 'id' must be defined.");
@@ -282,7 +284,7 @@ export class Client {
       });
   }
 
-  protected processProducts(response: Response): Promise<GetProductResponse> {
+  protected processProducts(response: Response): Promise<ProductResponse> {
     const status = response.status;
     let _headers: any = {};
     if (response.headers && response.headers.forEach) {
@@ -295,7 +297,7 @@ export class Client {
           _responseText === ""
             ? null
             : JSON.parse(_responseText, this.jsonParseReviver);
-        result200 = GetProductResponse.fromJS(resultData200);
+        result200 = ProductResponse.fromJS(resultData200);
         return result200;
       });
     } else if (status === 404) {
@@ -324,7 +326,7 @@ export class Client {
         );
       });
     }
-    return Promise.resolve<GetProductResponse>(null as any);
+    return Promise.resolve<ProductResponse>(null as any);
   }
 
   /**
@@ -333,7 +335,7 @@ export class Client {
    */
   offset(
     body?: ProductOffsetPageStaticQuery | undefined
-  ): Promise<ProductOffsetPageStaticResponseOffsetPageResponse> {
+  ): Promise<ProductResponseOffsetPageResponse> {
     let url_ = this.baseUrl + "/api/v1/products/offset";
     url_ = url_.replace(/[?&]$/, "");
 
@@ -359,7 +361,7 @@ export class Client {
 
   protected processOffset(
     response: Response
-  ): Promise<ProductOffsetPageStaticResponseOffsetPageResponse> {
+  ): Promise<ProductResponseOffsetPageResponse> {
     const status = response.status;
     let _headers: any = {};
     if (response.headers && response.headers.forEach) {
@@ -372,10 +374,7 @@ export class Client {
           _responseText === ""
             ? null
             : JSON.parse(_responseText, this.jsonParseReviver);
-        result200 =
-          ProductOffsetPageStaticResponseOffsetPageResponse.fromJS(
-            resultData200
-          );
+        result200 = ProductResponseOffsetPageResponse.fromJS(resultData200);
         return result200;
       });
     } else if (status === 400) {
@@ -404,18 +403,14 @@ export class Client {
         );
       });
     }
-    return Promise.resolve<ProductOffsetPageStaticResponseOffsetPageResponse>(
-      null as any
-    );
+    return Promise.resolve<ProductResponseOffsetPageResponse>(null as any);
   }
 
   /**
    * @param top (optional)
    * @return OK
    */
-  bestSellers(
-    top?: number | undefined
-  ): Promise<ListBestSellerProductResponse[]> {
+  bestSellers(top?: number | undefined): Promise<ProductResponse[]> {
     let url_ = this.baseUrl + "/api/v1/products/best-sellers?";
     if (top === null) throw new Error("The parameter 'top' cannot be null.");
     else if (top !== undefined)
@@ -438,9 +433,7 @@ export class Client {
       });
   }
 
-  protected processBestSellers(
-    response: Response
-  ): Promise<ListBestSellerProductResponse[]> {
+  protected processBestSellers(response: Response): Promise<ProductResponse[]> {
     const status = response.status;
     let _headers: any = {};
     if (response.headers && response.headers.forEach) {
@@ -456,7 +449,7 @@ export class Client {
         if (Array.isArray(resultData200)) {
           result200 = [] as any;
           for (let item of resultData200)
-            result200!.push(ListBestSellerProductResponse.fromJS(item));
+            result200!.push(ProductResponse.fromJS(item));
         } else {
           result200 = <any>null;
         }
@@ -488,7 +481,7 @@ export class Client {
         );
       });
     }
-    return Promise.resolve<ListBestSellerProductResponse[]>(null as any);
+    return Promise.resolve<ProductResponse[]>(null as any);
   }
 
   /**
@@ -720,142 +713,8 @@ export class Client {
   }
 }
 
-export class GetProductCategoryResponse implements IGetProductCategoryResponse {
-  id?: Ulid;
-  name?: string | undefined;
-  parentId?: Ulid;
-  icon?: string | undefined;
-  visible?: string | undefined;
-
-  constructor(data?: IGetProductCategoryResponse) {
-    if (data) {
-      for (var property in data) {
-        if (data.hasOwnProperty(property))
-          (<any>this)[property] = (<any>data)[property];
-      }
-    }
-  }
-
-  init(_data?: any) {
-    if (_data) {
-      this.id = _data["id"] ? Ulid.fromJS(_data["id"]) : <any>undefined;
-      this.name = _data["name"];
-      this.parentId = _data["parentId"]
-        ? Ulid.fromJS(_data["parentId"])
-        : <any>undefined;
-      this.icon = _data["icon"];
-      this.visible = _data["visible"];
-    }
-  }
-
-  static fromJS(data: any): GetProductCategoryResponse {
-    data = typeof data === "object" ? data : {};
-    let result = new GetProductCategoryResponse();
-    result.init(data);
-    return result;
-  }
-
-  toJSON(data?: any) {
-    data = typeof data === "object" ? data : {};
-    data["id"] = this.id ? this.id.toJSON() : <any>undefined;
-    data["name"] = this.name;
-    data["parentId"] = this.parentId ? this.parentId.toJSON() : <any>undefined;
-    data["icon"] = this.icon;
-    data["visible"] = this.visible;
-    return data;
-  }
-}
-
-export interface IGetProductCategoryResponse {
-  id?: Ulid;
-  name?: string | undefined;
-  parentId?: Ulid;
-  icon?: string | undefined;
-  visible?: string | undefined;
-}
-
-export class GetProductResponse implements IGetProductResponse {
-  id?: Ulid;
-  categoryId?: Ulid;
-  costPrice?: number;
-  name?: string | undefined;
-  productCd?: string | undefined;
-  sellingPrice?: number;
-  stock?: number;
-  supplierId?: string | undefined;
-  txDesc?: string | undefined;
-  unit?: string | undefined;
-  weight?: number;
-
-  constructor(data?: IGetProductResponse) {
-    if (data) {
-      for (var property in data) {
-        if (data.hasOwnProperty(property))
-          (<any>this)[property] = (<any>data)[property];
-      }
-    }
-  }
-
-  init(_data?: any) {
-    if (_data) {
-      this.id = _data["id"] ? Ulid.fromJS(_data["id"]) : <any>undefined;
-      this.categoryId = _data["categoryId"]
-        ? Ulid.fromJS(_data["categoryId"])
-        : <any>undefined;
-      this.costPrice = _data["costPrice"];
-      this.name = _data["name"];
-      this.productCd = _data["productCd"];
-      this.sellingPrice = _data["sellingPrice"];
-      this.stock = _data["stock"];
-      this.supplierId = _data["supplierId"];
-      this.txDesc = _data["txDesc"];
-      this.unit = _data["unit"];
-      this.weight = _data["weight"];
-    }
-  }
-
-  static fromJS(data: any): GetProductResponse {
-    data = typeof data === "object" ? data : {};
-    let result = new GetProductResponse();
-    result.init(data);
-    return result;
-  }
-
-  toJSON(data?: any) {
-    data = typeof data === "object" ? data : {};
-    data["id"] = this.id ? this.id.toJSON() : <any>undefined;
-    data["categoryId"] = this.categoryId
-      ? this.categoryId.toJSON()
-      : <any>undefined;
-    data["costPrice"] = this.costPrice;
-    data["name"] = this.name;
-    data["productCd"] = this.productCd;
-    data["sellingPrice"] = this.sellingPrice;
-    data["stock"] = this.stock;
-    data["supplierId"] = this.supplierId;
-    data["txDesc"] = this.txDesc;
-    data["unit"] = this.unit;
-    data["weight"] = this.weight;
-    return data;
-  }
-}
-
-export interface IGetProductResponse {
-  id?: Ulid;
-  categoryId?: Ulid;
-  costPrice?: number;
-  name?: string | undefined;
-  productCd?: string | undefined;
-  sellingPrice?: number;
-  stock?: number;
-  supplierId?: string | undefined;
-  txDesc?: string | undefined;
-  unit?: string | undefined;
-  weight?: number;
-}
-
 export class GetUserResponse implements IGetUserResponse {
-  id?: Ulid;
+  id?: string;
   email?: string | undefined;
 
   constructor(data?: IGetUserResponse) {
@@ -869,7 +728,7 @@ export class GetUserResponse implements IGetUserResponse {
 
   init(_data?: any) {
     if (_data) {
-      this.id = _data["id"] ? Ulid.fromJS(_data["id"]) : <any>undefined;
+      this.id = _data["id"] ? _data["id"] : <any>undefined;
       this.email = _data["email"];
     }
   }
@@ -883,105 +742,23 @@ export class GetUserResponse implements IGetUserResponse {
 
   toJSON(data?: any) {
     data = typeof data === "object" ? data : {};
-    data["id"] = this.id ? this.id.toJSON() : <any>undefined;
+    data["id"] = this.id ? this.id : <any>undefined;
     data["email"] = this.email;
     return data;
   }
 }
 
 export interface IGetUserResponse {
-  id?: Ulid;
+  id?: string;
   email?: string | undefined;
-}
-
-export class ListBestSellerProductResponse
-  implements IListBestSellerProductResponse
-{
-  id?: Ulid;
-  categoryId?: Ulid;
-  costPrice?: number;
-  name?: string | undefined;
-  productCd?: string | undefined;
-  sellingPrice?: number;
-  stock?: number;
-  supplierId?: string | undefined;
-  txDesc?: string | undefined;
-  unit?: string | undefined;
-  weight?: number;
-
-  constructor(data?: IListBestSellerProductResponse) {
-    if (data) {
-      for (var property in data) {
-        if (data.hasOwnProperty(property))
-          (<any>this)[property] = (<any>data)[property];
-      }
-    }
-  }
-
-  init(_data?: any) {
-    if (_data) {
-      this.id = _data["id"] ? Ulid.fromJS(_data["id"]) : <any>undefined;
-      this.categoryId = _data["categoryId"]
-        ? Ulid.fromJS(_data["categoryId"])
-        : <any>undefined;
-      this.costPrice = _data["costPrice"];
-      this.name = _data["name"];
-      this.productCd = _data["productCd"];
-      this.sellingPrice = _data["sellingPrice"];
-      this.stock = _data["stock"];
-      this.supplierId = _data["supplierId"];
-      this.txDesc = _data["txDesc"];
-      this.unit = _data["unit"];
-      this.weight = _data["weight"];
-    }
-  }
-
-  static fromJS(data: any): ListBestSellerProductResponse {
-    data = typeof data === "object" ? data : {};
-    let result = new ListBestSellerProductResponse();
-    result.init(data);
-    return result;
-  }
-
-  toJSON(data?: any) {
-    data = typeof data === "object" ? data : {};
-    data["id"] = this.id ? this.id.toJSON() : <any>undefined;
-    data["categoryId"] = this.categoryId
-      ? this.categoryId.toJSON()
-      : <any>undefined;
-    data["costPrice"] = this.costPrice;
-    data["name"] = this.name;
-    data["productCd"] = this.productCd;
-    data["sellingPrice"] = this.sellingPrice;
-    data["stock"] = this.stock;
-    data["supplierId"] = this.supplierId;
-    data["txDesc"] = this.txDesc;
-    data["unit"] = this.unit;
-    data["weight"] = this.weight;
-    return data;
-  }
-}
-
-export interface IListBestSellerProductResponse {
-  id?: Ulid;
-  categoryId?: Ulid;
-  costPrice?: number;
-  name?: string | undefined;
-  productCd?: string | undefined;
-  sellingPrice?: number;
-  stock?: number;
-  supplierId?: string | undefined;
-  txDesc?: string | undefined;
-  unit?: string | undefined;
-  weight?: number;
 }
 
 export class ListProductCategoryResponse
   implements IListProductCategoryResponse
 {
-  id?: Ulid;
+  id?: string;
   name?: string | undefined;
-  parentId?: Ulid;
+  parentId?: string;
   icon?: string | undefined;
   visible?: string | undefined;
   children?: ListProductCategoryResponse[] | undefined;
@@ -997,7 +774,7 @@ export class ListProductCategoryResponse
 
   init(_data?: any) {
     if (_data) {
-      this.id = _data["id"] ? Ulid.fromJS(_data["id"]) : <any>undefined;
+      this.id = _data["id"] ? _data["id"] : <any>undefined;
       this.name = _data["name"];
       this.parentId = _data["parentId"]
         ? Ulid.fromJS(_data["parentId"])
@@ -1021,9 +798,9 @@ export class ListProductCategoryResponse
 
   toJSON(data?: any) {
     data = typeof data === "object" ? data : {};
-    data["id"] = this.id ? this.id.toJSON() : <any>undefined;
+    data["id"] = this.id ? this.id : <any>undefined;
     data["name"] = this.name;
-    data["parentId"] = this.parentId ? this.parentId.toJSON() : <any>undefined;
+    data["parentId"] = this.parentId ? this.parentId : <any>undefined;
     data["icon"] = this.icon;
     data["visible"] = this.visible;
     if (Array.isArray(this.children)) {
@@ -1035,17 +812,17 @@ export class ListProductCategoryResponse
 }
 
 export interface IListProductCategoryResponse {
-  id?: Ulid;
+  id?: string;
   name?: string | undefined;
-  parentId?: Ulid;
+  parentId?: string;
   icon?: string | undefined;
   visible?: string | undefined;
   children?: ListProductCategoryResponse[] | undefined;
 }
 
 export class ListProductResponse implements IListProductResponse {
-  id?: Ulid;
-  categoryId?: Ulid;
+  id?: string;
+  categoryId?: string;
   costPrice?: number;
   name?: string | undefined;
   productCd?: string | undefined;
@@ -1067,7 +844,7 @@ export class ListProductResponse implements IListProductResponse {
 
   init(_data?: any) {
     if (_data) {
-      this.id = _data["id"] ? Ulid.fromJS(_data["id"]) : <any>undefined;
+      this.id = _data["id"] ? _data["id"] : <any>undefined;
       this.categoryId = _data["categoryId"]
         ? Ulid.fromJS(_data["categoryId"])
         : <any>undefined;
@@ -1092,10 +869,8 @@ export class ListProductResponse implements IListProductResponse {
 
   toJSON(data?: any) {
     data = typeof data === "object" ? data : {};
-    data["id"] = this.id ? this.id.toJSON() : <any>undefined;
-    data["categoryId"] = this.categoryId
-      ? this.categoryId.toJSON()
-      : <any>undefined;
+    data["id"] = this.id ? this.id : <any>undefined;
+    data["categoryId"] = this.categoryId ? this.categoryId : <any>undefined;
     data["costPrice"] = this.costPrice;
     data["name"] = this.name;
     data["productCd"] = this.productCd;
@@ -1110,8 +885,8 @@ export class ListProductResponse implements IListProductResponse {
 }
 
 export interface IListProductResponse {
-  id?: Ulid;
-  categoryId?: Ulid;
+  id?: string;
+  categoryId?: string;
   costPrice?: number;
   name?: string | undefined;
   productCd?: string | undefined;
@@ -1225,6 +1000,123 @@ export interface IProblemDetails {
   [key: string]: any;
 }
 
+export class ProductAttachmentResponse implements IProductAttachmentResponse {
+  id?: string;
+  name?: string | undefined;
+  originName?: string | undefined;
+  link?: string | undefined;
+  size?: number;
+
+  constructor(data?: IProductAttachmentResponse) {
+    if (data) {
+      for (var property in data) {
+        if (data.hasOwnProperty(property))
+          (<any>this)[property] = (<any>data)[property];
+      }
+    }
+  }
+
+  init(_data?: any) {
+    if (_data) {
+      this.id = _data["id"] ? _data["id"] : <any>undefined;
+      this.name = _data["name"];
+      this.originName = _data["originName"];
+      this.link = _data["link"];
+      this.size = _data["size"];
+    }
+  }
+
+  static fromJS(data: any): ProductAttachmentResponse {
+    data = typeof data === "object" ? data : {};
+    let result = new ProductAttachmentResponse();
+    result.init(data);
+    return result;
+  }
+
+  toJSON(data?: any) {
+    data = typeof data === "object" ? data : {};
+    data["id"] = this.id ? this.id : <any>undefined;
+    data["name"] = this.name;
+    data["originName"] = this.originName;
+    data["link"] = this.link;
+    data["size"] = this.size;
+    return data;
+  }
+}
+
+export interface IProductAttachmentResponse {
+  id?: string;
+  name?: string | undefined;
+  originName?: string | undefined;
+  link?: string | undefined;
+  size?: number;
+}
+
+export class ProductCategoryResponse implements IProductCategoryResponse {
+  id?: string;
+  name?: string | undefined;
+  parentId?: string;
+  icon?: string | undefined;
+  visible?: string | undefined;
+  products?: ProductResponse[] | undefined;
+
+  constructor(data?: IProductCategoryResponse) {
+    if (data) {
+      for (var property in data) {
+        if (data.hasOwnProperty(property))
+          (<any>this)[property] = (<any>data)[property];
+      }
+    }
+  }
+
+  init(_data?: any) {
+    if (_data) {
+      this.id = _data["id"] ? _data["id"] : <any>undefined;
+      this.name = _data["name"];
+      this.parentId = _data["parentId"]
+        ? Ulid.fromJS(_data["parentId"])
+        : <any>undefined;
+      this.icon = _data["icon"];
+      this.visible = _data["visible"];
+      if (Array.isArray(_data["products"])) {
+        this.products = [] as any;
+        for (let item of _data["products"])
+          this.products!.push(ProductResponse.fromJS(item));
+      }
+    }
+  }
+
+  static fromJS(data: any): ProductCategoryResponse {
+    data = typeof data === "object" ? data : {};
+    let result = new ProductCategoryResponse();
+    result.init(data);
+    return result;
+  }
+
+  toJSON(data?: any) {
+    data = typeof data === "object" ? data : {};
+    data["id"] = this.id ? this.id : <any>undefined;
+    data["name"] = this.name;
+    data["parentId"] = this.parentId ? this.parentId : <any>undefined;
+    data["icon"] = this.icon;
+    data["visible"] = this.visible;
+    if (Array.isArray(this.products)) {
+      data["products"] = [];
+      for (let item of this.products) data["products"].push(item.toJSON());
+    }
+    return data;
+  }
+}
+
+export interface IProductCategoryResponse {
+  id?: string;
+  name?: string | undefined;
+  parentId?: string;
+  icon?: string | undefined;
+  visible?: string | undefined;
+  products?: ProductResponse[] | undefined;
+}
+
 export class ProductOffsetPageStaticQuery
   implements IProductOffsetPageStaticQuery
 {
@@ -1277,11 +1169,9 @@ export interface IProductOffsetPageStaticQuery {
   sortBy?: ProductStaticSortBy;
 }
 
-export class ProductOffsetPageStaticResponse
-  implements IProductOffsetPageStaticResponse
-{
-  id?: Ulid;
-  categoryId?: Ulid;
+export class ProductResponse implements IProductResponse {
+  id?: string;
+  categoryId?: string;
   costPrice?: number;
   name?: string | undefined;
   productCd?: string | undefined;
@@ -1291,8 +1181,10 @@ export class ProductOffsetPageStaticResponse
   txDesc?: string | undefined;
   unit?: string | undefined;
   weight?: number;
+  translations?: ProductTranslationResponse[] | undefined;
+  attachments?: ProductAttachmentResponse[] | undefined;
 
-  constructor(data?: IProductOffsetPageStaticResponse) {
+  constructor(data?: IProductResponse) {
     if (data) {
       for (var property in data) {
         if (data.hasOwnProperty(property))
@@ -1303,7 +1195,7 @@ export class ProductOffsetPageStaticResponse
 
   init(_data?: any) {
     if (_data) {
-      this.id = _data["id"] ? Ulid.fromJS(_data["id"]) : <any>undefined;
+      this.id = _data["id"] ? _data["id"] : <any>undefined;
       this.categoryId = _data["categoryId"]
         ? Ulid.fromJS(_data["categoryId"])
         : <any>undefined;
@@ -1316,22 +1208,30 @@ export class ProductOffsetPageStaticResponse
       this.txDesc = _data["txDesc"];
       this.unit = _data["unit"];
       this.weight = _data["weight"];
+      if (Array.isArray(_data["translations"])) {
+        this.translations = [] as any;
+        for (let item of _data["translations"])
+          this.translations!.push(ProductTranslationResponse.fromJS(item));
+      }
+      if (Array.isArray(_data["attachments"])) {
+        this.attachments = [] as any;
+        for (let item of _data["attachments"])
+          this.attachments!.push(ProductAttachmentResponse.fromJS(item));
+      }
     }
   }
 
-  static fromJS(data: any): ProductOffsetPageStaticResponse {
+  static fromJS(data: any): ProductResponse {
     data = typeof data === "object" ? data : {};
-    let result = new ProductOffsetPageStaticResponse();
+    let result = new ProductResponse();
     result.init(data);
     return result;
   }
 
   toJSON(data?: any) {
     data = typeof data === "object" ? data : {};
-    data["id"] = this.id ? this.id.toJSON() : <any>undefined;
-    data["categoryId"] = this.categoryId
-      ? this.categoryId.toJSON()
-      : <any>undefined;
+    data["id"] = this.id ? this.id : <any>undefined;
+    data["categoryId"] = this.categoryId ? this.categoryId : <any>undefined;
     data["costPrice"] = this.costPrice;
     data["name"] = this.name;
     data["productCd"] = this.productCd;
@@ -1341,13 +1241,23 @@ export class ProductOffsetPageStaticResponse
     data["txDesc"] = this.txDesc;
     data["unit"] = this.unit;
     data["weight"] = this.weight;
+    if (Array.isArray(this.translations)) {
+      data["translations"] = [];
+      for (let item of this.translations)
+        data["translations"].push(item.toJSON());
+    }
+    if (Array.isArray(this.attachments)) {
+      data["attachments"] = [];
+      for (let item of this.attachments)
+        data["attachments"].push(item.toJSON());
+    }
     return data;
   }
 }
 
-export interface IProductOffsetPageStaticResponse {
-  id?: Ulid;
-  categoryId?: Ulid;
+export interface IProductResponse {
+  id?: string;
+  categoryId?: string;
   costPrice?: number;
   name?: string | undefined;
   productCd?: string | undefined;
@@ -1357,12 +1267,14 @@ export interface IProductOffsetPageStaticResponse {
   txDesc?: string | undefined;
   unit?: string | undefined;
   weight?: number;
+  translations?: ProductTranslationResponse[] | undefined;
+  attachments?: ProductAttachmentResponse[] | undefined;
 }
 
-export class ProductOffsetPageStaticResponseOffsetPageResponse
-  implements IProductOffsetPageStaticResponseOffsetPageResponse
+export class ProductResponseOffsetPageResponse
+  implements IProductResponseOffsetPageResponse
 {
-  readonly items?: ProductOffsetPageStaticResponse[] | undefined;
+  readonly items?: ProductResponse[] | undefined;
   readonly totalItemsCount?: number;
   readonly totalPages?: number;
   readonly currentPage?: number;
@@ -1371,7 +1283,7 @@ export class ProductOffsetPageStaticResponseOffsetPageResponse
   readonly hasPreviousPage?: boolean;
   readonly hasNextPage?: boolean;
 
-  constructor(data?: IProductOffsetPageStaticResponseOffsetPageResponse) {
+  constructor(data?: IProductResponseOffsetPageResponse) {
     if (data) {
       for (var property in data) {
         if (data.hasOwnProperty(property))
@@ -1385,7 +1297,7 @@ export class ProductOffsetPageStaticResponseOffsetPageResponse
       if (Array.isArray(_data["items"])) {
         (<any>this).items = [] as any;
         for (let item of _data["items"])
-          (<any>this).items!.push(ProductOffsetPageStaticResponse.fromJS(item));
+          (<any>this).items!.push(ProductResponse.fromJS(item));
       }
       (<any>this).totalItemsCount = _data["totalItemsCount"];
       (<any>this).totalPages = _data["totalPages"];
@@ -1397,9 +1309,9 @@ export class ProductOffsetPageStaticResponseOffsetPageResponse
     }
   }
 
-  static fromJS(data: any): ProductOffsetPageStaticResponseOffsetPageResponse {
+  static fromJS(data: any): ProductResponseOffsetPageResponse {
     data = typeof data === "object" ? data : {};
-    let result = new ProductOffsetPageStaticResponseOffsetPageResponse();
+    let result = new ProductResponseOffsetPageResponse();
     result.init(data);
     return result;
   }
@@ -1421,8 +1333,8 @@ export class ProductOffsetPageStaticResponseOffsetPageResponse
   }
 }
 
-export interface IProductOffsetPageStaticResponseOffsetPageResponse {
-  items?: ProductOffsetPageStaticResponse[] | undefined;
+export interface IProductResponseOffsetPageResponse {
+  items?: ProductResponse[] | undefined;
   totalItemsCount?: number;
   totalPages?: number;
   currentPage?: number;
@@ -1433,6 +1345,9 @@ export interface IProductOffsetPageStaticResponseOffsetPageResponse {
 }
 
 export class ProductStaticFilter implements IProductStaticFilter {
+  productCategoryId?: string;
+  name?: string | undefined;
+
   constructor(data?: IProductStaticFilter) {
     if (data) {
       for (var property in data) {
@@ -1442,7 +1357,14 @@ export class ProductStaticFilter implements IProductStaticFilter {
     }
   }
 
-  init(_data?: any) {}
+  init(_data?: any) {
+    if (_data) {
+      this.productCategoryId = _data["productCategoryId"]
+        ? _data["productCategoryId"]
+        : <any>undefined;
+      this.name = _data["name"];
+    }
+  }
 
   static fromJS(data: any): ProductStaticFilter {
     data = typeof data === "object" ? data : {};
@@ -1453,11 +1375,18 @@ export class ProductStaticFilter implements IProductStaticFilter {
 
   toJSON(data?: any) {
     data = typeof data === "object" ? data : {};
+    data["productCategoryId"] = this.productCategoryId
+      ? this.productCategoryId
+      : <any>undefined;
+    data["name"] = this.name;
     return data;
   }
 }
 
-export interface IProductStaticFilter {}
+export interface IProductStaticFilter {
+  productCategoryId?: string;
+  name?: string | undefined;
+}
 
 export class ProductStaticSortBy implements IProductStaticSortBy {
   name?: SortDirection;
@@ -1513,6 +1442,54 @@ export interface IProductStaticSortBy {
   thenName?: SortDirection;
   thenSchoolCode?: SortDirection;
   thenSchoolLevelCode?: SortDirection;
+}
+
+export class ProductTranslationResponse implements IProductTranslationResponse {
+  id?: string;
+  languageCode?: string | undefined;
+  name?: string | undefined;
+  description?: string | undefined;
+
+  constructor(data?: IProductTranslationResponse) {
+    if (data) {
+      for (var property in data) {
+        if (data.hasOwnProperty(property))
+          (<any>this)[property] = (<any>data)[property];
+      }
+    }
+  }
+
+  init(_data?: any) {
+    if (_data) {
+      this.id = _data["id"] ? _data["id"] : <any>undefined;
+      this.languageCode = _data["languageCode"];
+      this.name = _data["name"];
+      this.description = _data["description"];
+    }
+  }
+
+  static fromJS(data: any): ProductTranslationResponse {
+    data = typeof data === "object" ? data : {};
+    let result = new ProductTranslationResponse();
+    result.init(data);
+    return result;
+  }
+
+  toJSON(data?: any) {
+    data = typeof data === "object" ? data : {};
+    data["id"] = this.id ? this.id : <any>undefined;
+    data["languageCode"] = this.languageCode;
+    data["name"] = this.name;
+    data["description"] = this.description;
+    return data;
+  }
+}
+
+export interface IProductTranslationResponse {
+  id?: string;
+  languageCode?: string | undefined;
+  name?: string | undefined;
+  description?: string | undefined;
 }
 
 export enum SortDirection {
@@ -1603,7 +1580,7 @@ export interface IUserLoginRequest {
 }
 
 export class UserLoginResponse implements IUserLoginResponse {
-  id?: Ulid;
+  id?: string;
   accessToken?: string | undefined;
 
   constructor(data?: IUserLoginResponse) {
@@ -1617,7 +1594,7 @@ export class UserLoginResponse implements IUserLoginResponse {
 
   init(_data?: any) {
     if (_data) {
-      this.id = _data["id"] ? Ulid.fromJS(_data["id"]) : <any>undefined;
+      this.id = _data["id"] ? _data["id"] : <any>undefined;
       this.accessToken = _data["accessToken"];
     }
   }
@@ -1631,14 +1608,14 @@ export class UserLoginResponse implements IUserLoginResponse {
 
   toJSON(data?: any) {
     data = typeof data === "object" ? data : {};
-    data["id"] = this.id ? this.id.toJSON() : <any>undefined;
+    data["id"] = this.id ? this.id : <any>undefined;
     data["accessToken"] = this.accessToken;
     return data;
   }
 }
 
 export interface IUserLoginResponse {
-  id?: Ulid;
+  id?: string;
   accessToken?: string | undefined;
 }
 
@@ -1687,7 +1664,7 @@ export interface IUserRegisterRequest {
 }
 
 export class UserRegisterResponse implements IUserRegisterResponse {
-  id?: Ulid;
+  id?: string;
   accessToken?: string | undefined;
 
   constructor(data?: IUserRegisterResponse) {
@@ -1701,7 +1678,7 @@ export class UserRegisterResponse implements IUserRegisterResponse {
 
   init(_data?: any) {
     if (_data) {
-      this.id = _data["id"] ? Ulid.fromJS(_data["id"]) : <any>undefined;
+      this.id = _data["id"] ? _data["id"] : <any>undefined;
       this.accessToken = _data["accessToken"];
     }
   }
@@ -1715,14 +1692,14 @@ export class UserRegisterResponse implements IUserRegisterResponse {
 
   toJSON(data?: any) {
     data = typeof data === "object" ? data : {};
-    data["id"] = this.id ? this.id.toJSON() : <any>undefined;
+    data["id"] = this.id ? this.id : <any>undefined;
     data["accessToken"] = this.accessToken;
     return data;
   }
 }
 
 export interface IUserRegisterResponse {
-  id?: Ulid;
+  id?: string;
   accessToken?: string | undefined;
 }
 
