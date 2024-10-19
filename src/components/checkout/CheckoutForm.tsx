@@ -33,11 +33,13 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { useAppSelector } from "@/hooks/reduxHooks";
 import {
+  calculateShipping,
   getCities,
   getCountries,
   getRegions,
   Place,
-} from "@/api/services/getPlaceData";
+  ShippingRate,
+} from "@/api/services/externalApiService";
 
 const FormSchema = z.object({
   username: z.string().min(2, {
@@ -58,10 +60,14 @@ const FormSchema = z.object({
 export function CheckoutForm() {
   const { cartItems } = useAppSelector((state) => state.cart);
   const [countries, setCountries] = useState<Place[]>([]);
-  const [selectedCountry, setSelectedCountry] = useState<string | null>(null); // Cập nhật state cho selectedCountry
+  const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
   const [regions, setRegions] = useState<Place[]>([]);
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
   const [cities, setCities] = useState<Place[]>([]);
+  const [shippingRate, setShippingRate] = useState<ShippingRate[]>([]);
+  const [debounceTimeout, setDebounceTimeout] = useState<NodeJS.Timeout | null>(
+    null
+  );
 
   useEffect(() => {
     const fetchCountries = async () => {
@@ -92,11 +98,63 @@ export function CheckoutForm() {
     fetchCities();
   }, [selectedRegion]);
 
+  const handleShippingCalculation = async () => {
+    if (!form.watch("address") || !form.watch("zipcode")) return;
+    try {
+      const address = {
+        name: form.watch("username"),
+        street: form.watch("address"),
+        city:
+          cities.find((city) => city.geonameId == form.watch("city"))?.name ??
+          "",
+        state:
+          regions.find((region) => region.geonameId == selectedRegion)?.name ??
+          "",
+        zip: form.watch("zipcode"),
+        country:
+          countries.find((country) => country.geonameId == selectedCountry)
+            ?.countryCode ?? "",
+      };
+      const parcel = {
+        length: 10,
+        width: 8,
+        height: 4,
+        weight: 2,
+      };
+      const rate = await calculateShipping(address, parcel);
+      console.log("Shipping Rate:", rate);
+      setShippingRate(rate);
+    } catch (error) {
+      console.error("Error fetching shipping rate:", error);
+    }
+  };
+
+  const debounceShippingCalculation = () => {
+    if (debounceTimeout) {
+      clearTimeout(debounceTimeout);
+    }
+
+    const timeout = setTimeout(() => {
+      handleShippingCalculation();
+    }, 4000);
+
+    setDebounceTimeout(timeout);
+  };
+
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       username: "",
+      company: "",
+      address: "",
       country: "",
+      region: "",
+      city: "",
+      zipcode: "",
+      email: "",
+      phone: "",
+      isShip: false,
+      note: "",
     },
   });
 
@@ -176,7 +234,14 @@ export function CheckoutForm() {
                     <FormItem>
                       <FormLabel>Address</FormLabel>
                       <FormControl>
-                        <Input placeholder="Address" {...field} />
+                        <Input
+                          placeholder="Address"
+                          {...field}
+                          onChange={(event) => {
+                            field.onChange(event);
+                            debounceShippingCalculation();
+                          }}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -290,7 +355,14 @@ export function CheckoutForm() {
                       <FormItem>
                         <FormLabel>Zip Code</FormLabel>
                         <FormControl>
-                          <Input placeholder="Zip Code" {...field} />
+                          <Input
+                            placeholder="Zip Code"
+                            {...field}
+                            onChange={(event) => {
+                              field.onChange(event);
+                              debounceShippingCalculation();
+                            }}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -375,7 +447,13 @@ export function CheckoutForm() {
               <ProductOrder key={product.item.id} product={product} />
             ))}
             <div className="hidden md:block">
-              <OrderSummary>{onRenderCheckoutButton()}</OrderSummary>
+              <OrderSummary
+                // shippingRate={
+                //   shippingRate.length > 0 ? shippingRate[0].amount : 0
+                // }
+              >
+                {onRenderCheckoutButton()}
+              </OrderSummary>
             </div>
           </CardContent>
         </Card>
@@ -386,7 +464,13 @@ export function CheckoutForm() {
             <CardTitle>Totals</CardTitle>
           </CardHeader>
           <CardContent>
-            <OrderSummary>{onRenderCheckoutButton()}</OrderSummary>
+            <OrderSummary
+              // shippingRate={
+              //   shippingRate.length > 0 ? shippingRate[0].amount : 0
+              // }
+            >
+              {onRenderCheckoutButton()}
+            </OrderSummary>
           </CardContent>
         </Card>
       </div>
