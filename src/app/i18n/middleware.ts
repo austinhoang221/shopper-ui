@@ -37,6 +37,7 @@ export function middleware(req: A) {
     if (lngInReferer) response.cookies.set(cookieName, lngInReferer);
     return response;
   }
+  NextResponse.next().cookies.set(cookieName, lng);
 
   return NextResponse.next();
 }
