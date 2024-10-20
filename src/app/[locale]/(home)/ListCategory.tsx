@@ -13,12 +13,12 @@ export default async function ListCategory({ language }) {
         return (
           <div className="text-center" key={category.id?.toString()}>
             <Link
-              className="mx-auto w-20 h-20 mb-2 rounded-full border-2 flex p-3 justify-center items-center bg-secondary border-primary"
+              className="mx-auto w-20 h-20 mb-2 rounded-full border-2 flex p-3 justify-center items-center bg-white border-primary"
               href={`${language}/category/${convertStringToHandle(
                 category.name
               )}-cat.${category?.id?.toString()}`}
             >
-              <Icon iconName={category.icon!} />
+              <Icon className="text-primary" iconName={category.icon!} />
             </Link>
             <span className="text-primary font-bold">{category.name}</span>
           </div>

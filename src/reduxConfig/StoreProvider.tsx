@@ -15,13 +15,13 @@ export default function StoreProvider({
     // Create the store instance the first time this renders
     storeRef.current = makeStore();
   }
-  // const persistor = persistStore(storeRef.current);
+  const persistor = persistStore(storeRef.current);
 
   return (
     <Provider store={storeRef.current}>
-      {/* <PersistGate loading={null} persistor={persistor}> */}
-      {children}
-      {/* </PersistGate> */}
+      <PersistGate loading={null} persistor={persistor}>
+        {children}
+      </PersistGate>
     </Provider>
   );
 }

@@ -13,7 +13,6 @@ import {
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { Button } from "../ui/button";
@@ -88,7 +87,9 @@ const Header = ({ language }) => {
                         <RadioGroupItem
                           value={l}
                           id={`radio-${index}`}
-                          onClick={() => router.push(l)}
+                          onClick={() => {
+                            router.push(l);
+                          }}
                         />
                         <Label className="ml-2" htmlFor={`radio-${index}`}>
                           {onRenderLanguageItem(l)}

@@ -27,7 +27,6 @@ export class Client {
   /**
    * @return OK
    */
-
   protected async transformOptions(options: RequestInit): Promise<RequestInit> {
     options.headers = {
       ...options.headers,
@@ -35,7 +34,6 @@ export class Client {
     };
     return Promise.resolve(options);
   }
-
   productCategoriesAll(): Promise<ListProductCategoryResponse[]> {
     let url_ = this.baseUrl + "/api/v1/product-categories";
     url_ = url_.replace(/[?&]$/, "");
@@ -112,7 +110,7 @@ export class Client {
   /**
    * @return OK
    */
-  productCategories(id: Ulid): Promise<ProductCategoryResponse> {
+  productCategories(id: string): Promise<ProductCategoryResponse> {
     let url_ = this.baseUrl + "/api/v1/product-categories/{id}";
     if (id === undefined || id === null)
       throw new Error("The parameter 'id' must be defined.");
@@ -261,7 +259,7 @@ export class Client {
   /**
    * @return OK
    */
-  products(id: Ulid): Promise<ProductResponse> {
+  products(id: string): Promise<ProductResponse> {
     let url_ = this.baseUrl + "/api/v1/products/{id}";
     if (id === undefined || id === null)
       throw new Error("The parameter 'id' must be defined.");
@@ -776,9 +774,7 @@ export class ListProductCategoryResponse
     if (_data) {
       this.id = _data["id"] ? _data["id"] : <any>undefined;
       this.name = _data["name"];
-      this.parentId = _data["parentId"]
-        ? Ulid.fromJS(_data["parentId"])
-        : <any>undefined;
+      this.parentId = _data["parentId"] ? _data["parentId"] : <any>undefined;
       this.icon = _data["icon"];
       this.visible = _data["visible"];
       if (Array.isArray(_data["children"])) {
@@ -1073,9 +1069,7 @@ export class ProductCategoryResponse implements IProductCategoryResponse {
     if (_data) {
       this.id = _data["id"] ? _data["id"] : <any>undefined;
       this.name = _data["name"];
-      this.parentId = _data["parentId"]
-        ? Ulid.fromJS(_data["parentId"])
-        : <any>undefined;
+      this.parentId = _data["parentId"] ? _data["parentId"] : <any>undefined;
       this.icon = _data["icon"];
       this.visible = _data["visible"];
       if (Array.isArray(_data["products"])) {

@@ -9,7 +9,10 @@ export type CartItem = {
 interface ICartState {
   cartItems: CartItem[];
 }
-
+export type AddToCartType = {
+  item: ProductResponse;
+  quantity: number;
+};
 const initialState: ICartState = {
   cartItems: [],
 };
@@ -17,21 +20,24 @@ const cartSlice = createSlice({
   name: "cart",
   initialState: initialState,
   reducers: {
-    addToCart: (state, action: PayloadAction<ProductResponse>) => {
+    addToCart: (state, action: PayloadAction<AddToCartType>) => {
       const itemExists = state.cartItems.find(
-        (product) => product.item.id === action.payload.id
+        (product) => product.item.id === action.payload.item.id
       );
 
       if (itemExists) {
         state?.cartItems?.map((i) =>
           i.item === itemExists.item
-            ? { ...action.payload, quantity: i.quantity++ }
+            ? {
+                ...action.payload.item,
+                quantity: (i.quantity += action.payload.quantity),
+              }
             : i
         );
       } else {
         state.cartItems.push({
-          item: action.payload,
-          quantity: 1,
+          item: action.payload.item,
+          quantity: action.payload.quantity ?? 1,
           select: true,
         });
       }

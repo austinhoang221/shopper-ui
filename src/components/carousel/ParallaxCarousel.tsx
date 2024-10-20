@@ -8,7 +8,6 @@ import {
 } from "@/components/ui/carousel";
 import "./ParallaxCarousel.scss";
 import Autoplay from "embla-carousel-autoplay";
-import { useDocVisible } from "@/hooks/use-document";
 import Image from "next/image";
 
 type Props = {

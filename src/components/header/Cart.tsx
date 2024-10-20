@@ -70,8 +70,7 @@ const Cart = () => {
           <DrawerContent className="bg-white">
             <DrawerHeader>
               <DrawerTitle>
-                <FontAwesomeIcon icon={faCartShopping} className="pr-2"/>
-                <span>Shopping Cart</span>
+                <span className="text-primary">Shopping Cart</span>
               </DrawerTitle>
               <DrawerDescription></DrawerDescription>
             </DrawerHeader>

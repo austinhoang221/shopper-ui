@@ -11,16 +11,28 @@ import {
   ProductStaticFilter,
 } from "@/api/services/client";
 import { defaultPageSize } from "@/utils/constants";
+import { useAppSelector } from "@/hooks/reduxHooks";
+import { IBreadcrumbState } from "@/reduxConfig/breadCrumbSlice";
+import UpdateBreadcrumb from "../header/UpdateBreadcrumb";
 
 type Props = {
   isInfiniteScroll: boolean;
   category: string;
 };
+
 const ListProduct = (props: Props) => {
   const [page, setPage] = React.useState(1);
   const [loading, setLoading] = React.useState(false);
   const [hasMore, setHasMore] = React.useState(true);
   const [products, setProducts] = React.useState<ProductResponse[]>([]);
+  const items: IBreadcrumbState[] = [
+    {
+      icon: "",
+      href: `category/${props.category}`,
+      name: props.category.split("-cat.")?.[0],
+      key: `k-c-nav-${props.category}`,
+    },
+  ];
 
   React.useEffect(() => {
     if (props.category) fetchData();
@@ -45,6 +57,7 @@ const ListProduct = (props: Props) => {
       if (products?.length + defaultPageSize >= data.totalItemsCount!) {
         setHasMore(false);
       }
+      console.log(data);
       setProducts((prev) => [...prev, ...data.items!]);
       setPage((prev) => prev + 1);
     }
@@ -54,7 +67,8 @@ const ListProduct = (props: Props) => {
   return (
     // <div className="max-h-[300px] w-full overflow-y-auto px-10">
     <>
-      <div className="grid grid-cols-2 lg:grid-cols-4 md:gap-y-4 gap-4 mt-6">
+      <UpdateBreadcrumb items={items} />
+      <div className="grid grid-cols-2 lg:grid-cols-4 md:gap-y-4 gap-2 md:gap-4 mt-6">
         {products.map((product) => (
           <Product key={product.id} product={product} />
         ))}

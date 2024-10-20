@@ -9,15 +9,18 @@ import "./input-number.css";
 type Props = {
   initialValue: number;
   min: number;
+  onChange?: (value: number) => void;
 };
 export default function InputNumber(props: Props) {
   const [value, setValue] = useState(props.initialValue);
   const handleIncrement = () => {
     setValue(value + 1);
+    props.onChange?.(value + 1);
   };
   const handleDecrement = () => {
     if (value > 0) {
       setValue(value - 1);
+      props.onChange?.(value - 1);
     }
   };
   return (
@@ -25,7 +28,10 @@ export default function InputNumber(props: Props) {
       <Input
         type="number"
         value={value}
-        onChange={(e) => setValue(parseInt(e.target.value) || 0)}
+        onChange={(e) => {
+          setValue(parseInt(e.target.value) || 0);
+          props.onChange?.(Number(e.target.value) || 0);
+        }}
         min={props.min}
         className="w-28 text-center"
         startContent={

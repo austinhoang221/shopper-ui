@@ -27,6 +27,7 @@ export default function CartDetail() {
   const [checkAll, setCheckAll] = React.useState(true);
   const dispatch = useAppDispatch();
   const location = usePathname();
+  const language = location.split("/")[1];
   const { calculateTotalCart } = useUtils();
   const onRemoveFromCart = (id: string) => {
     dispatch(removeFromCart(id));
@@ -55,16 +56,19 @@ export default function CartDetail() {
                   <Checkbox
                     checked={cartItem.select}
                     onCheckedChange={(checked) =>
-                      onChangeSelectOption(cartItem.item.id.toString(), checked)
+                      onChangeSelectOption(
+                        cartItem.item.id?.toString() ?? "",
+                        checked
+                      )
                     }
                   ></Checkbox>
                   <Link
-                    href={cartItem.item.title}
+                    href={cartItem.item.name ?? ""}
                     className="aspect-square w-24 block"
                   >
                     <Image
-                      src={cartItem.item.images[0]}
-                      alt={cartItem.item.title}
+                      src={cartItem.item.attachments?.[0]?.link ?? ""}
+                      alt={cartItem.item.name ?? ""}
                       width={96}
                       height={96}
                       className="object-cover w-full block rounded-lg mb-4 min-w-24"
@@ -76,15 +80,15 @@ export default function CartDetail() {
                         <TooltipTrigger asChild>
                           <div className="flex gap-4 justify-between items-center">
                             <Link
-                              href={cartItem.item.title}
+                              href={cartItem.item.name ?? ""}
                               className="font-normal hover:underline  block text-sm flex-1 truncate"
                             >
-                              {cartItem.item.title}
+                              {cartItem.item.name ?? ""}
                             </Link>
                           </div>
                         </TooltipTrigger>
                         <TooltipContent align="start">
-                          {cartItem.item.title}
+                          {cartItem.item.name ?? ""}
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
@@ -92,13 +96,15 @@ export default function CartDetail() {
                     <div className="flex justify-between items-center">
                       <span className="text-center flex">
                         <span>{cartItem.quantity} x </span>
-                        <p className="font-bold ml-1">{cartItem.item.price}$</p>
+                        <p className="font-bold text-primary ml-1">
+                          {cartItem.item.sellingPrice}$
+                        </p>
                       </span>
                       <Button
                         size="icon"
                         variant="ghost"
                         onClick={() =>
-                          onRemoveFromCart(cartItem.item.id.toString())
+                          onRemoveFromCart(cartItem.item.id?.toString() ?? "")
                         }
                       >
                         <FontAwesomeIcon
@@ -131,10 +137,12 @@ export default function CartDetail() {
             </div>
             <span>
               Total:{" "}
-              <span className="text-lg font-bold">{calculateTotalCart}$</span>
+              <span className="text-lg font-bold text-primary">
+                {calculateTotalCart}$
+              </span>
             </span>
           </div>
-          <Link className="w-full" href={`${location}/cart`}>
+          <Link className="w-full" href={`/${language}/cart`}>
             <Button className="w-full">View cart</Button>
           </Link>
         </>

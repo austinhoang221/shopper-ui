@@ -1,11 +1,22 @@
+import UpdateBreadcrumb from "@/components/header/UpdateBreadcrumb";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { IBreadcrumbState } from "@/reduxConfig/breadcrumbSlice";
 
 const TrackOrderPage = () => {
+  const items: IBreadcrumbState[] = [
+    {
+      icon: "faLocationDot",
+      href: `track-order`,
+      name: "Track order",
+      key: `k-c-nav-track-order`,
+    },
+  ];
   return (
     <Card>
+      <UpdateBreadcrumb items={items} />
       <CardContent>
         <div className="text-bolder text-2xl my-8">Track Order</div>
         <div className="pb-4">

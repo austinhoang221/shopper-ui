@@ -1,4 +1,5 @@
 "use client";
+import UpdateBreadcrumb from "@/components/header/UpdateBreadcrumb";
 import { OrderSummary } from "@/components/OrderSummary/OrderSummary";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,6 +13,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
+import { IBreadcrumbState } from "@/reduxConfig/breadcrumbSlice";
 import { CartItem, removeFromCart } from "@/reduxConfig/cartSlice";
 import { faArrowRight, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -24,15 +26,22 @@ import {
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
-type Props = {};
-
-const ListCart = (props: Props) => {
+const ListCart = () => {
   const dispatch = useAppDispatch();
   const { cartItems } = useAppSelector((state) => state.cart);
   const onRemoveFromCart = (id: string) => {
     dispatch(removeFromCart(id));
   };
   const router = useRouter();
+  const items: IBreadcrumbState[] = [
+    {
+      icon: "faCartShopping",
+      href: `cart`,
+      name: "Cart",
+      key: `k-c-nav-cart`,
+    },
+  ];
+
   const columns: ColumnDef<CartItem>[] = [
     {
       accessorKey: "products",
@@ -62,18 +71,23 @@ const ListCart = (props: Props) => {
   };
   return (
     <div className="grid grid-cols-12 gap-4 mt-4">
+      <UpdateBreadcrumb items={items} />
       <Card className="col-span-12 md:col-span-8">
         <CardHeader>
           <CardTitle>Shopping Cart</CardTitle>
         </CardHeader>
         <CardContent>
           <Table>
-            <TableHeader className="bg-secondary text-secondary-foreground">
+            <TableHeader className="bg-tertiary ">
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => {
                     return (
-                      <TableHead key={header.id} colSpan={header.colSpan}>
+                      <TableHead
+                        className="text-primary"
+                        key={header.id}
+                        colSpan={header.colSpan}
+                      >
                         {header.isPlaceholder
                           ? null
                           : flexRender(
@@ -92,27 +106,31 @@ const ListCart = (props: Props) => {
                   <TableRow key={product.item.id} className="items-center">
                     <TableCell className="flex gap-2 ">
                       <Image
-                        src={product.item.images[0]}
-                        alt={product.item.title}
+                        src={product.item.attachments?.[0]?.link ?? ""}
+                        alt={product.item.name ?? ""}
                         width={96}
                         height={96}
                         className="object-cover w-full block rounded-lg mb-4 h-16 min-w-16 max-w-16"
                       />
-                      <span>{product.item.title}</span>
+                      <span>{product.item.name}</span>
                     </TableCell>
-                    <TableCell>{product.item.price.toFixed(2)}$</TableCell>
+                    <TableCell className="text-primary">
+                      {product.item.sellingPrice?.toFixed(2)}$
+                    </TableCell>
                     <TableCell className="gap-2">
-                      <InputNumber
-                        min={1}
-                        initialValue={Number(product.quantity)}
-                      />
+                      <div className="w-28">
+                        <InputNumber
+                          min={1}
+                          initialValue={Number(product.quantity)}
+                        />
+                      </div>
                     </TableCell>
                     <TableCell>
                       <Button
                         size="icon"
                         variant="ghost"
                         onClick={() =>
-                          onRemoveFromCart(product.item.id.toString())
+                          onRemoveFromCart(product.item.id?.toString() ?? "")
                         }
                       >
                         <FontAwesomeIcon

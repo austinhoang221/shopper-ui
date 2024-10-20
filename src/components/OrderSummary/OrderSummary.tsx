@@ -29,7 +29,9 @@ export function OrderSummary({ children }) {
       <Separator className="bg-[#d5dbdb] mt-4" />
       <div className="flex justify-between items-center my-4">
         <span>Total: </span>
-        <span className="text-lg font-bold">${total.toFixed(2)}</span>
+        <span className="text-lg text-primary font-bold">
+          ${total.toFixed(2)}
+        </span>
       </div>
 
       {children}

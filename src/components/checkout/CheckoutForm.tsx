@@ -101,7 +101,7 @@ export function CheckoutForm() {
   });
 
   const onRenderCheckoutButton = () => (
-    <Button className="w-full bg-tertiary text-tertiary-foreground p-4">
+    <Button className="w-full p-4" variant="default">
       CHECKOUT
       <FontAwesomeIcon className="ml-2" icon={faArrowRight} />
     </Button>

@@ -4,6 +4,7 @@ import React from "react";
 import {
   Carousel,
   CarouselContent,
+  CarouselDots,
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
@@ -23,8 +24,16 @@ const ImageGallery = (props: Props) => {
     setAlt(alt);
   };
   return (
-    <div className="mx-auto">
-      <Image width={500} height={500} alt={alt} src={src} className="mx-auto" />
+    <div className="mx-auto w-full">
+      <div className="w-full relative pt-[100%]">
+        <Image
+          src={src}
+          alt={alt}
+          objectFit="cover"
+          fill
+          className="w-full h-full top-0 left-0 object-cover"
+        />
+      </div>
       <Carousel
         opts={{
           align: "start",
@@ -53,8 +62,7 @@ const ImageGallery = (props: Props) => {
             </CarouselItem>
           ))}
         </CarouselContent>
-        <CarouselPrevious />
-        <CarouselNext />
+        <CarouselDots />
       </Carousel>
     </div>
   );

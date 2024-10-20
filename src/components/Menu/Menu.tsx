@@ -20,6 +20,7 @@ import Link from "next/link";
 import { Separator } from "../ui/separator";
 import { service } from "@/api/services/service";
 import { ListProductCategoryResponse } from "@/api/services/client";
+import { convertStringToHandle } from "@/utils/utils";
 
 type Props = {
   language: string;
@@ -56,7 +57,11 @@ export default function Menu(props: Props) {
                 <Collapsible>
                   <div className="flex items-center justify-between space-x-4">
                     <Link
-                      href={category.name!}
+                      href={`/${
+                        props.language
+                      }/category/${convertStringToHandle(
+                        category.name
+                      )}-cat.${category?.id?.toString()}`}
                       className="text-sm font-bold w-full"
                     >
                       {category.name}
@@ -74,7 +79,11 @@ export default function Menu(props: Props) {
                   <CollapsibleContent>
                     {category.children?.map((child) => (
                       <Link
-                        href={`${props.language}/${child.name}`}
+                        href={`/${
+                          props.language
+                        }/category/${convertStringToHandle(
+                          child.name
+                        )}-cat.${child?.id?.toString()}`}
                         key={child.id?.toString()}
                         className="block px-4 py-2 text-sm "
                       >

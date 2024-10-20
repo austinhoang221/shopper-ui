@@ -16,6 +16,7 @@ import { addToCart } from "@/reduxConfig/cartSlice";
 import { convertStringToHandle } from "@/utils/utils";
 import { usePathname } from "next/navigation";
 import { ProductResponse } from "@/api/services/client";
+import { useToast } from "../hooks/use-toast";
 
 export interface DummyProductResponse {
   products: DummyProduct[];
@@ -37,16 +38,16 @@ export interface DummyProduct {
 export default function Product({ product }: { product: ProductResponse }) {
   const dispatch = useAppDispatch();
   const pathname = usePathname();
-  const path = pathname.split("/").slice(0, 2).join("/");
-  console.log(
-    `${path}/${convertStringToHandle(product.name)}-id.${product.id}`
-  );
+  const { toast } = useToast();
   const onAddToCart = (item: ProductResponse) => {
-    dispatch(addToCart(item));
+    dispatch(addToCart({ item: item, quantity: 1 }));
+    toast({
+      title: "Successfully added to cart",
+    });
   };
-  const href = `${path}/${convertStringToHandle(product.name?.toString())}-p.${
-    product.id
-  }`;
+  const href = `${pathname}/${convertStringToHandle(
+    product.name?.toString()
+  )}-p.${product.id}`;
   return (
     <div className="bg-white shadow-lg rounded-lg p-4">
       <Link href={href}>
@@ -72,13 +73,13 @@ export default function Product({ product }: { product: ProductResponse }) {
         </Tooltip>
       </TooltipProvider>
 
-      <p className="font-bold">{product.sellingPrice}$</p>
+      <p className="font-bold text-primary">{product.sellingPrice}$</p>
       <Button
         className="w-full mt-2"
-        variant="secondary"
+        variant="outline"
         onClick={() => onAddToCart(product)}
       >
-        <span className="mr-2">Add to cart</span>
+        <span className="mr-2 text-primary">Add to cart</span>
         <FontAwesomeIcon
           icon={faCartShopping}
           className="text-primary cursor-pointer"
