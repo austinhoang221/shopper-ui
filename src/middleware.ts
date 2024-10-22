@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import acceptLanguage from "accept-language";
-import { cookieName, fallbackLng, languages } from "./setting";
+import { cookieName, fallbackLng, languages } from "./app/i18n/setting";
 
 acceptLanguage.languages(languages);
 
@@ -17,15 +17,14 @@ export function middleware(req: A) {
     lng = acceptLanguage.get(req.cookies.get(cookieName).value);
   if (!lng) lng = acceptLanguage.get(req.headers.get("Accept-Language"));
   if (!lng) lng = fallbackLng;
+  if (!lng) NextResponse.next().cookies.set(cookieName, lng);
 
   // Redirect if lng in path is not
   if (
     !languages.some((loc) => req.nextUrl.pathname.startsWith(`/${loc}`)) &&
     !req.nextUrl.pathname.startsWith("/_next")
   ) {
-    return NextResponse.redirect(
-      new URL(`/${lng}${req.nextUrl.pathname}`, req.url)
-    );
+    return NextResponse.redirect(new URL(`/${lng}`, req.url));
   }
 
   if (req.headers.has("referer")) {
@@ -37,7 +36,6 @@ export function middleware(req: A) {
     if (lngInReferer) response.cookies.set(cookieName, lngInReferer);
     return response;
   }
-  NextResponse.next().cookies.set(cookieName, lng);
 
   return NextResponse.next();
 }

@@ -1,18 +1,15 @@
 "use client";
 import React from "react";
-import { Card, CardContent } from "@/components/ui/card";
 import {
   Carousel,
   CarouselContent,
   CarouselDots,
   CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
 } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
-type Props = {};
+import Image from "next/image";
 
-const HomeCarousel = (props: Props) => {
+const HomeCarousel = () => {
   const plugin = React.useRef(
     Autoplay({ delay: 2000, stopOnInteraction: true })
   );
@@ -26,11 +23,18 @@ const HomeCarousel = (props: Props) => {
     >
       <CarouselContent>
         {Array.from({ length: 5 }).map((_, index) => (
-          <CarouselItem key={index}>
-            <img
-              className="embla__slide"
-              width="100%"
-              src={`https://picsum.photos/600/350?v=${index}`}
+          <CarouselItem key={index} className="w-full relative pt-[100%]">
+            <Image
+              className="embla__slide w-full h-full object-cover"
+              placeholder="blur"
+              quality={100}
+              fill
+              sizes="100vw"
+              style={{
+                objectFit: "cover",
+              }}
+              src={`https://picsum.photos/570/230?v=${index}`}
+              priority
               alt="Your alt text"
             />
           </CarouselItem>

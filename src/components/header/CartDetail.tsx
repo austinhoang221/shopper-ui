@@ -21,6 +21,7 @@ import { useUtils } from "@/hooks/use-utils";
 import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
 import EmptyCart from "@/public/imgs/empty-cart.png";
 import React from "react";
+import { ScrollArea } from "../ui/scroll-area";
 
 export default function CartDetail() {
   const { cartItems } = useAppSelector((state) => state.cart);
@@ -46,7 +47,7 @@ export default function CartDetail() {
     <div>
       {cartItems.length > 0 ? (
         <>
-          <div className="max-h-[25rem] gap-4 overflow-y-scroll overflow-x-hidden">
+          <ScrollArea className="max-h-[25rem] gap-4">
             {cartItems.map((cartItem) => {
               return (
                 <div
@@ -119,7 +120,7 @@ export default function CartDetail() {
                 </div>
               );
             })}
-          </div>
+          </ScrollArea>
           <Separator className="bg-[#d5dbdb]" />
           <div className="flex justify-between items-center my-4">
             <div className="flex justify-between items-center space-x-2">

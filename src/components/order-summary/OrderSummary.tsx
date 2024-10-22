@@ -1,7 +1,8 @@
+import { ReactNode } from "react";
 import { Separator } from "../ui/separator";
 import { useUtils } from "@/hooks/use-utils";
 
-export function OrderSummary({ children }) {
+export function OrderSummary({ children }: { children: ReactNode }) {
   const { calculateTotalCart } = useUtils();
   const tax = parseFloat(calculateTotalCart) / 10;
   const ship = 5;

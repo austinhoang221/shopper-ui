@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { ArrowRightIcon } from "@radix-ui/react-icons";
 import useEmblaCarousel, {
   type UseEmblaCarouselType,
 } from "embla-carousel-react";
@@ -258,6 +257,7 @@ const CarouselDots = React.forwardRef<
   React.HTMLAttributes<HTMLDivElement>
 >((props, ref) => {
   const { api } = useCarousel();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [updateState, setUpdateState] = React.useState(false);
   const toggleUpdateState = React.useCallback(
     () => setUpdateState((prevState) => !prevState),

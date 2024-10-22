@@ -1,8 +1,6 @@
 "use client";
 import React from "react";
 import InfiniteScroll from "@/components/ui/infinite-scroll";
-import { Loader2 } from "lucide-react";
-import Product from "./Product";
 import { service } from "@/api/services/service";
 import {
   OffsetPage,
@@ -11,9 +9,10 @@ import {
   ProductStaticFilter,
 } from "@/api/services/client";
 import { defaultPageSize } from "@/utils/constants";
-import { useAppSelector } from "@/hooks/reduxHooks";
-import { IBreadcrumbState } from "@/reduxConfig/breadCrumbSlice";
 import UpdateBreadcrumb from "../header/UpdateBreadcrumb";
+import { Skeleton } from "../ui/skeleton";
+import Product from "./Product";
+import { IBreadcrumbState } from "@/reduxConfig/breadcrumbSlice";
 
 type Props = {
   isInfiniteScroll: boolean;
@@ -36,6 +35,7 @@ const ListProduct = (props: Props) => {
 
   React.useEffect(() => {
     if (props.category) fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.category]);
 
   const fetchData = async () => {
@@ -68,7 +68,7 @@ const ListProduct = (props: Props) => {
     // <div className="max-h-[300px] w-full overflow-y-auto px-10">
     <>
       <UpdateBreadcrumb items={items} />
-      <div className="grid grid-cols-2 lg:grid-cols-4 md:gap-y-4 gap-2 md:gap-4 mt-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 md:gap-y-4 gap-2 md:gap-4 ">
         {products.map((product) => (
           <Product key={product.id} product={product} />
         ))}
@@ -81,8 +81,16 @@ const ListProduct = (props: Props) => {
           threshold={1}
         >
           {hasMore && (
-            <div className="w-full flex justify-center mt-4">
-              <Loader2 className="my-4 text-black h-12 w-12 animate-spin" />
+            <div className="grid grid-cols-2 lg:grid-cols-4 md:gap-y-4 gap-2 md:gap-4 mt-6">
+              {Array.from({ length: 4 }).map((_, index) => (
+                <div key={index} className="shadow-lg rounded-lg p-4">
+                  <Skeleton className="h-[14rem] rounded-lg bg-gray-200" />
+                  <div className="space-y-2 mt-2">
+                    <Skeleton className="h-4 w-[9rem] bg-gray-200" />
+                    <Skeleton className="h-4 w-[5rem] bg-gray-200" />
+                  </div>
+                </div>
+              ))}
             </div>
           )}
         </InfiniteScroll>

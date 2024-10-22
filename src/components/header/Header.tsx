@@ -1,5 +1,5 @@
 "use client";
-import { languages } from "@/app/i18n/setting";
+import { fallbackLng, languages } from "@/app/i18n/setting";
 import {
   faGlobe,
   faHeadphones,
@@ -25,7 +25,7 @@ import Cart from "./Cart";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { Label } from "../ui/label";
 
-const Header = ({ language }) => {
+const Header = ({ language }: { language: string }) => {
   const router = useRouter();
   const onRenderLanguageItem = (lang: string) => {
     switch (lang) {
@@ -36,6 +36,14 @@ const Header = ({ language }) => {
       case "vn":
         return "Vietnamese - VN";
     }
+  };
+
+  const onChangeLanguage = (l: string) => {
+    const url = window.location.pathname
+      .split("/")
+      .filter((item) => item && item !== "en")
+      .join("/");
+    router.push(`/${l}/${url}`);
   };
   return (
     <nav className=" w-full px-2 bg-white/90 sticky top-0 z-40 backdrop-blur-sm border-b flex-none transition-colors duration-500  ">
@@ -77,7 +85,10 @@ const Header = ({ language }) => {
                 />
               </DropdownMenuTrigger>
               <DropdownMenuContent aria-label="Static Actions">
-                <RadioGroup defaultValue={language} className="p-1">
+                <RadioGroup
+                  defaultValue={language || fallbackLng}
+                  className="p-1"
+                >
                   <div className="flex flex-col justify-center p-2 gap-y-2">
                     <h2>Change language</h2>
                     <Separator className="bg-[#d5dbdb] " />
@@ -88,7 +99,7 @@ const Header = ({ language }) => {
                           value={l}
                           id={`radio-${index}`}
                           onClick={() => {
-                            router.push(l);
+                            onChangeLanguage(l);
                           }}
                         />
                         <Label className="ml-2" htmlFor={`radio-${index}`}>

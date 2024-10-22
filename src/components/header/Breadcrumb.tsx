@@ -3,24 +3,26 @@ import React from "react";
 import {
   Breadcrumb as BreadcrumbComponent,
   BreadcrumbItem,
-  BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { useAppSelector } from "@/hooks/reduxHooks";
-
-const Breadcrumb = ({ language }) => {
+import Link from "next/link";
+type Props = {
+  language: string;
+};
+const Breadcrumb: React.FC<Props> = ({ language }) => {
   const breadcrumbs = useAppSelector((state) => state.breadcrumb);
   if (breadcrumbs.value.length > 0)
     return (
-      <BreadcrumbComponent className="flex bg-tertiary  items-center  p-2">
-        <BreadcrumbList className="container">
-          {breadcrumbs.value.length > 0 &&
-            breadcrumbs.value.map((link, index) => {
+      breadcrumbs.value.length > 1 && (
+        <BreadcrumbComponent className="flex bg-tertiary  items-center  p-2">
+          <BreadcrumbList className="container">
+            {breadcrumbs.value.map((link, index) => {
               return (
                 <React.Fragment key={link.key}>
                   <BreadcrumbItem>
-                    <BreadcrumbLink
+                    <Link
                       className={`text-primary ${
                         index === breadcrumbs.value.length - 1
                           ? "font-bold"
@@ -28,8 +30,8 @@ const Breadcrumb = ({ language }) => {
                       }`}
                       href={`/${language}/${link.href}`}
                     >
-                      <span>{link.name}</span>
-                    </BreadcrumbLink>
+                      {link.name}
+                    </Link>
                   </BreadcrumbItem>
                   {index < breadcrumbs.value.length - 1 && (
                     <BreadcrumbSeparator />
@@ -37,8 +39,9 @@ const Breadcrumb = ({ language }) => {
                 </React.Fragment>
               );
             })}
-        </BreadcrumbList>
-      </BreadcrumbComponent>
+          </BreadcrumbList>
+        </BreadcrumbComponent>
+      )
     );
 };
 

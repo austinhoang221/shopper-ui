@@ -6,8 +6,18 @@ import PrallaxCarousel from "@/components/carousel/ParallaxCarousel";
 import UpdateBreadcrumb from "@/components/header/UpdateBreadcrumb";
 import { IBreadcrumbState } from "@/reduxConfig/breadcrumbSlice";
 import DetailContent from "./DetailContent";
-
-export default async function ProductDetail({ params }) {
+export async function generateMetadata({ params }: { params: { id: string } }) {
+  const product = await service.client.products(params.id.split("-p.")?.[1]);
+  console.log(product);
+  return {
+    title: product.name,
+  };
+}
+export default async function ProductDetail({
+  params,
+}: {
+  params: { category: string; id: string };
+}) {
   const product = await service.client.products(params.id.split("-p.")?.[1]);
   const items: IBreadcrumbState[] = [
     {

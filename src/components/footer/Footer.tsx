@@ -1,8 +1,6 @@
 import React from "react";
 
-type Props = {};
-
-const Footer = (props: Props) => {
+const Footer = () => {
   return (
     <footer className="text-primary">
       Copyright <span className="px-4 text-center">Shopper</span>{" "}

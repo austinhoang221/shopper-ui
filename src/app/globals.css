@@ -75,7 +75,7 @@ body{
 @layer base {
 
   body {
-    @apply bg-[#EAEDED] text-foreground;
+    @apply bg-white text-foreground;
   }
 }
 

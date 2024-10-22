@@ -1,6 +1,6 @@
 "use client";
 import UpdateBreadcrumb from "@/components/header/UpdateBreadcrumb";
-import { OrderSummary } from "@/components/OrderSummary/OrderSummary";
+import { OrderSummary } from "@/components/order-summary/OrderSummary";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import InputNumber from "@/components/ui/input-number";

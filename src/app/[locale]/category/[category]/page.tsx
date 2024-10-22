@@ -24,7 +24,15 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
-
+export async function generateMetadata({
+  params,
+}: {
+  params: { category: string };
+}) {
+  return {
+    title: convertHandleToString(params.category.split("-cat")[0]),
+  };
+}
 const ProductByCategory = ({ params }: { params: { category: string } }) => {
   return (
     <>

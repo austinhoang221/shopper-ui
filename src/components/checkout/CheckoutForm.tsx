@@ -23,11 +23,10 @@ import {
 } from "../ui/select";
 import { Checkbox } from "../ui/checkbox";
 import { Textarea } from "../ui/textarea";
-import PaymentOption from "./PaymentOption/PaymentOption";
+// import PaymentOption from "./PaymentOption/PaymentOption";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import ProductOrder from "./ProductOrder/ProductOrder";
 import React, { useEffect, useState } from "react";
-import { OrderSummary } from "../OrderSummary/OrderSummary";
 import { Button } from "../ui/button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
@@ -40,6 +39,8 @@ import {
   Place,
   ShippingRate,
 } from "@/api/services/externalApiService";
+// import { useFormStatus } from "react-dom";
+import { OrderSummary } from "../order-summary/OrderSummary";
 
 const FormSchema = z.object({
   username: z.string().min(2, {
@@ -68,7 +69,8 @@ export function CheckoutForm() {
   const [debounceTimeout, setDebounceTimeout] = useState<NodeJS.Timeout | null>(
     null
   );
-
+  // const { pending } = useFormStatus();
+  console.log(shippingRate);
   useEffect(() => {
     const fetchCountries = async () => {
       const countryData = await getCountries();

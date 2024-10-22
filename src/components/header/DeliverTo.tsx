@@ -3,9 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
 import { Button } from "../ui/button";
 
-type Props = {};
-
-const DeliverTo = (props: Props) => {
+const DeliverTo = () => {
   return (
     <Button className="items-center gap-1 flex pl-2" variant="ghost">
       <FontAwesomeIcon
