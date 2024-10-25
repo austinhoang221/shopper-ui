@@ -17,9 +17,11 @@ export function middleware(req: A) {
     lng = acceptLanguage.get(req.cookies.get(cookieName).value);
   if (!lng) lng = acceptLanguage.get(req.headers.get("Accept-Language"));
   if (!lng) lng = fallbackLng;
-  if (!lng) NextResponse.next().cookies.set(cookieName, lng);
-
-  // Redirect if lng in path is not
+  if (!lng)
+    NextResponse.next().cookies.set(cookieName, lng, {
+      secure: true,
+      httpOnly: true,
+    });
   if (
     !languages.some((loc) => req.nextUrl.pathname.startsWith(`/${loc}`)) &&
     !req.nextUrl.pathname.startsWith("/_next")
@@ -33,7 +35,10 @@ export function middleware(req: A) {
       refererUrl.pathname.startsWith(`/${l}`)
     );
     const response = NextResponse.next();
-    if (lngInReferer) response.cookies.set(cookieName, lngInReferer);
+    if (lngInReferer)
+      response.cookies.set(cookieName, lngInReferer, {
+        secure: true,
+      });
     return response;
   }
 

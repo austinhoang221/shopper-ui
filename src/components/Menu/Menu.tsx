@@ -1,4 +1,3 @@
-"use client";
 import { faBars, faCaretDown } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
@@ -18,27 +17,16 @@ import {
 } from "../ui/collapsible";
 import Link from "next/link";
 import { Separator } from "../ui/separator";
-import { service } from "@/api/services/service";
-import { ListProductCategoryResponse } from "@/api/services/client";
 import { convertStringToHandle } from "@/utils/utils";
+import { ListProductCategoryResponse } from "@/api/services/api";
 
 type Props = {
   language: string;
   className?: string;
+  categories: ListProductCategoryResponse[];
 };
 
 export default function Menu(props: Props) {
-  const [categories, setCategories] = React.useState<
-    ListProductCategoryResponse[]
-  >([]);
-  React.useEffect(() => {
-    const fetchData = async () => {
-      const data = await service.client.productCategoriesAll();
-      setCategories(data);
-    };
-    fetchData();
-  }, []);
-
   return (
     <div className={props.className}>
       <Sheet>
@@ -52,7 +40,7 @@ export default function Menu(props: Props) {
             <SheetTitle>Hello</SheetTitle>
           </SheetHeader>
           <div className="space-y-4">
-            {categories.map((category, index) => (
+            {props.categories.map((category, index) => (
               <div key={category.id!.toString()}>
                 <Collapsible>
                   <div className="flex items-center justify-between space-x-4">
@@ -92,7 +80,7 @@ export default function Menu(props: Props) {
                     ))}
                   </CollapsibleContent>
                 </Collapsible>
-                {index < categories.length - 1 && (
+                {index < props.categories.length - 1 && (
                   <Separator className="mt-4 bg-[#d5dbdb]" />
                 )}
               </div>

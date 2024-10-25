@@ -1,5 +1,5 @@
+import { service } from "@/api/services/service";
 import ListProduct from "@/components/product/ListProduct";
-import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,8 +15,6 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Slider } from "@/components/ui/slider";
-import { cn } from "@/lib/utils";
 import { convertHandleToString } from "@/utils/utils";
 import {
   faChevronCircleDown,
@@ -24,6 +22,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
+import CategoryFilters from "./CategoryFilters";
 export async function generateMetadata({
   params,
 }: {
@@ -33,25 +32,28 @@ export async function generateMetadata({
     title: convertHandleToString(params.category.split("-cat")[0]),
   };
 }
-const ProductByCategory = ({ params }: { params: { category: string } }) => {
+
+export async function ProductByCategory({
+  params,
+}: Readonly<{ params: { category: string } }>) {
+  const criterias = await service.client.filters(
+    params.category.split("-cat.")[1]
+  );
   return (
     <>
       <div className="block md:flex mt-4 justify-between">
-        <h1 className="text-lg font-bold truncate mb-2 md:mb-0">
+        <h1 className="text-xl font-bold truncate mb-2 md:mb-0">
           {convertHandleToString(params.category.split("-cat")[0])}
         </h1>
         <div className="flex gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger type="button">
-              <Button>
-                Sort by
-                <FontAwesomeIcon
-                  className="ml-2"
-                  icon={faChevronCircleDown}
-                  width={18}
-                  height={18}
-                />
-              </Button>
+              <FontAwesomeIcon
+                className="ml-2"
+                icon={faChevronCircleDown}
+                width={18}
+                height={18}
+              />
             </DropdownMenuTrigger>
             <DropdownMenuContent aria-label="Static Actions">
               <DropdownMenuGroup>
@@ -67,15 +69,12 @@ const ProductByCategory = ({ params }: { params: { category: string } }) => {
 
           <Sheet>
             <SheetTrigger className="block sm:hidden">
-              <Button>
-                Filters
-                <FontAwesomeIcon
-                  className="ml-2"
-                  icon={faFilter}
-                  width={18}
-                  height={18}
-                />
-              </Button>
+              <FontAwesomeIcon
+                className="ml-2"
+                icon={faFilter}
+                width={18}
+                height={18}
+              />
             </SheetTrigger>
             <SheetContent>
               <SheetHeader>
@@ -83,11 +82,8 @@ const ProductByCategory = ({ params }: { params: { category: string } }) => {
               </SheetHeader>
               <h1 className="font-bold my-2">Price</h1>
               <Separator className="bg-[#d5dbdb]" />
-              <Slider
-                defaultValue={[50]}
-                max={100}
-                step={1}
-                className={cn("w-[60%]")}
+              <CategoryFilters
+                criterias={JSON.parse(JSON.stringify(criterias))}
               />
             </SheetContent>
           </Sheet>
@@ -96,15 +92,7 @@ const ProductByCategory = ({ params }: { params: { category: string } }) => {
       <div className="hidden md:grid grid-cols-12 gap-4 mt-2">
         <div className="col-span-2">
           <h1 className="text-lg font-bold">Filters</h1>
-          <Separator className="bg-[#d5dbdb] my-2" />
-          <h1 className="fon-bold my-2">Price</h1>
-          <Separator className="bg-[#d5dbdb]" />
-          <Slider
-            defaultValue={[50]}
-            max={100}
-            step={1}
-            className={cn("w-[60%]")}
-          />
+          <CategoryFilters criterias={JSON.parse(JSON.stringify(criterias))} />
         </div>
         <div className="col-span-10">
           <ListProduct category={params.category} isInfiniteScroll />
@@ -116,6 +104,6 @@ const ProductByCategory = ({ params }: { params: { category: string } }) => {
       </div>
     </>
   );
-};
+}
 
 export default ProductByCategory;

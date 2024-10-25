@@ -1,21 +1,23 @@
 import { HTTPStatusCodeType } from "../enums/HttpStatusCodeType";
-import { Client } from "./client";
+import { Client } from "./api";
+import { getCookie } from "cookies-next";
 
 const baseUrl = "http://localhost:5283";
-const authorizedFetchFunction = (
+async function authorizedFetchFunction(
   url: RequestInfo,
   init: RequestInit
-): Promise<Response> => {
+): Promise<Response> {
   const controller: AbortController = new AbortController();
   const signal: AbortSignal = controller.signal;
+  const token = getCookie("i18next");
   const headers = {
-    // Authorization: `Bearer ${Context.token}`,
     signal,
+    "content-language": token,
   };
 
   init.headers = { ...init.headers, ...(headers as A) };
   return fetch(url, init);
-};
+}
 
 const catchServiceErrors = <T>(target: T): T => {
   const prototype = Object.getPrototypeOf(target);

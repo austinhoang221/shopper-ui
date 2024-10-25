@@ -1,6 +1,5 @@
 "use client";
-
-import { ProductResponse } from "@/api/services/client";
+import { GetProductResponse } from "@/api/services/api";
 import { Button } from "@/components/ui/button";
 import InputNumber from "@/components/ui/input-number";
 import { useAppDispatch } from "@/hooks/reduxHooks";
@@ -8,11 +7,11 @@ import { useToast } from "@/hooks/use-toast";
 import { addToCart } from "@/reduxConfig/cartSlice";
 import { faCartShopping } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import React from "react";
 
 type Props = {
-  product: ProductResponse;
+  product: GetProductResponse;
 };
 
 const DetailContent = (props: Props) => {
@@ -20,8 +19,8 @@ const DetailContent = (props: Props) => {
   const { product } = props;
   const { toast } = useToast();
   const router = useRouter();
-  const url = window.location.pathname;
-  const language = url.split("/")[1];
+  const params = useParams();
+  const language = params.locale;
   const [quantity, setQuantity] = React.useState(1);
   return (
     <div>
@@ -32,7 +31,7 @@ const DetailContent = (props: Props) => {
 
       <div className="flex items-center justify-between mb-2">
         <span className="text-muted-foreground">Sku</span>
-        <span>{product.productCd}</span>
+        {/* <span>{product.productCd}</span> */}
       </div>
 
       <div className="flex items-center justify-between mb-2">
@@ -45,13 +44,12 @@ const DetailContent = (props: Props) => {
       </div>
       <div className="flex items-center justify-between mb-2">
         <span className="text-muted-foreground">In stock</span>
-        <span>{product.stock}</span>
+        {/* <span>{product.stock}</span> */}
       </div>
       <div className="flex items-center justify-between">
         <span className="text-muted-foreground">Quantity</span>
         <InputNumber
           onChange={(value) => {
-            console.log(value);
             setQuantity(value);
           }}
           initialValue={1}

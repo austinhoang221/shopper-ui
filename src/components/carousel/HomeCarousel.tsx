@@ -26,7 +26,6 @@ const HomeCarousel = () => {
           <CarouselItem key={index} className="w-full relative pt-[100%]">
             <Image
               className="embla__slide w-full h-full object-cover"
-              placeholder="blur"
               quality={100}
               fill
               sizes="100vw"

@@ -1,4 +1,4 @@
-import { ListProductCategoryResponse } from "@/api/services/client";
+import { ListProductCategoryResponse } from "@/api/services/api";
 import { service } from "@/api/services/service";
 import { Icon } from "@/components/ui/icon";
 import { convertStringToHandle } from "@/utils/utils";
@@ -7,6 +7,18 @@ import React from "react";
 type Props = {
   language: string;
 };
+export const revalidate = 3600;
+
+export const dynamicParams = true;
+
+export async function generateStaticParams() {
+  const categories = await service.client.productCategoriesAll();
+
+  return categories.map((category) => ({
+    id: String(category.id),
+  }));
+}
+
 export const ListCategory: React.FC<Props> = async ({ language }) => {
   const categories = await service.client.productCategoriesAll();
   return (

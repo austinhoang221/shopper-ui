@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import Header from "@/components/header/Header";
 import Footer from "@/components/footer/Footer";
-import SearchBox from "@/components/header/SearchBox";
 import React from "react";
-import Breadcumb from "@/components/header/Breadcrumb";
+import Breadcrumb from "@/components/header/Breadcrumb";
 import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
@@ -15,8 +14,7 @@ export default function Layout({ children, params: { locale } }: A) {
   return (
     <>
       <Header language={locale}></Header>
-      <Breadcumb language={locale} />
-      <SearchBox className="block md:hidden px-2" />
+      <Breadcrumb language={locale} />
       <Toaster />
       <main className="container mx-auto px-2 md:px-0">{children}</main>
       <Footer></Footer>

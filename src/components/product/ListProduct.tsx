@@ -5,9 +5,9 @@ import { service } from "@/api/services/service";
 import {
   OffsetPage,
   ProductOffsetPageStaticQuery,
-  ProductResponse,
+  ProductOffsetPageStaticResponse,
   ProductStaticFilter,
-} from "@/api/services/client";
+} from "@/api/services/api";
 import { defaultPageSize } from "@/utils/constants";
 import UpdateBreadcrumb from "../header/UpdateBreadcrumb";
 import { Skeleton } from "../ui/skeleton";
@@ -23,7 +23,9 @@ const ListProduct = (props: Props) => {
   const [page, setPage] = React.useState(1);
   const [loading, setLoading] = React.useState(false);
   const [hasMore, setHasMore] = React.useState(true);
-  const [products, setProducts] = React.useState<ProductResponse[]>([]);
+  const [products, setProducts] = React.useState<
+    ProductOffsetPageStaticResponse[]
+  >([]);
   const items: IBreadcrumbState[] = [
     {
       icon: "",
@@ -53,11 +55,10 @@ const ListProduct = (props: Props) => {
         page: pageModel,
         filter: modelFilter,
       });
-      const data = await service.client.offset(model);
+      const data = await service.client.offset2(model);
       if (products?.length + defaultPageSize >= data.totalItemsCount!) {
         setHasMore(false);
       }
-      console.log(data);
       setProducts((prev) => [...prev, ...data.items!]);
       setPage((prev) => prev + 1);
     }

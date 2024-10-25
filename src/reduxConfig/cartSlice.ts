@@ -1,4 +1,4 @@
-import { ProductResponse } from "@/api/services/client";
+import { ProductResponse } from "@/api/services/api";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export type CartItem = {

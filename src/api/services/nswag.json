@@ -12,9 +12,13 @@
       "openApiToTypeScriptClient": {
         "className": "{controller}Client",
         "moduleName": "",
-        "typeMappings": {
-        "ULID": "string"
-      },
+        "typescript": {
+          "typeNameGenerator": {
+            "mappings": {
+              "Ulid": "string"
+            }
+          }
+        },
         "namespace": "",
         "typeScriptVersion": 3.7,
         "promiseType": "Promise",
@@ -68,7 +72,7 @@
         "templateDirectory": null,
         "serviceHost": null,
         "serviceSchemes": null,
-        "output": "client.ts",
+        "output": "api.ts",
         "newLineBehavior": "Auto",
         "responseType": "text"
       }

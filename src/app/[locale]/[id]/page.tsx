@@ -8,31 +8,35 @@ import { IBreadcrumbState } from "@/reduxConfig/breadcrumbSlice";
 import DetailContent from "./DetailContent";
 export async function generateMetadata({ params }: { params: { id: string } }) {
   const product = await service.client.products(params.id.split("-p.")?.[1]);
-  console.log(product);
   return {
     title: product.name,
   };
 }
+
 export default async function ProductDetail({
   params,
-}: {
+}: Readonly<{
   params: { category: string; id: string };
-}) {
+}>) {
   const product = await service.client.products(params.id.split("-p.")?.[1]);
-  const items: IBreadcrumbState[] = [
-    {
-      icon: "",
-      href: `category/${params.category}`,
-      name: params.category.split("-cat.")?.[0],
-      key: `k-c-nav-${params.category}`,
-    },
-    {
-      icon: "",
-      href: `${product.name}`,
-      name: product.name ?? "",
-      key: `k-c-nav-${product.name}`,
-    },
-  ];
+  console.log(product);
+  const categoriesBreadcrumb =
+    product.memberNames
+      ?.slice(0, product.memberNames.length - 1)
+      .map((item) => ({
+        icon: "",
+        href: `category/${item}`,
+        name: item,
+        key: `k-c-nav-${item}`,
+      })) ?? [];
+  categoriesBreadcrumb.push({
+    icon: "",
+    href: `${product.name}`,
+    name: product.name ?? "",
+    key: `k-c-nav-${product.i18nName}`,
+  });
+  const items: IBreadcrumbState[] = [...categoriesBreadcrumb];
+
   return (
     <>
       <UpdateBreadcrumb items={items} />
@@ -40,12 +44,14 @@ export default async function ProductDetail({
         <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
           <ImageGallery
             images={
-              product.attachments?.map((attach) => attach.link ?? "") ?? []
+              product.children?.reduce((acc: string[], child) => {
+                const flat =
+                  child.attachments?.map((attach) => attach.link ?? "") || [];
+                return acc.concat(flat);
+              }, []) ?? []
             }
-            defaultAlt={product.name ?? ""}
-            defaultSrc={
-              product.attachments?.map((attach) => attach.link)?.[0] ?? ""
-            }
+            defaultAlt={product.i18nName ?? ""}
+            defaultSrc={product.children?.[0]?.attachments?.[0]?.link ?? ""}
           />
           <DetailContent product={JSON.parse(JSON.stringify(product))} />
         </CardContent>
@@ -55,7 +61,7 @@ export default async function ProductDetail({
           <CardTitle>Product description</CardTitle>
         </CardHeader>
         <CardContent>
-          <p>{product.txDesc}</p>
+          <p>{product.i18nTxDesc}</p>
         </CardContent>
       </Card>
       <Card className="mt-4">
@@ -63,11 +69,11 @@ export default async function ProductDetail({
           <CardTitle>Similar products</CardTitle>
         </CardHeader>
         <CardContent>
-          <PrallaxCarousel
+          {/* <PrallaxCarousel
             images={
               product.attachments?.map((attach) => attach.link ?? "") ?? []
             }
-          />
+          /> */}
         </CardContent>
       </Card>
     </>

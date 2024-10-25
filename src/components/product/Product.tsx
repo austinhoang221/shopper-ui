@@ -14,9 +14,9 @@ import { faCartShopping } from "@fortawesome/free-solid-svg-icons";
 import { useAppDispatch } from "@/hooks/reduxHooks";
 import { addToCart } from "@/reduxConfig/cartSlice";
 import { convertStringToHandle } from "@/utils/utils";
-import { usePathname } from "next/navigation";
-import { ProductResponse } from "@/api/services/client";
 import { useToast } from "../hooks/use-toast";
+import { ProductOffsetPageStaticResponse } from "@/api/services/api";
+import { useParams } from "next/navigation";
 
 export interface DummyProductResponse {
   products: DummyProduct[];
@@ -35,17 +35,22 @@ export interface DummyProduct {
   availabilityStatus: string;
 }
 
-export default function Product({ product }: { product: ProductResponse }) {
+export default function Product({
+  product,
+}: {
+  product: ProductOffsetPageStaticResponse;
+}) {
   const dispatch = useAppDispatch();
-  const pathname = usePathname();
   const { toast } = useToast();
-  const onAddToCart = (item: ProductResponse) => {
+  const onAddToCart = (item: ProductOffsetPageStaticResponse) => {
     dispatch(addToCart({ item: item, quantity: 1 }));
     toast({
       title: "Successfully added to cart",
     });
   };
-  const href = `${pathname}/${convertStringToHandle(
+  const params = useParams();
+  const language = params.locale;
+  const href = `/${language}/${convertStringToHandle(
     product.name?.toString()
   )}-p.${product.id}`;
   return (
