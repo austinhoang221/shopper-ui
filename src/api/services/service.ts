@@ -9,10 +9,12 @@ async function authorizedFetchFunction(
 ): Promise<Response> {
   const controller: AbortController = new AbortController();
   const signal: AbortSignal = controller.signal;
-  const token = getCookie("i18next");
+  const language = getCookie("content-language");
+  const userId = getCookie("user-id");
   const headers = {
     signal,
-    "content-language": token,
+    "content-language": language,
+    userId,
   };
 
   init.headers = { ...init.headers, ...(headers as A) };

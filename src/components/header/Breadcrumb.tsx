@@ -1,4 +1,3 @@
-"use client";
 import React from "react";
 import {
   Breadcrumb as BreadcrumbComponent,
@@ -6,34 +5,35 @@ import {
   BreadcrumbList,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { useAppSelector } from "@/hooks/reduxHooks";
 import Link from "next/link";
+import { IBreadcrumbState } from "@/reduxConfig/breadcrumbSlice";
 type Props = {
   language: string;
+  breadcrumbs: IBreadcrumbState[];
 };
-const Breadcrumb: React.FC<Props> = ({ language }) => {
-  const breadcrumbs = useAppSelector((state) => state.breadcrumb);
-  if (breadcrumbs.value.length > 0)
+const Breadcrumb: React.FC<Props> = (props: Props) => {
+  if (props.breadcrumbs.length > 0)
     return (
-      breadcrumbs.value.length > 1 && (
-        <BreadcrumbComponent className="flex bg-tertiary  items-center  p-2">
+      props.breadcrumbs.length > 1 && (
+        <BreadcrumbComponent className="flex bg-secondary  items-center  p-2">
           <BreadcrumbList className="container">
-            {breadcrumbs.value.map((link, index) => {
+            {props.breadcrumbs.map((link, index) => {
               return (
                 <React.Fragment key={link.key}>
                   <BreadcrumbItem>
                     <Link
                       className={`text-primary ${
-                        index === breadcrumbs.value.length - 1
+                        index === props.breadcrumbs.length - 1
                           ? "font-bold"
                           : ""
                       }`}
-                      href={`/${language}/${link.href}`}
+                      href={`/${props.language}/${link.href}`}
+                      scroll={false}
                     >
                       {link.name}
                     </Link>
                   </BreadcrumbItem>
-                  {index < breadcrumbs.value.length - 1 && (
+                  {index < props.breadcrumbs.length - 1 && (
                     <BreadcrumbSeparator />
                   )}
                 </React.Fragment>

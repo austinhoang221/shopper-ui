@@ -6,6 +6,8 @@ import PrallaxCarousel from "@/components/carousel/ParallaxCarousel";
 import UpdateBreadcrumb from "@/components/header/UpdateBreadcrumb";
 import { IBreadcrumbState } from "@/reduxConfig/breadcrumbSlice";
 import DetailContent from "./DetailContent";
+import Breadcrumb from "@/components/header/Breadcrumb";
+import Product from "@/components/product/Product";
 export async function generateMetadata({ params }: { params: { id: string } }) {
   const product = await service.client.products(params.id.split("-p.")?.[1]);
   return {
@@ -16,10 +18,9 @@ export async function generateMetadata({ params }: { params: { id: string } }) {
 export default async function ProductDetail({
   params,
 }: Readonly<{
-  params: { category: string; id: string };
+  params: { id: string };
 }>) {
   const product = await service.client.products(params.id.split("-p.")?.[1]);
-  console.log(product);
   const categoriesBreadcrumb =
     product.memberNames
       ?.slice(0, product.memberNames.length - 1)
@@ -39,23 +40,9 @@ export default async function ProductDetail({
 
   return (
     <>
-      <UpdateBreadcrumb items={items} />
-      <Card className="mt-4">
-        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-          <ImageGallery
-            images={
-              product.children?.reduce((acc: string[], child) => {
-                const flat =
-                  child.attachments?.map((attach) => attach.link ?? "") || [];
-                return acc.concat(flat);
-              }, []) ?? []
-            }
-            defaultAlt={product.i18nName ?? ""}
-            defaultSrc={product.children?.[0]?.attachments?.[0]?.link ?? ""}
-          />
-          <DetailContent product={JSON.parse(JSON.stringify(product))} />
-        </CardContent>
-      </Card>
+      <Breadcrumb language="en" breadcrumbs={items} />
+      <DetailContent product={JSON.parse(JSON.stringify(product))} />
+
       <Card className="mt-4">
         <CardHeader>
           <CardTitle>Product description</CardTitle>

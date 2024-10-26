@@ -31,6 +31,7 @@ export const ListCategory: React.FC<Props> = async ({ language }) => {
               href={`${language}/category/${convertStringToHandle(
                 category.name
               )}-cat.${category?.id?.toString()}`}
+              scroll={false}
             >
               <Icon className="text-primary" iconName={category.icon!} />
             </Link>

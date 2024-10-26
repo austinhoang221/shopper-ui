@@ -14,7 +14,7 @@ export default function Layout({ children, params: { locale } }: A) {
   return (
     <>
       <Header language={locale}></Header>
-      <Breadcrumb language={locale} />
+      {/* <Breadcrumb language={locale} /> */}
       <Toaster />
       <main className="container mx-auto px-2 md:px-0">{children}</main>
       <Footer></Footer>

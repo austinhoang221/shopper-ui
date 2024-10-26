@@ -78,7 +78,7 @@ const ListCart = () => {
         </CardHeader>
         <CardContent>
           <Table>
-            <TableHeader className="bg-tertiary ">
+            <TableHeader className="bg-secondary ">
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => {
@@ -165,7 +165,7 @@ const ListCart = () => {
           <OrderSummary>
             <Button
               disabled={cartItems.length === 0}
-              className="w-full bg-tertiary text-tertiary-foreground p-4"
+              className="w-full bg-secondary text-secondary-foreground p-4"
               onClick={() => goToCheckOut()}
             >
               PROCEED TO CHECKOUT

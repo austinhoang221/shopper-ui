@@ -7,6 +7,8 @@ import { config } from "@fortawesome/fontawesome-svg-core";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import StoreProvider from "@/reduxConfig/StoreProvider";
 import { cn } from "@/lib/utils";
+import { cookies } from "next/headers";
+import { ulid } from "ulidx";
 config.autoAddCss = false;
 
 export const metadata: Metadata = {

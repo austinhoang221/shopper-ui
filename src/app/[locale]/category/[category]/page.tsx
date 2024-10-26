@@ -83,7 +83,9 @@ export async function ProductByCategory({
               <h1 className="font-bold my-2">Price</h1>
               <Separator className="bg-[#d5dbdb]" />
               <CategoryFilters
-                criterias={JSON.parse(JSON.stringify(criterias))}
+                criterias={
+                  criterias ? JSON.parse(JSON.stringify(criterias)) : []
+                }
               />
             </SheetContent>
           </Sheet>
@@ -92,7 +94,9 @@ export async function ProductByCategory({
       <div className="hidden md:grid grid-cols-12 gap-4 mt-2">
         <div className="col-span-2">
           <h1 className="text-lg font-bold">Filters</h1>
-          <CategoryFilters criterias={JSON.parse(JSON.stringify(criterias))} />
+          <CategoryFilters
+            criterias={criterias ? JSON.parse(JSON.stringify(criterias)) : []}
+          />
         </div>
         <div className="col-span-10">
           <ListProduct category={params.category} isInfiniteScroll />

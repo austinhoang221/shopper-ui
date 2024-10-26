@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import acceptLanguage from "accept-language";
 import { cookieName, fallbackLng, languages } from "./app/i18n/setting";
+import { ulid } from "ulidx";
 
 acceptLanguage.languages(languages);
 
@@ -28,19 +29,23 @@ export function middleware(req: A) {
   ) {
     return NextResponse.redirect(new URL(`/${lng}`, req.url));
   }
+  const response = NextResponse.next();
 
+  if (!req.cookies.get("user-id")?.value) {
+    const expires = new Date();
+    expires.setDate(expires.getDate() + 7);
+    response.cookies.set("user-id", ulid(), { secure: true, expires: expires });
+  }
   if (req.headers.has("referer")) {
     const refererUrl = new URL(req.headers.get("referer"));
     const lngInReferer = languages.find((l) =>
       refererUrl.pathname.startsWith(`/${l}`)
     );
-    const response = NextResponse.next();
     if (lngInReferer)
       response.cookies.set(cookieName, lngInReferer, {
         secure: true,
       });
-    return response;
   }
 
-  return NextResponse.next();
+  return response;
 }
