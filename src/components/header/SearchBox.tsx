@@ -2,7 +2,12 @@
 import React, { ChangeEvent } from "react";
 import { Input } from "../ui/input";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSearch } from "@fortawesome/free-solid-svg-icons";
+import {
+  faArrowAltCircleDown,
+  faArrowDown,
+  faChevronCircleDown,
+  faSearch,
+} from "@fortawesome/free-solid-svg-icons";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -35,13 +40,12 @@ const SearchBox = (props: Props) => {
 
   const handleSearch = () => {
     if (inputValue) {
-      const href = `${
-        props.language
-      }/?q=${inputValue}/category/${convertStringToHandle(
+      const href = `/${props.language}/category/${convertStringToHandle(
         selectedCategory.name
-      )}-cat.${selectedCategory?.id?.toString()}`;
-      router.push(href);
-      router.refresh();
+      )}-cat.${selectedCategory?.id?.toString()}?q=${encodeURIComponent(
+        inputValue
+      )}`;
+      router.push(href, { scroll: false });
     }
   };
 
@@ -53,10 +57,49 @@ const SearchBox = (props: Props) => {
     setSelectedCategory(category);
   };
   return (
-    <div className={props.className}>
+    <div
+      className={`${
+        props.className + "items-center w-full mx-auto  basis-full"
+      }`}
+    >
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          asChild
+          className="h-[40px] p-2 border-2 border-primary rounded-none border-r-0 flex-grow whitespace-nowrap"
+        >
+          <span className="bg-primary text-white font-semibold">
+            {selectedCategory.name}
+
+            <FontAwesomeIcon
+              icon={faChevronCircleDown}
+              width={18}
+              height={18}
+              className="text-white ml-2 cursor-pointer"
+            />
+          </span>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent aria-label="Static Actions">
+          <DropdownMenuGroup>
+            {props.categories.map((category) => {
+              return (
+                <DropdownMenuCheckboxItem
+                  key={category.id}
+                  checked={selectedCategory?.id === category.id}
+                  onCheckedChange={() => onChangeCategory(category)}
+                >
+                  <div className="flex items-center gap-2">
+                    {/* <Icon iconName={category.icon ?? ""} /> */}
+                    <span>{category.name}</span>
+                  </div>
+                </DropdownMenuCheckboxItem>
+              );
+            })}
+          </DropdownMenuGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
       <Input
         placeholder="Type to search..."
-        className="w-full"
+        className="w-full  rounded-none focus:border-primary focus:border-2"
         value={inputValue ?? ""}
         onChange={handleChange}
         onKeyDown={handleKeyPress}
@@ -77,37 +120,6 @@ const SearchBox = (props: Props) => {
           </Link>
         }
         type="search"
-        startContent={
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              {/* <Icon iconName={categoryIcon} /> */}
-              <FontAwesomeIcon
-                icon={faSearch}
-                width={18}
-                height={18}
-                className="text-primary cursor-pointer"
-              />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent aria-label="Static Actions">
-              <DropdownMenuGroup>
-                {props.categories.map((category) => {
-                  return (
-                    <DropdownMenuCheckboxItem
-                      key={category.id}
-                      checked={selectedCategory?.id === category.id}
-                      onCheckedChange={() => onChangeCategory(category)}
-                    >
-                      <div className="flex items-center gap-2">
-                        {/* <Icon iconName={category.icon ?? ""} /> */}
-                        <span>{category.name}</span>
-                      </div>
-                    </DropdownMenuCheckboxItem>
-                  );
-                })}
-              </DropdownMenuGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        }
       />
     </div>
   );

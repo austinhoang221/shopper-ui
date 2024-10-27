@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 import Image from "next/image";
+import { AspectRatio } from "../ui/aspect-ratio";
 
 const HomeCarousel = () => {
   const plugin = React.useRef(
@@ -23,19 +24,16 @@ const HomeCarousel = () => {
     >
       <CarouselContent>
         {Array.from({ length: 5 }).map((_, index) => (
-          <CarouselItem key={index} className="w-full relative pt-[100%]">
-            <Image
-              className="embla__slide w-full h-full object-cover"
-              quality={100}
-              fill
-              sizes="100vw"
-              style={{
-                objectFit: "cover",
-              }}
-              src={`https://picsum.photos/570/230?v=${index}`}
-              priority
-              alt="Your alt text"
-            />
+          <CarouselItem key={index} className="w-full relative max-h-[350px]">
+            <AspectRatio ratio={16 / 9}>
+              <Image
+                fill
+                className="h-full w-full rounded-md object-cover"
+                src={`https://picsum.photos/600/350?v=${index}`}
+                priority
+                alt="Your alt text"
+              />
+            </AspectRatio>
           </CarouselItem>
         ))}
       </CarouselContent>

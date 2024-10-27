@@ -37,7 +37,7 @@ export default function Menu(props: Props) {
         </SheetTrigger>
         <SheetContent side="left">
           <SheetHeader>
-            <SheetTitle>Hello</SheetTitle>
+            <SheetTitle>Discover categories</SheetTitle>
           </SheetHeader>
           <div className="space-y-4">
             {props.categories.map((category, index) => (
@@ -50,7 +50,7 @@ export default function Menu(props: Props) {
                       }/category/${convertStringToHandle(
                         category.name
                       )}-cat.${category?.id?.toString()}`}
-                      className="text-sm font-bold w-full"
+                      className="text-sm block font-bold w-full"
                     >
                       {category.name}
                     </Link>
@@ -73,7 +73,7 @@ export default function Menu(props: Props) {
                           child.name
                         )}-cat.${child?.id?.toString()}`}
                         key={child.id?.toString()}
-                        className="block px-4 py-2 text-sm "
+                        className="block px-4 py-2 text-sm hover:bg-muted"
                       >
                         {child.name}
                       </Link>
