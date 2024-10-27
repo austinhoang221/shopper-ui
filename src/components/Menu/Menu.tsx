@@ -19,6 +19,7 @@ import Link from "next/link";
 import { Separator } from "../ui/separator";
 import { convertStringToHandle } from "@/utils/utils";
 import { ListProductCategoryResponse } from "@/api/services/api";
+import ChangeLanguage from "../header/ChangeLanguage";
 
 type Props = {
   language: string;
@@ -85,6 +86,11 @@ export default function Menu(props: Props) {
                 )}
               </div>
             ))}
+
+            <div className="block md:hidden">
+              <SheetTitle>Settings</SheetTitle>
+              <ChangeLanguage language={props.language} />
+            </div>
           </div>
         </SheetContent>
       </Sheet>

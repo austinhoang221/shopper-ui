@@ -5,10 +5,8 @@ import { fallbackLng, languages } from "@/app/i18n/setting";
 import { Separator } from "../ui/separator";
 import { Label } from "../ui/label";
 import { useParams, useRouter } from "next/navigation";
-import { ListProductCategoryResponse } from "@/api/services/api";
 type Props = {
   language: string;
-  categories: ListProductCategoryResponse[];
 };
 
 const ChangeLanguage = (props: Props) => {
@@ -31,9 +29,12 @@ const ChangeLanguage = (props: Props) => {
   };
 
   return (
-    <RadioGroup defaultValue={props.language || fallbackLng} className="p-1">
-      <div className="flex flex-col justify-center p-2 gap-y-2">
-        <h2>Change language</h2>
+    <RadioGroup
+      defaultValue={props.language || fallbackLng}
+      className="p-0 md:p-1"
+    >
+      <div className="flex flex-col justify-center p-0 md:p-2 gap-y-2">
+        <h2 className="text-sm block font-bold w-full">Change language</h2>
         <Separator className="bg-[#d5dbdb] " />
 
         {languages.map((l, index) => (
