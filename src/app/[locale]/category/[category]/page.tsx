@@ -1,3 +1,4 @@
+"use client";
 import { service } from "@/api/services/service";
 import ListProduct from "@/components/product/ListProduct";
 import {
@@ -21,26 +22,87 @@ import {
   faFilter,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React from "react";
-import CategoryFilters from "./CategoryFilters";
-export async function generateMetadata({
-  params,
-}: {
-  params: { category: string };
-}) {
-  return {
-    title: convertHandleToString(params.category.split("-cat")[0]),
-  };
-}
+import React, { createContext } from "react";
+import CategoryFilters, { ListCriteria } from "./CategoryFilters";
+import {
+  GetFilterByIdCriteriaResponse,
+  GetFilterByIdPriceRangeResponse,
+} from "@/api/services/api";
 
-export async function ProductByCategory({
+interface ICriteriaContextProps {
+  priceRange?: GetFilterByIdPriceRangeResponse;
+  criterias?: GetFilterByIdCriteriaResponse[];
+  criteriaValues?: ListCriteria[];
+  priceRangeValue?: GetFilterByIdPriceRangeResponse;
+  isLoading: boolean;
+  setCriterias?: (criterias: GetFilterByIdCriteriaResponse[]) => void;
+  setCriteriaValues?: (value: ListCriteria[]) => void;
+  setPriceRange?: (priceRange: GetFilterByIdPriceRangeResponse) => void;
+  setPriceRangeValue?: (priceRange: GetFilterByIdPriceRangeResponse) => void;
+  setIsLoading?: (isLoading: boolean) => void;
+}
+export const CriteriaContext = createContext<ICriteriaContextProps>({
+  criterias: [],
+  criteriaValues: [],
+  priceRange: undefined,
+  priceRangeValue: undefined,
+  isLoading: false,
+});
+export default function ProductByCategory({
   params,
 }: Readonly<{ params: { category: string } }>) {
-  const criterias = await service.client.filters(
-    params.category.split("-cat.")[1]
-  );
+  const [criterias, setCriterias] = React.useState<
+    GetFilterByIdCriteriaResponse[] | undefined
+  >([]);
+  const [criteriaValues, setCriteriaValues] = React.useState<
+    ListCriteria[] | undefined
+  >([]);
+  const [priceRange, setPriceRange] = React.useState<
+    GetFilterByIdPriceRangeResponse | undefined
+  >(undefined);
+  const [priceRangeValue, setPriceRangeValue] = React.useState<
+    GetFilterByIdPriceRangeResponse | undefined
+  >(undefined);
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  React.useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      const data = await service.client.filters(
+        params.category.split("-cat.")[1]
+      );
+      setCriterias(data?.criterias ?? []);
+      const initialCriteriaValue: ListCriteria[] =
+        data?.criterias?.reduce<ListCriteria[]>((acc, criteria) => {
+          const flat: ListCriteria[] =
+            criteria.values?.map((value) => ({
+              parent: criteria.criteriaName ?? "",
+              key: value ?? "",
+              check: false,
+            })) || [];
+
+          return acc.concat(flat);
+        }, []) || [];
+      setCriteriaValues(initialCriteriaValue);
+      setPriceRange(data?.priceRange ?? undefined);
+      setIsLoading(false);
+    };
+    fetchData();
+  }, [params.category]);
   return (
-    <>
+    <CriteriaContext.Provider
+      value={{
+        priceRange,
+        criterias,
+        criteriaValues,
+        priceRangeValue,
+        isLoading,
+        setCriterias,
+        setCriteriaValues,
+        setPriceRangeValue,
+        setIsLoading,
+        setPriceRange,
+      }}
+    >
       <div className="block md:flex mt-4 justify-between">
         <h1 className="text-xl font-bold truncate mb-2 md:mb-0">
           {convertHandleToString(params.category.split("-cat")[0])}
@@ -82,11 +144,7 @@ export async function ProductByCategory({
               </SheetHeader>
               <h1 className="font-bold my-2">Price</h1>
               <Separator className="bg-[#d5dbdb]" />
-              <CategoryFilters
-                criterias={
-                  criterias ? JSON.parse(JSON.stringify(criterias)) : []
-                }
-              />
+              <CategoryFilters />
             </SheetContent>
           </Sheet>
         </div>
@@ -94,20 +152,16 @@ export async function ProductByCategory({
       <div className="hidden md:grid grid-cols-12 gap-4 mt-2">
         <div className="col-span-2">
           <h1 className="text-lg font-bold">Filters</h1>
-          <CategoryFilters
-            criterias={criterias ? JSON.parse(JSON.stringify(criterias)) : []}
-          />
+          <CategoryFilters />
         </div>
         <div className="col-span-10">
-          <ListProduct category={params.category} isInfiniteScroll />
+          <ListProduct category={params.category} />
         </div>
       </div>
 
       <div className="block md:hidden">
-        <ListProduct category={params.category} isInfiniteScroll />
+        <ListProduct category={params.category} />
       </div>
-    </>
+    </CriteriaContext.Provider>
   );
 }
-
-export default ProductByCategory;

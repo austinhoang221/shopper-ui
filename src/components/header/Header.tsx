@@ -61,22 +61,21 @@ export default async function Header({
               </Button>
             </div>
 
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild className="">
-                <FontAwesomeIcon
-                  icon={faGlobe}
-                  className="text-primary cursor-pointer"
-                  width={18}
-                  height={18}
-                />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent aria-label="Static Actions">
-                <ChangeLanguage
-                  categories={JSON.parse(JSON.stringify(categories))}
-                  language={language}
-                />
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <div className="hidden md:block">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild className="hidden md:block">
+                  <FontAwesomeIcon
+                    icon={faGlobe}
+                    className="text-primary cursor-pointer"
+                    width={18}
+                    height={18}
+                  />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent aria-label="Change language">
+                  <ChangeLanguage language={language} />
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
             <Separator
               orientation="vertical"
               className="h-1/2 hidden sm:block"

@@ -5,10 +5,8 @@ import { languages } from "./i18n/setting";
 import { Inter } from "next/font/google";
 import { config } from "@fortawesome/fontawesome-svg-core";
 import "@fortawesome/fontawesome-svg-core/styles.css";
-import StoreProvider from "@/reduxConfig/StoreProvider";
 import { cn } from "@/lib/utils";
-import { cookies } from "next/headers";
-import { ulid } from "ulidx";
+
 config.autoAddCss = false;
 
 export const metadata: Metadata = {
@@ -37,7 +35,7 @@ export default function RootLayout({ children, params: { lng } }: A) {
       <body
         className={cn("antialiased", fontHeading.variable, fontBody.variable)}
       >
-        <StoreProvider>{children}</StoreProvider>
+        {children}
       </body>
     </html>
   );

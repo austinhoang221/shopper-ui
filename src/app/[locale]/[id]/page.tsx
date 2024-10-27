@@ -3,11 +3,11 @@ import ImageGallery from "@/components/ui/image-gallery";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { service } from "@/api/services/service";
 import PrallaxCarousel from "@/components/carousel/ParallaxCarousel";
-import UpdateBreadcrumb from "@/components/header/UpdateBreadcrumb";
-import { IBreadcrumbState } from "@/reduxConfig/breadcrumbSlice";
+
 import DetailContent from "./DetailContent";
-import Breadcrumb from "@/components/header/Breadcrumb";
+import Breadcrumb, { IBreadcrumbState } from "@/components/header/Breadcrumb";
 import Product from "@/components/product/Product";
+import { convertStringToHandle } from "@/utils/utils";
 export async function generateMetadata({ params }: { params: { id: string } }) {
   const product = await service.client.products(params.id.split("-p.")?.[1]);
   return {
@@ -22,18 +22,18 @@ export default async function ProductDetail({
 }>) {
   const product = await service.client.products(params.id.split("-p.")?.[1]);
   const categoriesBreadcrumb =
-    product.memberNames
-      ?.slice(0, product.memberNames.length - 1)
-      .map((item) => ({
-        icon: "",
-        href: `category/${item}`,
-        name: item,
-        key: `k-c-nav-${item}`,
-      })) ?? [];
+    product.members?.slice(0, product.members.length - 1).map((item) => ({
+      icon: "",
+      href: `category/${convertStringToHandle(
+        item.name
+      )}-cat.${item?.id?.toString()}}`,
+      name: item.name ?? "",
+      key: `k-c-nav-${item}`,
+    })) ?? [];
   categoriesBreadcrumb.push({
     icon: "",
     href: `${product.name}`,
-    name: product.name ?? "",
+    name: product.i18nName ?? "",
     key: `k-c-nav-${product.i18nName}`,
   });
   const items: IBreadcrumbState[] = [...categoriesBreadcrumb];

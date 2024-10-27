@@ -30,7 +30,6 @@ import React, { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
-import { useAppSelector } from "@/hooks/reduxHooks";
 import {
   calculateShipping,
   getCities,
@@ -59,7 +58,6 @@ const FormSchema = z.object({
 });
 
 export function CheckoutForm() {
-  const { cartItems } = useAppSelector((state) => state.cart);
   const [countries, setCountries] = useState<Place[]>([]);
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
   const [regions, setRegions] = useState<Place[]>([]);
@@ -445,9 +443,9 @@ export function CheckoutForm() {
             <CardTitle>Order Summary</CardTitle>
           </CardHeader>
           <CardContent>
-            {cartItems.map((product) => (
+            {/* {cartItems.map((product) => (
               <ProductOrder key={product.item.id} product={product} />
-            ))}
+            ))} */}
             <div className="hidden md:block">
               <OrderSummary
               // shippingRate={

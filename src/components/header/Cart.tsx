@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCartShopping } from "@fortawesome/free-solid-svg-icons";
-import { useAppSelector } from "@/hooks/reduxHooks";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import CartDetail from "./CartDetail";
 import {
@@ -17,8 +16,6 @@ import {
 } from "../ui/drawer";
 
 const Cart = () => {
-  const { cartItems } = useAppSelector((state) => state.cart);
-
   const [openPopover, setOpenPopover] = useState(false);
   const [openDrawer, setOpenDrawer] = useState(false);
 
@@ -46,7 +43,7 @@ const Cart = () => {
                 width={20}
                 height={20}
               />
-              <span className="ml-1 ">{cartItems?.length}</span>
+              {/* <span className="ml-1 ">{cartItems?.length}</span> */}
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-[25rem] ">
@@ -64,7 +61,7 @@ const Cart = () => {
                 width={20}
                 height={20}
               />
-              <span className="ml-1 ">{cartItems?.length}</span>
+              {/* <span className="ml-1 ">{cartItems?.length}</span> */}
             </Button>
           </DrawerTrigger>
           <DrawerContent className="bg-white">

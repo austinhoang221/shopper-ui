@@ -6,11 +6,18 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import Link from "next/link";
-import { IBreadcrumbState } from "@/reduxConfig/breadcrumbSlice";
+import iconMap from "@/icons/iconMap";
 type Props = {
   language: string;
   breadcrumbs: IBreadcrumbState[];
 };
+
+export interface IBreadcrumbState {
+  key: string;
+  href: string;
+  name: string;
+  icon: keyof typeof iconMap;
+}
 const Breadcrumb: React.FC<Props> = (props: Props) => {
   if (props.breadcrumbs.length > 0)
     return (

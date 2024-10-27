@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import acceptLanguage from "accept-language";
-import { cookieName, fallbackLng, languages } from "./app/i18n/setting";
+import { fallbackLng, languages } from "./app/i18n/setting";
 import { ulid } from "ulidx";
+import { contentLanguageCookie, userIdCookie } from "./utils/constants";
 
 acceptLanguage.languages(languages);
 
@@ -16,19 +17,22 @@ export function middleware(req: A) {
   let lng;
   const response = NextResponse.next();
 
-  if (req.cookies.has(cookieName))
-    lng = acceptLanguage.get(req.cookies.get(cookieName).value);
+  if (req.cookies.has(contentLanguageCookie))
+    lng = acceptLanguage.get(req.cookies.get(contentLanguageCookie).value);
   if (!lng) lng = acceptLanguage.get(req.headers.get("Accept-Language"));
   if (!lng) lng = fallbackLng;
-  if (!req.cookies.get(cookieName)?.value)
-    response.cookies.set(cookieName, lng, {
+  if (!req.cookies.get(contentLanguageCookie)?.value)
+    response.cookies.set(contentLanguageCookie, lng, {
       secure: true,
     });
 
-  if (!req.cookies.get("user-id")?.value) {
+  if (!req.cookies.get(userIdCookie)?.value) {
     const expires = new Date();
     expires.setDate(expires.getDate() + 7);
-    response.cookies.set("user-id", ulid(), { secure: true, expires: expires });
+    response.cookies.set(userIdCookie, ulid(), {
+      secure: true,
+      expires: expires,
+    });
   }
 
   if (

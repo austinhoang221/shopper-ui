@@ -11,8 +11,6 @@ import {
 import { Button } from "../ui/button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCartShopping } from "@fortawesome/free-solid-svg-icons";
-import { useAppDispatch } from "@/hooks/reduxHooks";
-import { addToCart } from "@/reduxConfig/cartSlice";
 import { convertStringToHandle } from "@/utils/utils";
 import { useToast } from "../hooks/use-toast";
 import { ProductOffsetPageStaticResponse } from "@/api/services/api";
@@ -40,10 +38,9 @@ export default function Product({
 }: {
   product: ProductOffsetPageStaticResponse;
 }) {
-  const dispatch = useAppDispatch();
   const { toast } = useToast();
   const onAddToCart = (item: ProductOffsetPageStaticResponse) => {
-    dispatch(addToCart({ item: item, quantity: 1 }));
+    // dispatch(addToCart({ item: item, quantity: 1 }));
     toast({
       title: "Successfully added to cart",
     });

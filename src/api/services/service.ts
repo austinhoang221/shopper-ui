@@ -1,3 +1,4 @@
+import { userIdCookie } from "@/utils/constants";
 import { HTTPStatusCodeType } from "../enums/HttpStatusCodeType";
 import { Client } from "./api";
 import { getCookie } from "cookies-next";
@@ -10,7 +11,7 @@ async function authorizedFetchFunction(
   const controller: AbortController = new AbortController();
   const signal: AbortSignal = controller.signal;
   const language = getCookie("content-language");
-  const userId = getCookie("user-id");
+  const userId = getCookie(userIdCookie);
   const headers = {
     signal,
     "content-language": language,
