@@ -1,17 +1,18 @@
 "use client";
 import React from "react";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
-import { fallbackLng, languages } from "@/app/i18n/setting";
+import { cookieName, fallbackLng, languages } from "@/app/i18n/setting";
 import { Separator } from "../ui/separator";
 import { Label } from "../ui/label";
 import { useParams, useRouter } from "next/navigation";
+import { deleteCookie, setCookie } from "cookies-next";
 type Props = {
   language: string;
 };
 
 const ChangeLanguage = (props: Props) => {
   const router = useRouter();
-  const params = useParams();
+
   const onRenderLanguageItem = (lang: string) => {
     switch (lang) {
       case "en":
@@ -25,6 +26,7 @@ const ChangeLanguage = (props: Props) => {
 
   const onChangeLanguage = (l: string) => {
     // const url = window.location.pathname.replace(`/${props.language}`, `/${l}`);
+    setCookie(cookieName, l);
     router.push(`/${l}`, { scroll: false });
   };
 
