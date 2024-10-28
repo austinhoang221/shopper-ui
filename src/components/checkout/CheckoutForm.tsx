@@ -40,6 +40,8 @@ import {
 } from "@/api/services/externalApiService";
 // import { useFormStatus } from "react-dom";
 import { OrderSummary } from "../order-summary/OrderSummary";
+import { service } from "@/api/services/service";
+import { GetByUserIdResponse } from "@/api/services/api";
 
 const FormSchema = z.object({
   username: z.string().min(2, {
@@ -67,7 +69,19 @@ export function CheckoutForm() {
   const [debounceTimeout, setDebounceTimeout] = useState<NodeJS.Timeout | null>(
     null
   );
+  const [cart, setCart] = React.useState<GetByUserIdResponse | null>(null);
+
   // const { pending } = useFormStatus();
+
+  React.useEffect(() => {
+    const fetchData = async () => {
+      const data = await service.client.cartsGET();
+      setCart(data);
+    };
+
+    fetchData();
+  }, []);
+
   console.log(shippingRate);
   useEffect(() => {
     const fetchCountries = async () => {
@@ -443,9 +457,9 @@ export function CheckoutForm() {
             <CardTitle>Order Summary</CardTitle>
           </CardHeader>
           <CardContent>
-            {/* {cartItems.map((product) => (
-              <ProductOrder key={product.item.id} product={product} />
-            ))} */}
+            {cart.items?.map((product) => (
+              <ProductOrder key={product.productId} product={product} />
+            ))}
             <div className="hidden md:block">
               <OrderSummary
               // shippingRate={

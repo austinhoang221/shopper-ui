@@ -35,7 +35,7 @@ const TrackOrderPage = () => {
         <Button
           size={"lg"}
           variant={"outline"}
-          className="border-2 border-[#674636] bg-[#F7EED3] text-black"
+          className="border-2 border-[--primary] bg-secondary text-black"
         >
           <span className="font-bold">TRACK ORDER &nbsp;&#8594;</span>
         </Button>
