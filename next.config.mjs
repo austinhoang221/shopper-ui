@@ -1,27 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  async headers() {
-    return [
-      {
-        source: "/:path*",
-        headers: [
-          {
-            key: "x-hello",
-            value: "there",
-          },
-        ],
-      },
-      {
-        source: "/hello",
-        headers: [
-          {
-            key: "x-hello",
-            value: "world",
-          },
-        ],
-      },
-    ];
-  },
+  reactStrictMode: false,
+
   experimental: {
     optimizePackageImports: [
       "@fortawesome/free-solid-svg-icons",

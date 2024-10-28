@@ -19,28 +19,30 @@ type Props = {
 };
 
 const ListProduct = (props: Props) => {
+  console.log(123);
   const { criteriaValues, priceRangeValue, isLoading } =
     useContext(CriteriaContext);
-  const [page, setPage] = React.useState(1);
+  const page = React.useRef(1);
+  const hasMore = React.useRef(true);
+  const itemCount = React.useRef(0);
   const [loading, setLoading] = React.useState(false);
-  const [hasMore, setHasMore] = React.useState(true);
   const [products, setProducts] = React.useState<
     ProductOffsetPageStaticResponse[]
   >([]);
   const searchParams = useSearchParams();
   const searchValue = searchParams.get("q");
 
-  React.useEffect(() => {
-    if (props.category) fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.category, criteriaValues, priceRangeValue]);
+  // React.useEffect(() => {
+  //   if (props.category) fetchData();
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [props.category]);
 
-  const fetchData = async () => {
+  const fetchData = React.useCallback(async () => {
     setLoading(true);
-    if (hasMore) {
+    if (hasMore.current) {
       const pageModel = OffsetPage.fromJS({
         pageSize: defaultPageSize,
-        pageNumber: page,
+        pageNumber: page.current,
       });
 
       const modelFilter = ProductStaticFilter.fromJS({
@@ -48,51 +50,69 @@ const ListProduct = (props: Props) => {
         name: searchValue ?? "",
         criterias: criteriaValues
           ?.filter((criteria) => criteria.check)
-          .map((criteria) => criteria.key),
-        priceRange: [priceRangeValue?.fromPrice, priceRangeValue?.toPrice],
+          ?.map((criteria) => criteria.key),
+        priceRange: priceRangeValue,
       });
       const model = ProductOffsetPageStaticQuery.fromJS({
         page: pageModel,
         filter: modelFilter,
       });
       const data = await service.client.offset2(model);
-      if (products?.length + defaultPageSize >= data.totalItemsCount!) {
-        setHasMore(false);
+      if (itemCount.current + defaultPageSize >= data.totalItemsCount!) {
+        hasMore.current = false;
       }
+      itemCount.current += data.items?.length ?? 0;
       setProducts((prev) => [...prev, ...data.items!]);
-      setPage((prev) => prev + 1);
+      page.current++;
     }
 
     setLoading(false);
-  };
+  }, [searchValue, criteriaValues, priceRangeValue]);
+
+  React.useEffect(() => {
+    if (props.category) {
+      page.current = 1;
+      setProducts([]);
+      itemCount.current = 0;
+      hasMore.current = true;
+      fetchData();
+    }
+  }, [searchValue, criteriaValues, priceRangeValue]);
+
   return (
     // <div className="max-h-[300px] w-full overflow-y-auto px-10">
     <>
-      <div className="grid grid-cols-2 lg:grid-cols-4 md:gap-y-4 gap-2 md:gap-4 ">
-        {products.map((product) => (
-          <Product key={product.id} product={product} />
-        ))}
-      </div>
-      <InfiniteScroll
-        hasMore={hasMore}
-        isLoading={loading}
-        next={fetchData}
-        threshold={1}
-      >
-        {hasMore && (
-          <div className="grid grid-cols-2 lg:grid-cols-4 md:gap-y-4 gap-2 md:gap-4 mt-6">
-            {Array.from({ length: 4 }).map((_, index) => (
-              <div key={index} className="shadow-lg rounded-lg p-4">
-                <Skeleton className="h-[14rem] rounded-lg bg-gray-200" />
-                <div className="space-y-2 mt-2">
-                  <Skeleton className="h-4 w-[9rem] bg-gray-200" />
-                  <Skeleton className="h-4 w-[5rem] bg-gray-200" />
-                </div>
-              </div>
+      {products.length > 0 ? (
+        <>
+          <div className="grid grid-cols-2 lg:grid-cols-4 md:gap-y-4 gap-2 md:gap-4 ">
+            {products.map((product) => (
+              <Product key={product.id} product={product} />
             ))}
           </div>
-        )}
-      </InfiniteScroll>
+          <InfiniteScroll
+            hasMore={hasMore.current}
+            isLoading={loading}
+            next={fetchData}
+            threshold={1}
+          >
+            {hasMore.current && (
+              <div className="grid grid-cols-2 lg:grid-cols-4 md:gap-y-4 gap-2 md:gap-4 mt-6">
+                {Array.from({ length: 4 }).map((_, index) => (
+                  <div key={index} className="shadow-lg rounded-lg p-4">
+                    <Skeleton className="h-[14rem] rounded-lg bg-gray-200" />
+                    <div className="space-y-2 mt-2">
+                      <Skeleton className="h-4 w-[9rem] bg-gray-200" />
+                      <Skeleton className="h-4 w-[5rem] bg-gray-200" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </InfiniteScroll>
+        </>
+      ) : (
+        <>Empty</>
+      )}
     </>
     // </div>
   );

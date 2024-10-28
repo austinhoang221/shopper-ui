@@ -4,6 +4,9 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Slider } from "@/components/ui/slider";
 import React, { useContext } from "react";
 import { CriteriaContext } from "./page";
+import { normalizeValue } from "@/utils/utils";
+import { cn } from "@/lib/utils";
+import { GetFilterByIdPriceRangeResponse } from "@/api/services/api";
 
 export type ListCriteria = {
   parent: string;
@@ -15,6 +18,7 @@ const CategoryFilters = () => {
     criterias,
     criteriaValues,
     priceRange,
+    priceRangeValue,
     setPriceRangeValue,
     setCriteriaValues,
     isLoading,
@@ -28,8 +32,12 @@ const CategoryFilters = () => {
       : [];
     setCriteriaValues?.(newValues);
   };
+
+  const onPriceRangeChange = (range: number[]) => {
+    setPriceRangeValue?.(range);
+  };
   return (
-    <ScrollArea>
+    <ScrollArea className="h-screen">
       {criterias?.map((criteria) => {
         return (
           <div key={criteria.criteriaName} className="mt-2">
@@ -60,9 +68,13 @@ const CategoryFilters = () => {
       })}
       <h2 className="my-4 font-medium">Price range</h2>
       <Slider
-        min={priceRange?.fromPrice ?? 0}
-        max={priceRange?.toPrice ?? 0}
+        minStepsBetweenThumbs={1}
+        max={priceRange?.toPrice}
+        min={priceRange?.fromPrice}
+        value={priceRangeValue}
         step={1}
+        onValueChange={onPriceRangeChange}
+        className={cn("w-full")}
       />
     </ScrollArea>
   );

@@ -21,6 +21,7 @@ export default async function ProductDetail({
   params: { id: string };
 }>) {
   const product = await service.client.products(params.id.split("-p.")?.[1]);
+  console.log(product);
   const categoriesBreadcrumb =
     product.members?.slice(0, product.members.length - 1).map((item) => ({
       icon: "",
@@ -28,7 +29,7 @@ export default async function ProductDetail({
         item.name
       )}-cat.${item?.id?.toString()}}`,
       name: item.name ?? "",
-      key: `k-c-nav-${item}`,
+      key: `k-c-nav-${item.id}`,
     })) ?? [];
   categoriesBreadcrumb.push({
     icon: "",

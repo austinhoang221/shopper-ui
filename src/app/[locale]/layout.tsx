@@ -7,6 +7,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { service } from "@/api/services/service";
 import { getCookie, hasCookie } from "cookies-next";
 import { userIdCookie } from "@/utils/constants";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export const metadata: Metadata = {
   title: "Shopper",
@@ -22,7 +23,9 @@ export default async function Layout({ children, params: { locale } }: A) {
       <Header language={locale}></Header>
       {/* <Breadcrumb language={locale} /> */}
       <Toaster />
-      <main className="container mx-auto px-2 md:px-0">{children}</main>
+      <main className="container mx-auto px-2 md:px-0">
+        <ScrollArea>{children}</ScrollArea>
+      </main>
       <Footer></Footer>
     </>
   );

@@ -7,9 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import ImageGallery from "@/components/ui/image-gallery";
 import InputNumber from "@/components/ui/input-number";
-import { useAppDispatch } from "@/hooks/reduxHooks";
 import { useToast } from "@/hooks/use-toast";
-import { addToCart } from "@/reduxConfig/cartSlice";
 import { faCartShopping } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useParams, useRouter } from "next/navigation";
@@ -20,7 +18,6 @@ type Props = {
 };
 
 const DetailContent = (props: Props) => {
-  const dispatch = useAppDispatch();
   const { product } = props;
   const { toast } = useToast();
   const router = useRouter();
@@ -92,7 +89,7 @@ const DetailContent = (props: Props) => {
             variant="outline"
             size="lg"
             onClick={() => {
-              dispatch(addToCart({ item: product, quantity: quantity }));
+              // dispatch(addToCart({ item: product, quantity: quantity }));
               toast({
                 title: "Successfully added to cart",
               });
