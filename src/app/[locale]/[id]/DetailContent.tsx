@@ -2,25 +2,24 @@
 import {
   GetProductChildResponse,
   GetProductResponse,
+  ProductOffsetPageStaticResponse,
 } from "@/api/services/api";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import ImageGallery from "@/components/ui/image-gallery";
 import InputNumber from "@/components/ui/input-number";
-import { useAppDispatch } from "@/hooks/reduxHooks";
 import { useToast } from "@/hooks/use-toast";
-import { addToCart } from "@/reduxConfig/cartSlice";
 import { faCartShopping } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useParams, useRouter } from "next/navigation";
 import React from "react";
+import { ProductOffsetPageStaticResponse } from "@/api/services/api";
 
 type Props = {
   product: GetProductResponse;
 };
 
 const DetailContent = (props: Props) => {
-  const dispatch = useAppDispatch();
   const { product } = props;
   const { toast } = useToast();
   const router = useRouter();
@@ -30,6 +29,12 @@ const DetailContent = (props: Props) => {
   const [detailProduct, setDetailProduct] = React.useState<
     GetProductChildResponse | undefined
   >(product?.children?.[0]);
+
+  const onAddToCart = (item: ProductOffsetPageStaticResponse) => {
+    toast({
+      title: "Successfully added to cart",
+    });
+  };
 
   const onRenderAttributes = () => {
     return product?.attributes?.map((attr) => {
@@ -91,12 +96,7 @@ const DetailContent = (props: Props) => {
             className="relative flex w-full items-center justify-center rounded-full mt-6 p-6"
             variant="outline"
             size="lg"
-            onClick={() => {
-              dispatch(addToCart({ item: product, quantity: quantity }));
-              toast({
-                title: "Successfully added to cart",
-              });
-            }}
+            onClick={() => onAddToCart(product)}
           >
             <span className="mr-2">Add to cart</span>
             <FontAwesomeIcon
