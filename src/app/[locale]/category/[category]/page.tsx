@@ -63,10 +63,9 @@ export default function ProductByCategory({
   const [priceRangeValue, setPriceRangeValue] = React.useState<number[]>([
     0, 0,
   ]);
-  const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const [isLoading, setIsLoading] = React.useState<boolean>(true);
   React.useEffect(() => {
     const fetchData = async () => {
-      setIsLoading(true);
       const data = await service.client.filters(
         params.category.split("-cat.")[1]
       );

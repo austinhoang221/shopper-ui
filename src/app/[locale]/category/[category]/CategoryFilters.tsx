@@ -7,6 +7,7 @@ import { CriteriaContext } from "./page";
 import { normalizeValue } from "@/utils/utils";
 import { cn } from "@/lib/utils";
 import { GetFilterByIdPriceRangeResponse } from "@/api/services/api";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export type ListCriteria = {
   parent: string;
@@ -38,8 +39,8 @@ const CategoryFilters = () => {
   };
   return (
     <ScrollArea className="h-screen">
-      {criterias?.map((criteria) => {
-        return (
+      {!isLoading ? (
+        criterias?.map((criteria) => (
           <div key={criteria.criteriaName} className="mt-2">
             <h2 className="my-4 font-medium">{criteria.criteriaName}</h2>
             <div className="grid grid-cols-1 gap-2">
@@ -63,19 +64,33 @@ const CategoryFilters = () => {
                   </div>
                 ))}
             </div>
+            <h2 className="my-4 font-medium">Price range</h2>
+            <Slider
+              minStepsBetweenThumbs={1}
+              max={priceRange?.toPrice}
+              min={priceRange?.fromPrice}
+              value={priceRangeValue}
+              step={1}
+              onValueChange={onPriceRangeChange}
+              className="w-full"
+            />
           </div>
-        );
-      })}
-      <h2 className="my-4 font-medium">Price range</h2>
-      <Slider
-        minStepsBetweenThumbs={1}
-        max={priceRange?.toPrice}
-        min={priceRange?.fromPrice}
-        value={priceRangeValue}
-        step={1}
-        onValueChange={onPriceRangeChange}
-        className={cn("w-full")}
-      />
+        ))
+      ) : (
+        <div className="">
+          {Array.from({ length: 4 }).map((_, index) => (
+            <div key={index} className="py-4">
+              <Skeleton className="h-4 w-full bg-gray-200" />
+              <div className="space-y-2 mt-2">
+                <Skeleton className="h-4 w-1/2 bg-gray-200" />
+                <Skeleton className="h-4 w-1/2 bg-gray-200" />
+                <Skeleton className="h-4 w-1/2 bg-gray-200" />
+                <Skeleton className="h-4 w-1/2 bg-gray-200" />
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </ScrollArea>
   );
 };

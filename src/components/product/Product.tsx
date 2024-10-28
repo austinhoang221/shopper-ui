@@ -58,7 +58,7 @@ export default function Product({
           alt={product.name ?? ""}
           width={200}
           height={200}
-          className="w-full h-56 object-contain rounded-lg mb-4"
+          className="w-full h-56 object-cover rounded-lg mb-4"
         />
       </Link>
       <TooltipProvider>

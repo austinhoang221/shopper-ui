@@ -2,6 +2,7 @@
 import {
   GetProductChildResponse,
   GetProductResponse,
+  ProductOffsetPageStaticResponse,
 } from "@/api/services/api";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -27,6 +28,12 @@ const DetailContent = (props: Props) => {
   const [detailProduct, setDetailProduct] = React.useState<
     GetProductChildResponse | undefined
   >(product?.children?.[0]);
+
+  const onAddToCart = (item: ProductOffsetPageStaticResponse) => {
+    toast({
+      title: "Successfully added to cart",
+    });
+  };
 
   const onRenderAttributes = () => {
     return product?.attributes?.map((attr) => {
@@ -88,12 +95,7 @@ const DetailContent = (props: Props) => {
             className="relative flex w-full items-center justify-center rounded-full mt-6 p-6"
             variant="outline"
             size="lg"
-            onClick={() => {
-              // dispatch(addToCart({ item: product, quantity: quantity }));
-              toast({
-                title: "Successfully added to cart",
-              });
-            }}
+            onClick={() => onAddToCart(product)}
           >
             <span className="mr-2">Add to cart</span>
             <FontAwesomeIcon

@@ -13,15 +13,14 @@ import { Skeleton } from "../ui/skeleton";
 import Product from "./Product";
 import { useSearchParams } from "next/navigation";
 import { CriteriaContext } from "@/app/[locale]/category/[category]/page";
+import Empty from "@/app/[locale]/category/[category]/Empty";
 
 type Props = {
   category: string;
 };
 
 const ListProduct = (props: Props) => {
-  console.log(123);
-  const { criteriaValues, priceRangeValue, isLoading } =
-    useContext(CriteriaContext);
+  const { criteriaValues, priceRangeValue } = useContext(CriteriaContext);
   const page = React.useRef(1);
   const hasMore = React.useRef(true);
   const itemCount = React.useRef(0);
@@ -95,7 +94,7 @@ const ListProduct = (props: Props) => {
             next={fetchData}
             threshold={1}
           >
-            {hasMore.current && (
+            {(hasMore.current || loading) && (
               <div className="grid grid-cols-2 lg:grid-cols-4 md:gap-y-4 gap-2 md:gap-4 mt-6">
                 {Array.from({ length: 4 }).map((_, index) => (
                   <div key={index} className="shadow-lg rounded-lg p-4">
@@ -111,7 +110,7 @@ const ListProduct = (props: Props) => {
           </InfiniteScroll>
         </>
       ) : (
-        <>Empty</>
+        !loading && <Empty />
       )}
     </>
     // </div>
