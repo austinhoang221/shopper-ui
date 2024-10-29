@@ -67,7 +67,6 @@ const Cart = () => {
           <DrawerContent className="bg-white">
             <DrawerHeader>
               <DrawerTitle>
-                <span className="text-primary">Shopping Cart</span>
               </DrawerTitle>
               <DrawerDescription></DrawerDescription>
             </DrawerHeader>

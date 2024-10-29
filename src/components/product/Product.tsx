@@ -38,13 +38,13 @@ export default function Product({
 }: {
   product: ProductOffsetPageStaticResponse;
 }) {
-  const { toast } = useToast();
-  const onAddToCart = (item: ProductOffsetPageStaticResponse) => {
-    // dispatch(addToCart({ item: item, quantity: 1 }));
-    toast({
-      title: "Successfully added to cart",
-    });
-  };
+  // const { toast } = useToast();
+  // const onAddToCart = (item: ProductOffsetPageStaticResponse) => {
+  //   // dispatch(addToCart({ item: item, quantity: 1 }));
+  //   toast({
+  //     title: "Successfully added to cart",
+  //   });
+  // };
   const params = useParams();
   const language = params.locale;
   const href = `/${language}/${convertStringToHandle(
@@ -76,7 +76,7 @@ export default function Product({
       </TooltipProvider>
 
       <p className="font-bold text-primary">{product.sellingPrice}$</p>
-      <Button
+      {/* <Button
         className="w-full mt-2"
         variant="outline"
         onClick={() => onAddToCart(product)}
@@ -88,7 +88,7 @@ export default function Product({
           width={18}
           height={18}
         />
-      </Button>
+      </Button> */}
     </div>
   );
 }

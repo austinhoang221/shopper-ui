@@ -1,9 +1,11 @@
 "use client";
 import {
+  AddCartItemRequest,
   GetProductChildResponse,
   GetProductResponse,
   ProductOffsetPageStaticResponse,
 } from "@/api/services/api";
+import { service } from "@/api/services/service";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import ImageGallery from "@/components/ui/image-gallery";
@@ -11,8 +13,10 @@ import InputNumber from "@/components/ui/input-number";
 import { useToast } from "@/hooks/use-toast";
 import { faCartShopping } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { getCookie } from "cookies-next";
 import { useParams, useRouter } from "next/navigation";
 import React from "react";
+import { userIdCookie } from "@/utils/constants";
 
 type Props = {
   product: GetProductResponse;
@@ -29,10 +33,24 @@ const DetailContent = (props: Props) => {
     GetProductChildResponse | undefined
   >(product?.children?.[0]);
 
-  const onAddToCart = (item: ProductOffsetPageStaticResponse) => {
-    toast({
-      title: "Successfully added to cart",
+  const onAddToCart = async (item: ProductOffsetPageStaticResponse) => {
+    const cartItem = new AddCartItemRequest({
+      productId: item.id,
+      qty: quantity,
+      unitPrice: item.sellingPrice,
     });
+    try {
+      const userId = getCookie(userIdCookie);
+      await service.client.cartsPOST(userId, cartItem);
+      toast({
+        title: "Successfully added to cart",
+      });
+    } catch (error) {
+      toast({
+        title: "Failed to add item to cart",
+        variant: "destructive",
+      });
+    }
   };
 
   const onRenderAttributes = () => {

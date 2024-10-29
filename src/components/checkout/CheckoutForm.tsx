@@ -42,6 +42,8 @@ import {
 import { OrderSummary } from "../order-summary/OrderSummary";
 import { service } from "@/api/services/service";
 import { GetByUserIdResponse } from "@/api/services/api";
+import { getCookie } from "cookies-next";
+import { userIdCookie } from "@/utils/constants";
 
 const FormSchema = z.object({
   username: z.string().min(2, {
@@ -75,7 +77,8 @@ export function CheckoutForm() {
 
   React.useEffect(() => {
     const fetchData = async () => {
-      const data = await service.client.cartsGET();
+      const userId = getCookie(userIdCookie);
+      const data = await service.client.cartsGET(userId);
       setCart(data);
     };
 
@@ -457,7 +460,7 @@ export function CheckoutForm() {
             <CardTitle>Order Summary</CardTitle>
           </CardHeader>
           <CardContent>
-            {cart.items?.map((product) => (
+            {cart?.items?.map((product) => (
               <ProductOrder key={product.productId} product={product} />
             ))}
             <div className="hidden md:block">
