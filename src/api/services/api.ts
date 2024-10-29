@@ -23,6 +23,7 @@ export class Client {
     this.http = http ? http : (window as any);
     this.baseUrl = baseUrl ?? "";
   }
+
   protected async transformOptions(options: RequestInit): Promise<RequestInit> {
     options.headers = {
       ...options.headers,
@@ -2286,6 +2287,7 @@ export class GetProductChildResponse implements IGetProductChildResponse {
   stock?: number;
   attachments?: GetProductAttachmentResponse[] | undefined;
   translations?: GetProductTranslationResponse[] | undefined;
+  attributeDetails?: GetProductAttributeDetailResponse[] | undefined;
 
   constructor(data?: IGetProductChildResponse) {
     if (data) {
@@ -2314,6 +2316,13 @@ export class GetProductChildResponse implements IGetProductChildResponse {
         this.translations = [] as any;
         for (let item of _data["translations"])
           this.translations!.push(GetProductTranslationResponse.fromJS(item));
+      }
+      if (Array.isArray(_data["attributeDetails"])) {
+        this.attributeDetails = [] as any;
+        for (let item of _data["attributeDetails"])
+          this.attributeDetails!.push(
+            GetProductAttributeDetailResponse.fromJS(item)
+          );
       }
     }
   }
@@ -2344,6 +2353,11 @@ export class GetProductChildResponse implements IGetProductChildResponse {
       for (let item of this.translations)
         data["translations"].push(item.toJSON());
     }
+    if (Array.isArray(this.attributeDetails)) {
+      data["attributeDetails"] = [];
+      for (let item of this.attributeDetails)
+        data["attributeDetails"].push(item.toJSON());
+    }
     return data;
   }
 }
@@ -2358,6 +2372,7 @@ export interface IGetProductChildResponse {
   stock?: number;
   attachments?: GetProductAttachmentResponse[] | undefined;
   translations?: GetProductTranslationResponse[] | undefined;
+  attributeDetails?: GetProductAttributeDetailResponse[] | undefined;
 }
 
 export class GetProductMemberResponse implements IGetProductMemberResponse {
