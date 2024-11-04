@@ -9,6 +9,7 @@ import "./input-number.css";
 type Props = {
   initialValue: number;
   min: number;
+  disabled?: boolean;
   onChange?: (value: number) => void;
 };
 export default function InputNumber(props: Props) {
@@ -28,6 +29,7 @@ export default function InputNumber(props: Props) {
       <Input
         type="number"
         value={value}
+        disabled={props.disabled}
         onChange={(e) => {
           setValue(parseInt(e.target.value) || 0);
           props.onChange?.(Number(e.target.value) || 0);
@@ -35,12 +37,18 @@ export default function InputNumber(props: Props) {
         min={props.min}
         className="w-28 text-center"
         startContent={
-          <Button variant="ghost" size="icon" onClick={handleDecrement}>
+          <Button
+            disabled={props.disabled}
+            variant="ghost"
+            size="icon"
+            onClick={handleDecrement}
+          >
             <FontAwesomeIcon icon={faMinus} />
           </Button>
         }
         endContent={
           <Button
+            disabled={props.disabled}
             variant="ghost"
             size="icon"
             onClick={handleIncrement}

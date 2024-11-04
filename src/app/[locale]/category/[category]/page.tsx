@@ -81,7 +81,7 @@ export default function ProductByCategory({
 
           return acc.concat(flat);
         }, []) || [];
-      setCriteriaValues(initialCriteriaValue);
+      setCriteriaValues([...new Set(initialCriteriaValue)]);
       setPriceRange(data?.priceRange ?? undefined);
       setIsLoading(false);
     };

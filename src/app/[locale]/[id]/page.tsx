@@ -21,16 +21,19 @@ export default async function ProductDetail({
   params: { id: string };
 }>) {
   const product = await service.client.products(params.id.split("-p.")?.[1]);
-  console.log(product);
+
   const categoriesBreadcrumb =
-    product.members?.slice(0, product.members.length - 1).map((item) => ({
-      icon: "",
-      href: `category/${convertStringToHandle(
+    product.members?.slice(0, product.members.length - 1).map((item) => {
+      const href = `category/${convertStringToHandle(
         item.name
-      )}-cat.${item?.id?.toString()}}`,
-      name: item.name ?? "",
-      key: `k-c-nav-${item.id}`,
-    })) ?? [];
+      )}-cat.${item.id?.toString()}`;
+      return {
+        icon: "",
+        href: href,
+        name: item.name ?? "",
+        key: `k-c-nav-${item.id}`,
+      };
+    }) ?? [];
   categoriesBreadcrumb.push({
     icon: "",
     href: `${product.name}`,
@@ -38,7 +41,7 @@ export default async function ProductDetail({
     key: `k-c-nav-${product.i18nName}`,
   });
   const items: IBreadcrumbState[] = [...categoriesBreadcrumb];
-
+  console.log(product);
   return (
     <>
       <Breadcrumb language="en" breadcrumbs={items} />
