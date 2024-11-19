@@ -1,21 +1,24 @@
 "use client";
 import {
+  AddCartItemRequest,
   GetByAttributeDetailIdsRequest,
   GetByAttributeDetailIdsResponse,
-  GetProductAttributeDetailResponse,
-  GetProductChildResponse,
+  GetByUserIdItemResponse,
   GetProductResponse,
-  ProductOffsetPageStaticResponse,
 } from "@/api/services/api";
 import { service } from "@/api/services/service";
+import { addToCart } from "@/app/store/cartSlice";
+import { useAppDispatch } from "@/components/hooks/redux";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import ImageGallery from "@/components/ui/image-gallery";
 import InputNumber from "@/components/ui/input-number";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
+import { userIdCookie } from "@/utils/constants";
 import { faCartShopping } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { getCookie } from "cookies-next";
 import { useParams, useRouter } from "next/navigation";
 import React from "react";
 
@@ -30,15 +33,19 @@ interface ProductAttribute {
 
 const DetailContent = (props: Props) => {
   const { product } = props;
+  const userId = getCookie(userIdCookie);
   const { toast } = useToast();
   const router = useRouter();
   const params = useParams();
+  const dispatch = useAppDispatch();
   const language = params.locale;
   const [quantity, setQuantity] = React.useState(1);
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
+  const [isLoadingButton, setIsLoadingButton] = React.useState<boolean>(false);
   const [detailProduct, setDetailProduct] = React.useState<
     GetByAttributeDetailIdsResponse | undefined
   >();
+
   const initialValue = product?.attributes?.reduce(
     (acc: ProductAttribute[], attr) => {
       const flat: ProductAttribute[] = [];
@@ -76,10 +83,27 @@ const DetailContent = (props: Props) => {
     fetchDetailProduct();
   }, [fetchDetailProduct, selectedAttributes]);
 
-  const onAddToCart = (item: ProductOffsetPageStaticResponse) => {
+  const onAddToCart = async (id: string) => {
+    setIsLoadingButton(true);
+    dispatch(
+      addToCart({
+        item: GetByUserIdItemResponse.fromJS({
+          productId: detailProduct?.id,
+          pictureUrl: detailProduct?.attachmentResponses?.[0].link,
+          productName: detailProduct?.name,
+          unitPrice: detailProduct?.costPrice,
+        }),
+        quantity: quantity,
+      })
+    );
+    await service.client.cartsPOST(
+      userId,
+      AddCartItemRequest.fromJS({ productId: id, qty: quantity })
+    );
     toast({
       title: "Successfully added to cart",
     });
+    setIsLoadingButton(false);
   };
 
   const handleAttributeClick = async (
@@ -210,11 +234,11 @@ const DetailContent = (props: Props) => {
             </div>
             {onRenderAttributes()}
             <Button
-              disabled={isLoading}
+              disabled={isLoading || isLoadingButton}
               className="relative flex w-full items-center justify-center rounded-full mt-6 p-6"
               variant="outline"
               size="lg"
-              onClick={() => onAddToCart(product)}
+              onClick={() => onAddToCart(detailProduct?.id ?? "")}
             >
               <span className="mr-2">Add to cart</span>
               <FontAwesomeIcon
@@ -225,7 +249,7 @@ const DetailContent = (props: Props) => {
               />
             </Button>
             <Button
-              disabled={isLoading}
+              disabled={isLoading || isLoadingButton}
               className="relative flex w-full items-center justify-center rounded-full mt-2 p-6"
               variant="default"
               onClick={() => router.push(`/${language}/cart`)}

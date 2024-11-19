@@ -1648,7 +1648,6 @@ export class Client {
 export class AddCartItemRequest implements IAddCartItemRequest {
   productId?: string;
   qty?: number;
-  unitPrice?: number;
 
   constructor(data?: IAddCartItemRequest) {
     if (data) {
@@ -1663,7 +1662,6 @@ export class AddCartItemRequest implements IAddCartItemRequest {
     if (_data) {
       this.productId = _data["productId"] ? _data["productId"] : <any>undefined;
       this.qty = _data["qty"];
-      this.unitPrice = _data["unitPrice"];
     }
   }
 
@@ -1678,7 +1676,6 @@ export class AddCartItemRequest implements IAddCartItemRequest {
     data = typeof data === "object" ? data : {};
     data["productId"] = this.productId ? this.productId : <any>undefined;
     data["qty"] = this.qty;
-    data["unitPrice"] = this.unitPrice;
     return data;
   }
 }
@@ -1686,7 +1683,6 @@ export class AddCartItemRequest implements IAddCartItemRequest {
 export interface IAddCartItemRequest {
   productId?: string;
   qty?: number;
-  unitPrice?: number;
 }
 
 export class AttachmentResponse implements IAttachmentResponse {
@@ -1879,7 +1875,6 @@ export class CreateOrderRequest implements ICreateOrderRequest {
   buyerEmail?: string | undefined;
   buyerName?: string | undefined;
   description?: string | undefined;
-  orderCd?: string | undefined;
   remark?: string | undefined;
   orderItems?: CreateOrderItemRequest[] | undefined;
 
@@ -1905,7 +1900,6 @@ export class CreateOrderRequest implements ICreateOrderRequest {
       this.buyerEmail = _data["buyerEmail"];
       this.buyerName = _data["buyerName"];
       this.description = _data["description"];
-      this.orderCd = _data["orderCd"];
       this.remark = _data["remark"];
       if (Array.isArray(_data["orderItems"])) {
         this.orderItems = [] as any;
@@ -1935,7 +1929,6 @@ export class CreateOrderRequest implements ICreateOrderRequest {
     data["buyerEmail"] = this.buyerEmail;
     data["buyerName"] = this.buyerName;
     data["description"] = this.description;
-    data["orderCd"] = this.orderCd;
     data["remark"] = this.remark;
     if (Array.isArray(this.orderItems)) {
       data["orderItems"] = [];
@@ -1957,7 +1950,6 @@ export interface ICreateOrderRequest {
   buyerEmail?: string | undefined;
   buyerName?: string | undefined;
   description?: string | undefined;
-  orderCd?: string | undefined;
   remark?: string | undefined;
   orderItems?: CreateOrderItemRequest[] | undefined;
 }
@@ -4382,7 +4374,6 @@ export interface IUlid {
 export class UpdateCartItemRequest implements IUpdateCartItemRequest {
   productId?: string;
   qty?: number;
-  unitPrice?: number;
 
   constructor(data?: IUpdateCartItemRequest) {
     if (data) {
@@ -4397,7 +4388,6 @@ export class UpdateCartItemRequest implements IUpdateCartItemRequest {
     if (_data) {
       this.productId = _data["productId"] ? _data["productId"] : <any>undefined;
       this.qty = _data["qty"];
-      this.unitPrice = _data["unitPrice"];
     }
   }
 
@@ -4412,7 +4402,6 @@ export class UpdateCartItemRequest implements IUpdateCartItemRequest {
     data = typeof data === "object" ? data : {};
     data["productId"] = this.productId ? this.productId : <any>undefined;
     data["qty"] = this.qty;
-    data["unitPrice"] = this.unitPrice;
     return data;
   }
 }
@@ -4420,7 +4409,6 @@ export class UpdateCartItemRequest implements IUpdateCartItemRequest {
 export interface IUpdateCartItemRequest {
   productId?: string;
   qty?: number;
-  unitPrice?: number;
 }
 
 export class UserLoginRequest implements IUserLoginRequest {

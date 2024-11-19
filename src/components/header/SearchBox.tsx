@@ -15,7 +15,7 @@ import {
   DropdownMenuGroup,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { ListProductCategoryResponse } from "@/api/services/api";
 import { Icon } from "../ui/icon";
 import { convertStringToHandle } from "@/utils/utils";

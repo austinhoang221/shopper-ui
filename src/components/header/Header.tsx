@@ -47,10 +47,10 @@ export default async function Header({
               />
             </div>
           </div>
-          <div className="flex justify-end items-center">
+          <div className="flex justify-end items-center gap-1">
             <Cart />
             <Separator orientation="vertical" className="h-1/2 " />
-            <div className="hidden sm:block">
+            {/* <div className="hidden sm:block">
               <Button size="icon" variant="ghost">
                 <FontAwesomeIcon
                   icon={faHeadphones}
@@ -59,17 +59,19 @@ export default async function Header({
                   height={18}
                 />
               </Button>
-            </div>
+            </div> */}
 
             <div className="hidden md:block">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild className="hidden md:block">
-                  <FontAwesomeIcon
-                    icon={faGlobe}
-                    className="text-primary cursor-pointer"
-                    width={18}
-                    height={18}
-                  />
+                  <Button size="icon" variant="ghost" className="relative ">
+                    <FontAwesomeIcon
+                      icon={faGlobe}
+                      className="text-primary cursor-pointer"
+                      width={30}
+                      height={30}
+                    />
+                  </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent aria-label="Change language">
                   <ChangeLanguage language={language} />

@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Header from "@/components/header/Header";
 import Footer from "@/components/footer/Footer";
 import React from "react";
-import Breadcrumb from "@/components/header/Breadcrumb";
 import { Toaster } from "@/components/ui/toaster";
 import { service } from "@/api/services/service";
 import { getCookie, hasCookie } from "cookies-next";

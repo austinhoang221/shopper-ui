@@ -14,10 +14,21 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "../ui/drawer";
+import { service } from "@/api/services/service";
+import { userIdCookie } from "@/utils/constants";
+import { getCookie } from "cookies-next";
+import { useAppDispatch, useAppSelector } from "../hooks/redux";
+import { updateCart } from "@/app/store/cartSlice";
+import { GetByUserIdItemResponse } from "@/api/services/api";
 
 const Cart = () => {
+  const dispatch = useAppDispatch();
+  const { cartItems } = useAppSelector((state) => state.cart);
   const [openPopover, setOpenPopover] = useState(false);
   const [openDrawer, setOpenDrawer] = useState(false);
+  const [cartData, setCartData] = useState<GetByUserIdItemResponse[]>([]);
+  const userId = getCookie(userIdCookie);
+  const [isLoading, setIsLoading] = React.useState<boolean>(true);
 
   useEffect(() => {
     const handleResize = () => {
@@ -31,17 +42,30 @@ const Cart = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  React.useEffect(() => {
+    const fetchData = async () => {
+      const data = await service.client.cartsGET(userId);
+      setCartData(data?.items ?? []);
+      setIsLoading(false);
+    };
+    fetchData();
+  }, []);
+
+  React.useEffect(() => {
+    dispatch(updateCart(cartData));
+  }, [cartData]);
+
   return (
     <>
-      <div className="hidden md:block">
+      <div className="hidden md:block relative">
         <Popover open={openPopover} onOpenChange={setOpenPopover}>
           <PopoverTrigger asChild>
             <Button size="icon" variant="ghost" className="relative ">
               <FontAwesomeIcon
                 icon={faCartShopping}
                 className="text-primary cursor-pointer"
-                width={20}
-                height={20}
+                width={25}
+                height={25}
               />
               {/* <span className="ml-1 ">{cartItems?.length}</span> */}
             </Button>
@@ -50,8 +74,11 @@ const Cart = () => {
             <CartDetail />
           </PopoverContent>
         </Popover>
+        <div className="absolute rounded-full px-1 -right-2 -top-2 min-w-5 text-center border border-white text-white bg-primary">
+          {cartItems?.length}
+        </div>
       </div>
-      <div className="block md:hidden">
+      <div className="block md:hidden relative">
         <Drawer open={openDrawer} onOpenChange={setOpenDrawer}>
           <DrawerTrigger asChild>
             <Button size="icon" variant="ghost" className="relative ">
@@ -66,8 +93,7 @@ const Cart = () => {
           </DrawerTrigger>
           <DrawerContent className="bg-white">
             <DrawerHeader>
-              <DrawerTitle>
-              </DrawerTitle>
+              <DrawerTitle></DrawerTitle>
               <DrawerDescription></DrawerDescription>
             </DrawerHeader>
             <div className="p-4">
@@ -75,6 +101,9 @@ const Cart = () => {
             </div>
           </DrawerContent>
         </Drawer>
+        <div className="absolute rounded-full px-1 -right-2 -top-2 min-w-5 text-center border border-white text-white bg-primary">
+          {cartItems?.length}
+        </div>
       </div>
     </>
   );

@@ -41,27 +41,34 @@ import {
 // import { useFormStatus } from "react-dom";
 import { OrderSummary } from "../order-summary/OrderSummary";
 import { service } from "@/api/services/service";
-import { GetByUserIdResponse } from "@/api/services/api";
+import { CreateOrderItemRequest, CreateOrderRequest } from "@/api/services/api";
 import { getCookie } from "cookies-next";
 import { userIdCookie } from "@/utils/constants";
+import { useAppSelector } from "../hooks/redux";
 
 const FormSchema = z.object({
-  username: z.string().min(2, {
-    message: "Username must be at least 2 characters.",
+  username: z.string().trim().min(1, {
+    message: "Name is required",
   }),
-  company: z.string(),
-  address: z.string(),
+  address: z.string().trim().min(1, {
+    message: "Address is required",
+  }),
   country: z.string(),
   region: z.string(),
   city: z.string(),
   zipcode: z.string(),
-  email: z.string(),
-  phone: z.string(),
+  email: z.string().trim().min(1, {
+    message: "Email is required",
+  }),
+  phone: z.string().trim().min(1, {
+    message: "Phone number is required",
+  }),
   isShip: z.boolean().default(false).optional(),
   note: z.string(),
 });
 
 export function CheckoutForm() {
+  const { cartItems } = useAppSelector((state) => state.cart);
   const [countries, setCountries] = useState<Place[]>([]);
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
   const [regions, setRegions] = useState<Place[]>([]);
@@ -71,21 +78,9 @@ export function CheckoutForm() {
   const [debounceTimeout, setDebounceTimeout] = useState<NodeJS.Timeout | null>(
     null
   );
-  const [cart, setCart] = React.useState<GetByUserIdResponse | null>(null);
 
-  // const { pending } = useFormStatus();
+  const userId = getCookie(userIdCookie);
 
-  React.useEffect(() => {
-    const fetchData = async () => {
-      const userId = getCookie(userIdCookie);
-      const data = await service.client.cartsGET(userId);
-      setCart(data);
-    };
-
-    fetchData();
-  }, []);
-
-  console.log(shippingRate);
   useEffect(() => {
     const fetchCountries = async () => {
       const countryData = await getCountries();
@@ -162,7 +157,6 @@ export function CheckoutForm() {
     resolver: zodResolver(FormSchema),
     defaultValues: {
       username: "",
-      company: "",
       address: "",
       country: "",
       region: "",
@@ -176,25 +170,55 @@ export function CheckoutForm() {
   });
 
   const onRenderCheckoutButton = () => (
-    <Button className="w-full p-4" variant="default">
+    <Button
+      className="w-full p-4"
+      variant="default"
+      type="submit"
+      onClick={() => onSubmit()}
+    >
       CHECKOUT
       <FontAwesomeIcon className="ml-2" icon={faArrowRight} />
     </Button>
   );
 
-  const onSubmit = (data: z.infer<typeof FormSchema>) => {
-    toast({
-      title: "You submitted the following values:",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-    });
+  const onSubmit = async () => {
+    form.trigger();
+    const formValue = form.getValues();
+    const result = FormSchema.safeParse(formValue);
+    if (result.success) {
+      console.log(cartItems);
+      const model = CreateOrderRequest.fromJS({
+        street: formValue?.address,
+        city: formValue?.city,
+        state: formValue?.region,
+        country: formValue?.country,
+        zipCode: formValue?.zipcode,
+        region: formValue?.region,
+        buyerId: userId,
+        buyerPhone: formValue?.phone,
+        buyerEmail: formValue?.email,
+        buyerName: formValue?.username,
+        description: formValue?.note,
+        // orderCd: formValue?.,
+        remark: formValue?.note,
+        orderItems: cartItems?.map((item) => {
+          return CreateOrderItemRequest.fromJS({
+            productId: item.productId,
+            productName: item.productName,
+            unitPrice: item.unitPrice,
+            discounts: 0,
+            pictureUrl: item.pictureUrl,
+            units: item.quantity,
+          });
+        }),
+      });
+      await service.client.ordersPOST(userId, model);
+    } else {
+    }
   };
 
   return (
-    <div className="grid grid-cols-12 gap-4">
+    <div className="grid grid-cols-12 gap-4 mt-4">
       <Card className="col-span-12 md:col-span-8 order-2 md:order-1">
         <CardContent>
           <CardHeader>
@@ -203,30 +227,24 @@ export function CheckoutForm() {
           <CardContent>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)}>
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="col-span-2">
-                    <FormField
-                      control={form.control}
-                      name="username"
-                      render={({ field }) => (
-                        <FormItem className="col-span-1">
-                          <FormLabel>User name</FormLabel>
-                          <div className="grid grid-cols-2 gap-4">
-                            <FormControl>
-                              <Input placeholder="First name" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                            <FormControl className="col-span-1">
-                              <Input placeholder="Last name" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </div>
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
+                <div>
                   <FormField
+                    control={form.control}
+                    name="username"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Name *</FormLabel>
+                        <div className="gap-4">
+                          <FormControl className="col-span-1">
+                            <Input placeholder="Name" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* <FormField
                     control={form.control}
                     name="company"
                     render={({ field }) => (
@@ -241,15 +259,15 @@ export function CheckoutForm() {
                         <FormMessage />
                       </FormItem>
                     )}
-                  />
+                  /> */}
                 </div>
 
                 <FormField
                   control={form.control}
                   name="address"
                   render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Address</FormLabel>
+                    <FormItem className="mt-2">
+                      <FormLabel>Address *</FormLabel>
                       <FormControl>
                         <Input
                           placeholder="Address"
@@ -265,7 +283,7 @@ export function CheckoutForm() {
                   )}
                 />
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-2">
                   <FormField
                     control={form.control}
                     name="country"
@@ -387,13 +405,13 @@ export function CheckoutForm() {
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-4 mt-2">
                   <FormField
                     control={form.control}
                     name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Email</FormLabel>
+                        <FormLabel>Email *</FormLabel>
                         <FormControl>
                           <Input placeholder="Email" {...field} />
                         </FormControl>
@@ -407,7 +425,7 @@ export function CheckoutForm() {
                     name="phone"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Phone Number</FormLabel>
+                        <FormLabel>Phone Number *</FormLabel>
                         <FormControl>
                           <Input placeholder="Phone number" {...field} />
                         </FormControl>
@@ -417,7 +435,7 @@ export function CheckoutForm() {
                   />
                 </div>
 
-                <FormField
+                {/* <FormField
                   control={form.control}
                   name="isShip"
                   render={({ field }) => (
@@ -431,7 +449,7 @@ export function CheckoutForm() {
                       <FormLabel>Ship into different address</FormLabel>
                     </FormItem>
                   )}
-                />
+                /> */}
                 {/* <PaymentOption /> */}
                 <CardTitle className="py-6">Additional Information</CardTitle>
                 <FormField
@@ -460,7 +478,7 @@ export function CheckoutForm() {
             <CardTitle>Order Summary</CardTitle>
           </CardHeader>
           <CardContent>
-            {cart?.items?.map((product) => (
+            {cartItems?.map((product) => (
               <ProductOrder key={product.productId} product={product} />
             ))}
             <div className="hidden md:block">

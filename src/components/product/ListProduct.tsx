@@ -96,7 +96,7 @@ const ListProduct = (props: Props) => {
           >
             {(hasMore.current || loading) && (
               <div className="grid grid-cols-2 lg:grid-cols-4 md:gap-y-4 gap-2 md:gap-4 mt-6">
-                {Array.from({ length: 8 }).map((_, index) => (
+                {Array.from({ length: 4 }).map((_, index) => (
                   <div key={index} className="shadow-lg rounded-lg p-4">
                     <Skeleton className="h-[14rem] rounded-lg bg-gray-200" />
                     <div className="space-y-2 mt-2">
