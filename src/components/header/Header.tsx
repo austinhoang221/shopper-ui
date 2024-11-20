@@ -22,6 +22,8 @@ import Cart from "./Cart";
 
 import ChangeLanguage from "./ChangeLanguage";
 import { service } from "@/api/services/service";
+import Login from "./Login";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 export default async function Header({
   language,
@@ -78,6 +80,9 @@ export default async function Header({
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
+            <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}>
+              <Login />
+            </GoogleOAuthProvider>
             <Separator
               orientation="vertical"
               className="h-1/2 hidden sm:block"
