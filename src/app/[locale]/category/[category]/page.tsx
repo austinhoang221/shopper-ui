@@ -28,6 +28,7 @@ import {
   GetFilterByIdCriteriaResponse,
   GetFilterByIdPriceRangeResponse,
 } from "@/api/services/api";
+import Empty from "./Empty";
 
 interface ICriteriaContextProps {
   priceRange?: GetFilterByIdPriceRangeResponse;
@@ -148,19 +149,25 @@ export default function ProductByCategory({
           </Sheet>
         </div>
       </div>
-      <div className="hidden md:grid grid-cols-12 gap-4 mt-2">
-        <div className="col-span-2">
-          <h1 className="text-lg font-bold">Filters</h1>
-          <CategoryFilters />
-        </div>
-        <div className="col-span-10">
-          <ListProduct category={params.category} />
-        </div>
-      </div>
+      {(criterias?.length && criterias?.length > 0) || priceRange ? (
+        <>
+          <div className="hidden md:grid grid-cols-12 gap-4 mt-2">
+            <div className="col-span-2">
+              <h1 className="text-lg font-bold">Filters</h1>
+              <CategoryFilters />
+            </div>
+            <div className="col-span-10">
+              <ListProduct category={params.category} />
+            </div>
+          </div>
 
-      <div className="block md:hidden">
-        <ListProduct category={params.category} />
-      </div>
+          <div className="block md:hidden">
+            <ListProduct category={params.category} />
+          </div>
+        </>
+      ) : (
+        <Empty />
+      )}
     </CriteriaContext.Provider>
   );
 }

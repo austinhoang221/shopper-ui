@@ -45,6 +45,17 @@ import { CreateOrderItemRequest, CreateOrderRequest } from "@/api/services/api";
 import { getCookie } from "cookies-next";
 import { userIdCookie } from "@/utils/constants";
 import { useAppSelector } from "../hooks/redux";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { Check, ChevronsUpDown } from "lucide-react";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "../ui/command";
+import { cn } from "@/lib/utils";
 
 const FormSchema = z.object({
   username: z.string().trim().min(1, {
@@ -60,9 +71,9 @@ const FormSchema = z.object({
   email: z.string().trim().min(1, {
     message: "Email is required",
   }),
-  phone: z.string().trim().min(1, {
-    message: "Phone number is required",
-  }),
+  phone: z
+    .string()
+    .refine((value) => /^[+]{1}(?:[0-9-()/.]\s?){6,15}[0-9]{1}$/.test(value)),
   isShip: z.boolean().default(false).optional(),
   note: z.string(),
 });
@@ -70,9 +81,11 @@ const FormSchema = z.object({
 export function CheckoutForm() {
   const { cartItems } = useAppSelector((state) => state.cart);
   const [countries, setCountries] = useState<Place[]>([]);
-  const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
+  const [selectedCountry, setSelectedCountry] = useState<string | null>(
+    "3017382"
+  );
   const [regions, setRegions] = useState<Place[]>([]);
-  const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
+  const [selectedRegion, setSelectedRegion] = useState<string | null>();
   const [cities, setCities] = useState<Place[]>([]);
   const [shippingRate, setShippingRate] = useState<ShippingRate[]>([]);
   const [debounceTimeout, setDebounceTimeout] = useState<NodeJS.Timeout | null>(
@@ -81,14 +94,14 @@ export function CheckoutForm() {
 
   const userId = getCookie(userIdCookie);
 
-  useEffect(() => {
-    const fetchCountries = async () => {
-      const countryData = await getCountries();
-      setCountries(countryData);
-    };
+  // useEffect(() => {
+  //   const fetchCountries = async () => {
+  //     const countryData = await getCountries();
+  //     setCountries(countryData);
+  //   };
 
-    fetchCountries();
-  }, []);
+  //   fetchCountries();
+  // }, []);
 
   useEffect(() => {
     if (!selectedCountry) return;
@@ -158,7 +171,7 @@ export function CheckoutForm() {
     defaultValues: {
       username: "",
       address: "",
-      country: "",
+      country: "France",
       region: "",
       city: "",
       zipcode: "",
@@ -184,9 +197,10 @@ export function CheckoutForm() {
   const onSubmit = async () => {
     form.trigger();
     const formValue = form.getValues();
+    console.log(formValue);
     const result = FormSchema.safeParse(formValue);
+
     if (result.success) {
-      console.log(cartItems);
       const model = CreateOrderRequest.fromJS({
         street: formValue?.address,
         city: formValue?.city,
@@ -212,8 +226,13 @@ export function CheckoutForm() {
           });
         }),
       });
+
       await service.client.ordersPOST(userId, model);
     } else {
+      toast({
+        title: "Please input all required fields",
+        variant: "destructive",
+      });
     }
   };
 
@@ -283,8 +302,8 @@ export function CheckoutForm() {
                   )}
                 />
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-2">
-                  <FormField
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-2">
+                  {/* <FormField
                     control={form.control}
                     name="country"
                     render={({ field }) => (
@@ -316,7 +335,7 @@ export function CheckoutForm() {
                         <FormMessage />
                       </FormItem>
                     )}
-                  />
+                  /> */}
 
                   <FormField
                     control={form.control}
@@ -324,29 +343,66 @@ export function CheckoutForm() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Region/State</FormLabel>
-                        <Select
-                          onValueChange={(value) => {
-                            field.onChange(value);
-                            setSelectedRegion(value);
-                          }}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select..." />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {regions.map((region) => (
-                              <SelectItem
-                                key={region.geonameId}
-                                value={region.geonameId}
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <FormControl>
+                              <Button
+                                variant="outline"
+                                role="combobox"
+                                className={cn(
+                                  "w-full justify-between",
+                                  !field.value && "text-muted-foreground"
+                                )}
                               >
-                                {region.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                                {field.value
+                                  ? regions.find(
+                                      (language) =>
+                                        language.geonameId.toString() ===
+                                        field.value
+                                    )?.name
+                                  : "Select region"}
+                                <ChevronsUpDown className="opacity-50" />
+                              </Button>
+                            </FormControl>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-full p-0">
+                            <Command>
+                              <CommandInput
+                                placeholder="Search"
+                                className="h-9"
+                              />
+                              <CommandList>
+                                <CommandEmpty>No region found.</CommandEmpty>
+                                <CommandGroup>
+                                  {regions.map((region) => (
+                                    <CommandItem
+                                      value={region.geonameId.toString()}
+                                      key={region.geonameId}
+                                      onSelect={() => {
+                                        form.setValue(
+                                          "region",
+                                          region.geonameId.toString()
+                                        );
+                                        setSelectedRegion(region.geonameId);
+                                      }}
+                                    >
+                                      {region.name}
+                                      <Check
+                                        className={cn(
+                                          "ml-auto",
+                                          region.geonameId.toString() ===
+                                            field.value
+                                            ? "opacity-100"
+                                            : "opacity-0"
+                                        )}
+                                      />
+                                    </CommandItem>
+                                  ))}
+                                </CommandGroup>
+                              </CommandList>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -358,26 +414,64 @@ export function CheckoutForm() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>City</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select..." />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {cities.map((city) => (
-                              <SelectItem
-                                key={city.geonameId}
-                                value={city.geonameId}
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <FormControl>
+                              <Button
+                                variant="outline"
+                                role="combobox"
+                                className={cn(
+                                  "w-full justify-between",
+                                  !field.value && "text-muted-foreground"
+                                )}
                               >
-                                {city.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                                {field.value
+                                  ? cities.find(
+                                      (city) =>
+                                        city.geonameId.toString() ===
+                                        field.value
+                                    )?.name
+                                  : "Select city"}
+                                <ChevronsUpDown className="opacity-50" />
+                              </Button>
+                            </FormControl>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-full p-0">
+                            <Command>
+                              <CommandInput
+                                placeholder="Search..."
+                                className="h-9"
+                              />
+                              <CommandList>
+                                <CommandEmpty>No city found.</CommandEmpty>
+                                <CommandGroup>
+                                  {cities.map((city) => (
+                                    <CommandItem
+                                      value={city.geonameId.toString()}
+                                      key={city.geonameId}
+                                      onSelect={() => {
+                                        form.setValue(
+                                          "city",
+                                          city.geonameId.toString()
+                                        );
+                                      }}
+                                    >
+                                      {city.name}
+                                      <Check
+                                        className={cn(
+                                          "ml-auto",
+                                          city.geonameId === field.value
+                                            ? "opacity-100"
+                                            : "opacity-0"
+                                        )}
+                                      />
+                                    </CommandItem>
+                                  ))}
+                                </CommandGroup>
+                              </CommandList>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
                         <FormMessage />
                       </FormItem>
                     )}

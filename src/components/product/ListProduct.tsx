@@ -79,41 +79,53 @@ const ListProduct = (props: Props) => {
   }, [searchValue, criteriaValues, priceRangeValue]);
 
   return (
-    // <div className="max-h-[300px] w-full overflow-y-auto px-10">
     <>
-      {products.length > 0 ? (
-        <>
-          <div className="grid grid-cols-2 lg:grid-cols-4 md:gap-y-4 gap-2 md:gap-4 ">
-            {products.map((product) => (
-              <Product key={product.id} product={product} />
-            ))}
-          </div>
-          <InfiniteScroll
-            hasMore={hasMore.current}
-            isLoading={loading}
-            next={fetchData}
-            threshold={1}
-          >
-            {(hasMore.current || loading) && (
-              <div className="grid grid-cols-2 lg:grid-cols-4 md:gap-y-4 gap-2 md:gap-4 mt-6">
-                {Array.from({ length: 4 }).map((_, index) => (
-                  <div key={index} className="shadow-lg rounded-lg p-4">
-                    <Skeleton className="h-[14rem] rounded-lg bg-gray-200" />
-                    <div className="space-y-2 mt-2">
-                      <Skeleton className="h-4 w-[9rem] bg-gray-200" />
-                      <Skeleton className="h-4 w-[5rem] bg-gray-200" />
+      {!loading ? (
+        products.length > 0 ? (
+          <>
+            <div className="grid grid-cols-2 lg:grid-cols-4 md:gap-y-4 gap-2 md:gap-4">
+              {products.map((product) => (
+                <Product key={product.id} product={product} />
+              ))}
+            </div>
+            <InfiniteScroll
+              hasMore={hasMore.current}
+              isLoading={loading}
+              next={fetchData}
+              threshold={1}
+            >
+              {hasMore.current && (
+                <div className="grid grid-cols-2 lg:grid-cols-4 md:gap-y-4 gap-2 md:gap-4 mt-6">
+                  {Array.from({ length: 4 }).map((_, index) => (
+                    <div key={index} className="shadow-lg rounded-lg p-4">
+                      <Skeleton className="h-[14rem] rounded-lg bg-gray-200" />
+                      <div className="space-y-2 mt-2">
+                        <Skeleton className="h-4 w-[9rem] bg-gray-200" />
+                        <Skeleton className="h-4 w-[5rem] bg-gray-200" />
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </InfiniteScroll>
-        </>
+                  ))}
+                </div>
+              )}
+            </InfiniteScroll>
+          </>
+        ) : (
+          <Empty />
+        )
       ) : (
-        !loading && <Empty />
+        <div className="grid grid-cols-2 lg:grid-cols-4 md:gap-y-4 gap-2 md:gap-4 mt-6">
+          {Array.from({ length: 8 }).map((_, index) => (
+            <div key={index} className="shadow-lg rounded-lg p-4">
+              <Skeleton className="h-[14rem] rounded-lg bg-gray-200" />
+              <div className="space-y-2 mt-2">
+                <Skeleton className="h-4 w-[9rem] bg-gray-200" />
+                <Skeleton className="h-4 w-[5rem] bg-gray-200" />
+              </div>
+            </div>
+          ))}
+        </div>
       )}
     </>
-    // </div>
   );
 };
 

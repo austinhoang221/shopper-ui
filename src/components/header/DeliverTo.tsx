@@ -14,7 +14,7 @@ const DeliverTo = () => {
       />
       <div className="md:flex-col leading-4 flex">
         <span className="text-xs mr-1 md:mr-0">Deliver to</span>
-        <span className="text-primary font-bold">Vietnam</span>
+        <span className="text-primary font-bold">France</span>
       </div>
     </Button>
   );
