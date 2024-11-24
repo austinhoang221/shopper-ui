@@ -1,7 +1,7 @@
 import ImageGallery from "@/components/ui/image-gallery";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { service } from "@/api/services/service";
+import { service } from "@/app/api/services/service";
 import PrallaxCarousel from "@/components/carousel/ParallaxCarousel";
 
 import DetailContent from "./DetailContent";

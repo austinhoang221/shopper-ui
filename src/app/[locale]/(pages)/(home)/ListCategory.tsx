@@ -1,5 +1,5 @@
-import { ListProductCategoryResponse } from "@/api/services/api";
-import { service } from "@/api/services/service";
+import { ListProductCategoryResponse } from "@/app/api/services/api";
+import { service } from "@/app/api/services/service";
 import { Icon } from "@/components/ui/icon";
 import { convertStringToHandle } from "@/utils/utils";
 import Link from "next/link";

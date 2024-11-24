@@ -1,12 +1,6 @@
 import type { Metadata } from "next";
-import Header from "@/components/header/Header";
 import Footer from "@/components/footer/Footer";
 import React from "react";
-import { Toaster } from "@/components/ui/toaster";
-import { service } from "@/api/services/service";
-import { getCookie, hasCookie } from "cookies-next";
-import { userIdCookie } from "@/utils/constants";
-import { ScrollArea } from "@/components/ui/scroll-area";
 
 export const metadata: Metadata = {
   title: "Shopper",
@@ -14,17 +8,9 @@ export const metadata: Metadata = {
 };
 
 export default async function Layout({ children, params: { locale } }: A) {
-  if (hasCookie(userIdCookie)) {
-    await service.client.users(getCookie(userIdCookie)!);
-  }
   return (
     <>
-      <Header language={locale}></Header>
-      {/* <Breadcrumb language={locale} /> */}
-      <Toaster />
-      <main className="container mx-auto px-2 md:px-0">
-        <ScrollArea>{children}</ScrollArea>
-      </main>
+      {children}
       <Footer></Footer>
     </>
   );

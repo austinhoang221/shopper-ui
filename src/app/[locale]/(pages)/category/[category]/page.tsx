@@ -1,5 +1,5 @@
 "use client";
-import { service } from "@/api/services/service";
+import { service } from "@/app/api/services/service";
 import ListProduct from "@/components/product/ListProduct";
 import {
   DropdownMenu,
@@ -27,7 +27,7 @@ import CategoryFilters, { ListCriteria } from "./CategoryFilters";
 import {
   GetFilterByIdCriteriaResponse,
   GetFilterByIdPriceRangeResponse,
-} from "@/api/services/api";
+} from "@/app/api/services/api";
 import Empty from "./Empty";
 
 interface ICriteriaContextProps {

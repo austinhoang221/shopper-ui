@@ -14,14 +14,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/select";
-import { Checkbox } from "../ui/checkbox";
 import { Textarea } from "../ui/textarea";
 // import PaymentOption from "./PaymentOption/PaymentOption";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
@@ -33,15 +25,17 @@ import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import {
   calculateShipping,
   getCities,
-  getCountries,
   getRegions,
   Place,
   ShippingRate,
-} from "@/api/services/externalApiService";
+} from "@/app/api/services/externalApiService";
 // import { useFormStatus } from "react-dom";
 import { OrderSummary } from "../order-summary/OrderSummary";
-import { service } from "@/api/services/service";
-import { CreateOrderItemRequest, CreateOrderRequest } from "@/api/services/api";
+import { service } from "@/app/api/services/service";
+import {
+  CreateOrderItemRequest,
+  CreateOrderRequest,
+} from "@/app/api/services/api";
 import { getCookie } from "cookies-next";
 import { userIdCookie } from "@/utils/constants";
 import { useAppSelector } from "../hooks/redux";

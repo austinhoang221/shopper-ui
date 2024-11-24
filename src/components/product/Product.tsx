@@ -13,7 +13,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCartShopping } from "@fortawesome/free-solid-svg-icons";
 import { convertStringToHandle } from "@/utils/utils";
 import { useToast } from "../hooks/use-toast";
-import { ProductOffsetPageStaticResponse } from "@/api/services/api";
+import { ProductOffsetPageStaticResponse } from "@/app/api/services/api";
 import { useParams } from "next/navigation";
 
 export interface DummyProductResponse {

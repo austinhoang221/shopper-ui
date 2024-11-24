@@ -1,4 +1,4 @@
-import { GetByUserIdItemResponse } from "@/api/services/api";
+import { GetByUserIdItemResponse } from "@/app/api/services/api";
 import Image from "next/image";
 import Link from "next/link";
 

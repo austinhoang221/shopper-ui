@@ -14,12 +14,12 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "../ui/drawer";
-import { service } from "@/api/services/service";
+import { service } from "@/app/api/services/service";
 import { userIdCookie } from "@/utils/constants";
 import { getCookie } from "cookies-next";
 import { useAppDispatch, useAppSelector } from "../hooks/redux";
 import { updateCart } from "@/app/store/cartSlice";
-import { GetByUserIdItemResponse } from "@/api/services/api";
+import { GetByUserIdItemResponse } from "@/app/api/services/api";
 
 const Cart = () => {
   const dispatch = useAppDispatch();

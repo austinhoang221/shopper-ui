@@ -3,8 +3,6 @@ import React, { ChangeEvent } from "react";
 import { Input } from "../ui/input";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faArrowAltCircleDown,
-  faArrowDown,
   faChevronCircleDown,
   faSearch,
 } from "@fortawesome/free-solid-svg-icons";
@@ -15,9 +13,8 @@ import {
   DropdownMenuGroup,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { useParams, useRouter } from "next/navigation";
-import { ListProductCategoryResponse } from "@/api/services/api";
-import { Icon } from "../ui/icon";
+import { useRouter } from "next/navigation";
+import { ListProductCategoryResponse } from "@/app/api/services/api";
 import { convertStringToHandle } from "@/utils/utils";
 import Link from "next/link";
 

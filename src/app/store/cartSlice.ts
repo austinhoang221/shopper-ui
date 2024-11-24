@@ -1,4 +1,4 @@
-import { GetByUserIdItemResponse } from "@/api/services/api";
+import { GetByUserIdItemResponse } from "@/app/api/services/api";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface ICartState {

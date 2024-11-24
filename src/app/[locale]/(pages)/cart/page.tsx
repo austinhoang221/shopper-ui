@@ -2,8 +2,8 @@
 import {
   GetByUserIdItemResponse,
   RemoveCartItemRequest,
-} from "@/api/services/api";
-import { service } from "@/api/services/service";
+} from "@/app/api/services/api";
+import { service } from "@/app/api/services/service";
 import { removeFromCart, updateQuantity } from "@/app/store/cartSlice";
 import { useAppDispatch, useAppSelector } from "@/components/hooks/redux";
 import { toast } from "@/components/hooks/use-toast";

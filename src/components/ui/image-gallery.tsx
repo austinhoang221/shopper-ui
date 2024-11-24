@@ -8,7 +8,7 @@ import {
   CarouselItem,
 } from "@/components/ui/carousel";
 import { Card, CardContent } from "./card";
-import { GetProductChildResponse } from "@/api/services/api";
+import { GetProductChildResponse } from "@/app/api/services/api";
 type Props = {
   defaultAlt: string;
   defaultSrc: string;

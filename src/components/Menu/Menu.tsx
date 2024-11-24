@@ -18,7 +18,7 @@ import {
 import Link from "next/link";
 import { Separator } from "../ui/separator";
 import { convertStringToHandle } from "@/utils/utils";
-import { ListProductCategoryResponse } from "@/api/services/api";
+import { ListProductCategoryResponse } from "@/app/api/services/api";
 import ChangeLanguage from "../header/ChangeLanguage";
 
 type Props = {

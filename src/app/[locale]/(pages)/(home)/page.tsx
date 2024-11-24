@@ -3,7 +3,7 @@ import HomeCarousel from "@/components/carousel/HomeCarousel";
 import { ListCategory } from "./ListCategory";
 import PrallaxCarousel from "@/components/carousel/ParallaxCarousel";
 import LayoutProvider from "@/app/LayoutProvider";
-import { service } from "@/api/services/service";
+import { service } from "@/app/api/services/service";
 
 const Home: React.FC<A> = async ({ params: { locale } }) => {
   const bestSellers = await service.client.bestSellers2(6);

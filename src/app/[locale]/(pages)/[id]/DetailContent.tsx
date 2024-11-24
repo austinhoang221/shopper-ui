@@ -5,8 +5,8 @@ import {
   GetByAttributeDetailIdsResponse,
   GetByUserIdItemResponse,
   GetProductResponse,
-} from "@/api/services/api";
-import { service } from "@/api/services/service";
+} from "@/app/api/services/api";
+import { service } from "@/app/api/services/service";
 import { addToCart } from "@/app/store/cartSlice";
 import { useAppDispatch } from "@/components/hooks/redux";
 import { Button } from "@/components/ui/button";

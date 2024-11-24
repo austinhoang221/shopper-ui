@@ -1,19 +1,19 @@
 "use client";
 import React, { useContext } from "react";
 import InfiniteScroll from "@/components/ui/infinite-scroll";
-import { service } from "@/api/services/service";
+import { service } from "@/app/api/services/service";
 import {
   OffsetPage,
   ProductOffsetPageStaticQuery,
   ProductOffsetPageStaticResponse,
   ProductStaticFilter,
-} from "@/api/services/api";
+} from "@/app/api/services/api";
 import { defaultPageSize } from "@/utils/constants";
 import { Skeleton } from "../ui/skeleton";
 import Product from "./Product";
 import { useSearchParams } from "next/navigation";
-import { CriteriaContext } from "@/app/[locale]/category/[category]/page";
-import Empty from "@/app/[locale]/category/[category]/Empty";
+import { CriteriaContext } from "@/app/[locale]/(pages)/category/[category]/page";
+import Empty from "@/app/[locale]/(pages)/category/[category]/Empty";
 
 type Props = {
   category: string;

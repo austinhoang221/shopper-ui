@@ -1,16 +1,10 @@
-import {
-  faGlobe,
-  faHeadphones,
-  faUser,
-} from "@fortawesome/free-solid-svg-icons";
+import { faGlobe } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
 import React from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { Button } from "../ui/button";
@@ -21,9 +15,8 @@ import DeliverTo from "./DeliverTo";
 import Cart from "./Cart";
 
 import ChangeLanguage from "./ChangeLanguage";
-import { service } from "@/api/services/service";
-import Login from "./Login";
-import { GoogleOAuthProvider } from "@react-oauth/google";
+import { service } from "@/app/api/services/service";
+import Authentication from "./Authentication";
 
 export default async function Header({
   language,
@@ -80,52 +73,7 @@ export default async function Header({
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
-            <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}>
-              <Login />
-            </GoogleOAuthProvider>
-            <Separator
-              orientation="vertical"
-              className="h-1/2 hidden sm:block"
-            />
-            <Button variant="ghost" className="px-2">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <FontAwesomeIcon
-                    icon={faUser}
-                    className="text-primary cursor-pointer"
-                    width={18}
-                    height={18}
-                  />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent aria-label="Profile Actions">
-                  <DropdownMenuGroup>
-                    <DropdownMenuItem key="profile" className="h-14 gap-2">
-                      <p className="font-semibold">Signed in as</p>
-                      <p className="font-semibold">zoey@example.com</p>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem key="settings">
-                      My Settings
-                    </DropdownMenuItem>
-                    <DropdownMenuItem key="team_settings">
-                      Team Settings
-                    </DropdownMenuItem>
-                    <DropdownMenuItem key="analytics">
-                      Analytics
-                    </DropdownMenuItem>
-                    <DropdownMenuItem key="system">System</DropdownMenuItem>
-                    <DropdownMenuItem key="configurations">
-                      Configurations
-                    </DropdownMenuItem>
-                    <DropdownMenuItem key="help_and_feedback">
-                      Help & Feedback
-                    </DropdownMenuItem>
-                    <DropdownMenuItem key="logout" color="danger">
-                      Log Out
-                    </DropdownMenuItem>
-                  </DropdownMenuGroup>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </Button>
+            <Authentication />
           </div>
         </div>
       </nav>
