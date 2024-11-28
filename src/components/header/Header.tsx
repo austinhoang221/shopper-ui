@@ -17,6 +17,7 @@ import Cart from "./Cart";
 import ChangeLanguage from "./ChangeLanguage";
 import { service } from "@/app/api/services/service";
 import Authentication from "./Authentication";
+import { SessionProvider } from "next-auth/react";
 
 export default async function Header({
   language,
@@ -25,7 +26,7 @@ export default async function Header({
   return (
     <>
       <nav className=" w-full px-2 bg-white/90 sticky top-0 z-40 backdrop-blur-sm border-b flex-none transition-colors duration-500  ">
-        <div className="container mx-auto items-center flex h-14 justify-between gap-3">
+        <div className="container mx-auto items-center flex h-14 justify-between gap-4">
           <div className="flex justify-start items-center">
             <Menu categories={categories} language={language} />
             <Link href="/" className="mr-4">
@@ -73,7 +74,9 @@ export default async function Header({
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
-            <Authentication />
+            <SessionProvider>
+              <Authentication />
+            </SessionProvider>
           </div>
         </div>
       </nav>

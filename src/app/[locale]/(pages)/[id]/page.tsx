@@ -41,7 +41,7 @@ export default async function ProductDetail({
     key: `k-c-nav-${product.i18nName}`,
   });
   const items: IBreadcrumbState[] = [...categoriesBreadcrumb];
-  console.log(product);
+
   return (
     <>
       <Breadcrumb language="en" breadcrumbs={items} />

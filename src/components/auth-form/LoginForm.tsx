@@ -10,18 +10,31 @@ import { SeparatorWithText } from "../ui/separator-text";
 import GoogleAuth from "./GoogleAuth";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import { SignIn } from "@/lib/auth-action";
+import { Alert, AlertDescription } from "../ui/alert";
+import { AlertCircle } from "lucide-react";
+import { PASSWORD_REGEX, PHONE_NUMBER_REGEX } from "@/utils/constants";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../ui/tooltip";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 
 type Props = {
   callBackUrl: string;
 };
 const FormSchema = z.object({
-  username: z.string().trim().min(1),
-  password: z.string().trim().min(1),
+  username: z.union([z.string().email(), z.string().regex(PHONE_NUMBER_REGEX)]),
+  password: z.string().trim().regex(PASSWORD_REGEX),
 });
 const LoginForm = (props: Props) => {
   const router = useRouter();
   const params = useParams();
-  console.log(params);
+  const [errorMsg, setErrorMsg] = React.useState<string>("");
+  const [isLoadingBtn, setIsLoadingBtn] = React.useState<boolean>(false);
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -32,15 +45,31 @@ const LoginForm = (props: Props) => {
 
   const onSubmit = async () => {
     form.trigger();
+    setErrorMsg("");
     const formValue = form.getValues();
     const result = FormSchema.safeParse(formValue);
     if (result.success) {
-      router.push(props.callBackUrl);
+      setIsLoadingBtn(true);
+      const response = await SignIn(props.callBackUrl, { ...formValue });
+      if (response?.error) {
+        setErrorMsg(response?.error);
+      } else {
+        router.push(props.callBackUrl);
+      }
+      setIsLoadingBtn(false);
+    } else {
+      setIsLoadingBtn(false);
     }
   };
 
   return (
     <div className="grid gap-4 py-4">
+      {errorMsg && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{errorMsg}</AlertDescription>
+        </Alert>
+      )}
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className="mb-3">
@@ -51,10 +80,7 @@ const LoginForm = (props: Props) => {
                 <FormItem>
                   <div className="gap-4">
                     <FormControl className="col-span-1">
-                      <Input
-                        placeholder="Email/Phone number/User name"
-                        {...field}
-                      />
+                      <Input placeholder="Email/Phone number" {...field} />
                     </FormControl>
                   </div>
                 </FormItem>
@@ -74,6 +100,24 @@ const LoginForm = (props: Props) => {
                           type="password"
                           placeholder="Password"
                           {...field}
+                          endContent={
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <FontAwesomeIcon
+                                    icon={faInfoCircle}
+                                    className="text-primary"
+                                  />
+                                </TooltipTrigger>
+                                <TooltipContent align="start">
+                                  The password must be 6 characters long and
+                                  include at least one uppercase letter (A-Z),
+                                  one numeric digit (0-9), and one special
+                                  character.
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          }
                         />
                       </FormControl>
                     </div>
@@ -86,7 +130,9 @@ const LoginForm = (props: Props) => {
         <div className="text-right opacity-60">Forgot Password?</div>
         <Button
           type="submit"
-          disabled={!FormSchema.safeParse(form.getValues())?.success}
+          loading={isLoadingBtn}
+          disabled={!form.formState.isValid || isLoadingBtn}
+          onClick={() => onSubmit()}
         >
           Login
         </Button>

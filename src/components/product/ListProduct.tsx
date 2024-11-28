@@ -24,7 +24,7 @@ const ListProduct = (props: Props) => {
   const page = React.useRef(1);
   const hasMore = React.useRef(true);
   const itemCount = React.useRef(0);
-  const [loading, setLoading] = React.useState(false);
+  const [loading, setLoading] = React.useState(true);
   const [products, setProducts] = React.useState<
     ProductOffsetPageStaticResponse[]
   >([]);

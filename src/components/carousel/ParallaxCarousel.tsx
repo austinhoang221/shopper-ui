@@ -18,7 +18,7 @@ const PrallaxCarousel = (props: Props) => {
   const plugin = React.useRef(
     Autoplay({ delay: 2000, stopOnInteraction: true })
   );
-  console.log(props.images);
+
   return (
     <Carousel
       className="w-full my-4"

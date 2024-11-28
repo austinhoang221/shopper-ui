@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Footer from "@/components/footer/Footer";
 import React from "react";
+import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
   title: "Shopper",
@@ -10,6 +11,8 @@ export const metadata: Metadata = {
 export default async function Layout({ children, params: { locale } }: A) {
   return (
     <>
+      <Toaster />
+
       {children}
       <Footer></Footer>
     </>

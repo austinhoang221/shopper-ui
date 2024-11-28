@@ -1,6 +1,5 @@
 import Header from "@/components/header/Header";
 import React from "react";
-import { Toaster } from "@/components/ui/toaster";
 import { service } from "@/app/api/services/service";
 import { getCookie, hasCookie } from "cookies-next";
 import { userIdCookie } from "@/utils/constants";
@@ -14,7 +13,6 @@ export default async function Layout({ children, params: { locale } }: A) {
     <>
       <Header language={locale}></Header>
       {/* <Breadcrumb language={locale} /> */}
-      <Toaster />
       <main className="container mx-auto px-2 md:px-0">
         <ScrollArea>{children}</ScrollArea>
       </main>
