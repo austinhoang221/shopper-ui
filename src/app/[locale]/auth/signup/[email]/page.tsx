@@ -1,13 +1,15 @@
 "use client";
 import { service } from "@/app/api/services/service";
 import { Button } from "@/components/ui/button";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import React from "react";
 
 const EmailVerification = () => {
   const params = useParams();
   const [countDown, setCountDown] = React.useState<number>(60);
   const id = React.useRef<NodeJS.Timeout | undefined>(undefined);
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl");
   const clear = () => {
     clearInterval(id.current);
   };
@@ -31,8 +33,8 @@ const EmailVerification = () => {
 
   const onResend = async () => {
     await service.client.resendConfirmedEmail(
-      params?.email as string,
-      `/${params?.locale}/auth/login`
+      decodeURIComponent(params?.email as string),
+      callbackUrl ?? ""
     );
     setCountDown(60);
     runHeartBeat();

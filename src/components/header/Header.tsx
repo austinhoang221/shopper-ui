@@ -74,7 +74,7 @@ export default async function Header({
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
-            <SessionProvider>
+            <SessionProvider refetchInterval={30} refetchOnWindowFocus={false}>
               <Authentication />
             </SessionProvider>
           </div>

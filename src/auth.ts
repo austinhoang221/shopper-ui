@@ -5,8 +5,10 @@ import {
   UserLoginRequest,
   UserLoginWithGoogleRequest,
 } from "./app/api/services/api";
-import { cookies } from "next/headers";
 import Credentials from "next-auth/providers/credentials";
+import { userIdCookie } from "./utils/constants";
+
+import { cookies } from "next/headers";
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     Google,
@@ -21,6 +23,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             ...credentials,
           })
         );
+        const expires = new Date();
+        expires.setDate(expires.getDate() + 7);
+        cookies().set({
+          name: userIdCookie,
+          value: response?.id ?? "",
+          expires: expires,
+          path: "/",
+        });
         return (response as User) ?? null;
       },
     }),
@@ -28,24 +38,33 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   callbacks: {
     async jwt({ token, user, account }) {
       try {
-        const response = await service.client.loginWithGoogle(
-          UserLoginWithGoogleRequest.fromJS({ idToken: account?.id_token })
-        );
-        if (response?.accessToken) {
-          const cookieStore = cookies();
-          cookieStore.set({
-            name: "token",
-            value: response.accessToken,
-            httpOnly: true,
-            path: "/",
-          });
-        }
-        if (user) {
+        if (account?.id_token) {
+          const response = await service.client.loginWithGoogle(
+            UserLoginWithGoogleRequest.fromJS({ idToken: account?.id_token })
+          );
           token.id = response.id;
           token.name = response.name;
           token.email = response.email;
           token.phoneNumber = response.phoneNumber;
           token.photoUrl = response.photoUrl;
+          if (response?.id) {
+            const expires = new Date();
+            expires.setDate(expires.getDate() + 7);
+            cookies().set({
+              name: userIdCookie,
+              value: response?.id,
+              expires: expires,
+              path: "/",
+            });
+          }
+        } else {
+          if (user?.id) {
+            token.id = user?.id;
+            token.name = user?.name;
+            token.email = user?.email;
+            token.phoneNumber = user?.phoneNumber;
+            token.photoUrl = user?.photoUrl;
+          }
         }
       } catch (error) {
         console.error("Error:", error);
@@ -53,11 +72,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
       return token;
     },
-    async signIn({ profile }) {
-      if (!profile?.email) {
-        throw new Error("No profile");
-      }
-
+    signIn({}) {
       return true;
     },
 

@@ -9,8 +9,6 @@ import { auth } from "@/auth";
 const Home: React.FC<A> = async ({ params: { locale } }) => {
   const bestSellers = await service.client.bestSellers2(6);
   const flat = bestSellers?.flatMap((item) => item.attachments);
-  const session = await auth();
-  console.log(session);
   return (
     <LayoutProvider>
       <HomeCarousel />

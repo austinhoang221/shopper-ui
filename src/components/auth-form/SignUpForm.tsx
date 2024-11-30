@@ -90,7 +90,7 @@ const SignUpForm = (props: Props) => {
           email: formValue.username,
           password: formValue.password,
           confirmPassword: formValue.confirmPassword,
-          returnUrl: `/${params?.locale}/auth/login`,
+          returnUrl: props.callBackUrl,
         })
       );
       setIsLoadingBtn(false);

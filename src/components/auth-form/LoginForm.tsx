@@ -51,6 +51,7 @@ const LoginForm = (props: Props) => {
     if (result.success) {
       setIsLoadingBtn(true);
       const response = await SignIn(props.callBackUrl, { ...formValue });
+      console.log(response);
       if (response?.error) {
         setErrorMsg(response?.error);
       } else {

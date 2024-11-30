@@ -16,12 +16,12 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { SignOut } from "@/lib/auth-action";
+
 // import { verifyGoogleToken } from "@/app/api/services/googleService";
 
 const Authentication = () => {
   const { data: userData } = useSession();
   const [pathname, setPathname] = React.useState<string>("");
-  console.log(userData);
   React.useEffect(() => {
     const path = window.location.pathname;
     try {

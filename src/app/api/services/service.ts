@@ -23,22 +23,22 @@ async function authorizedFetchFunction(
 }
 
 const catchServiceErrors = <T>(target: T): T => {
-  const prototype = Object.getPrototypeOf(target);
-  for (const key of Object.getOwnPropertyNames(prototype)) {
-    const descriptor = Object.getOwnPropertyDescriptor(prototype, key);
-    if (descriptor && typeof descriptor.value === "function") {
-      const originalMethod = descriptor.value;
-      descriptor.value = async function (...args: A[]) {
-        try {
-          const res = await originalMethod.apply(this, args);
-          return res;
-        } catch (error: A) {
-          handleServiceError(error);
-        }
-      };
-      Object.defineProperty(prototype, key, descriptor);
-    }
-  }
+  // const prototype = Object.getPrototypeOf(target);
+  // for (const key of Object.getOwnPropertyNames(prototype)) {
+  //   const descriptor = Object.getOwnPropertyDescriptor(prototype, key);
+  //   if (descriptor && typeof descriptor.value === "function") {
+  //     const originalMethod = descriptor.value;
+  //     descriptor.value = async function (...args: A[]) {
+  //       try {
+  //         const res = await originalMethod.apply(this, args);
+  //         return res;
+  //       } catch (error: A) {
+  //         handleServiceError(error);
+  //       }
+  //     };
+  //     Object.defineProperty(prototype, key, descriptor);
+  //   }
+  // }
   return target;
 };
 
