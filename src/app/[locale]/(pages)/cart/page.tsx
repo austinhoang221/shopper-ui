@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/table";
 import { userIdCookie } from "@/utils/constants";
 import debounce from "lodash.debounce";
-import { faArrowRight, faTrashCan } from "@fortawesome/free-solid-svg-icons";
+import { faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   ColumnDef,
@@ -33,6 +33,8 @@ import { getCookie } from "cookies-next";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React from "react";
+import { IconButton } from "@/components/ui/icon-button";
+import { ArrowRightIcon } from "lucide-react";
 
 const ListCart = () => {
   const router = useRouter();
@@ -200,14 +202,16 @@ const ListCart = () => {
         </CardHeader>
         <CardContent>
           <OrderSummary>
-            <Button
+            <IconButton
               disabled={cartItems?.length === 0}
-              className="w-full bg-secondary text-secondary-foreground p-4"
+              className="w-full p-4"
               onClick={() => goToCheckOut()}
+              variant="expandIcon"
+              Icon={ArrowRightIcon}
+              iconPlacement="right"
             >
               PROCEED TO CHECKOUT
-              <FontAwesomeIcon className="ml-2" icon={faArrowRight} />
-            </Button>
+            </IconButton>
           </OrderSummary>
         </CardContent>
       </Card>

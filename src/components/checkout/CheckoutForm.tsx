@@ -20,8 +20,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import ProductOrder from "./ProductOrder/ProductOrder";
 import React, { useEffect, useState } from "react";
 import { Button } from "../ui/button";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import {
   calculateShipping,
   getCities,
@@ -37,10 +35,10 @@ import {
   CreateOrderRequest,
 } from "@/app/api/services/api";
 import { getCookie } from "cookies-next";
-import { userIdCookie } from "@/utils/constants";
+import { PHONE_NUMBER_REGEX, userIdCookie } from "@/utils/constants";
 import { useAppSelector } from "../hooks/redux";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { Check, ChevronsUpDown } from "lucide-react";
+import { ArrowRightIcon, Check, ChevronsUpDown } from "lucide-react";
 import {
   Command,
   CommandEmpty,
@@ -50,6 +48,7 @@ import {
   CommandList,
 } from "../ui/command";
 import { cn } from "@/lib/utils";
+import { IconButton } from "../ui/icon-button";
 
 const FormSchema = z.object({
   username: z.string().trim().min(1, {
@@ -62,12 +61,24 @@ const FormSchema = z.object({
   region: z.string(),
   city: z.string(),
   zipcode: z.string(),
-  email: z.string().trim().min(1, {
-    message: "Email is required",
-  }),
+  email: z
+    .string()
+    .trim()
+    .min(1, {
+      message: "Email is required",
+    })
+    .email({
+      message: "Email must in correct format",
+    }),
   phone: z
     .string()
-    .refine((value) => /^[+]{1}(?:[0-9-()/.]\s?){6,15}[0-9]{1}$/.test(value)),
+    .trim()
+    .min(1, {
+      message: "Phone is required",
+    })
+    .regex(PHONE_NUMBER_REGEX, {
+      message: "Phone must in correct format",
+    }),
   isShip: z.boolean().default(false).optional(),
   note: z.string(),
 });
@@ -177,15 +188,15 @@ export function CheckoutForm() {
   });
 
   const onRenderCheckoutButton = () => (
-    <Button
+    <IconButton
       className="w-full p-4"
-      variant="default"
-      type="submit"
       onClick={() => onSubmit()}
+      variant="expandIcon"
+      Icon={ArrowRightIcon}
+      iconPlacement="right"
     >
       CHECKOUT
-      <FontAwesomeIcon className="ml-2" icon={faArrowRight} />
-    </Button>
+    </IconButton>
   );
 
   const onSubmit = async () => {
@@ -367,32 +378,31 @@ export function CheckoutForm() {
                               />
                               <CommandList>
                                 <CommandEmpty>No region found.</CommandEmpty>
-                                <CommandGroup>
-                                  {regions.map((region) => (
-                                    <CommandItem
-                                      value={region.geonameId.toString()}
-                                      key={region.geonameId}
-                                      onSelect={() => {
-                                        form.setValue(
-                                          "region",
-                                          region.geonameId.toString()
-                                        );
-                                        setSelectedRegion(region.geonameId);
-                                      }}
-                                    >
-                                      {region.name}
-                                      <Check
-                                        className={cn(
-                                          "ml-auto",
-                                          region.geonameId.toString() ===
-                                            field.value
-                                            ? "opacity-100"
-                                            : "opacity-0"
-                                        )}
-                                      />
-                                    </CommandItem>
-                                  ))}
-                                </CommandGroup>
+                                {regions.map((region) => (
+                                  <CommandItem
+                                    value={region.name}
+                                    key={region.geonameId}
+                                    onSelect={() => {
+                                      form.setValue(
+                                        "region",
+                                        region.geonameId.toString()
+                                      );
+                                      setSelectedRegion(region.geonameId);
+                                    }}
+                                  >
+                                    {region.name}
+                                    <Check
+                                      width={20}
+                                      className={cn(
+                                        "ml-auto",
+                                        region.geonameId.toString() ===
+                                          field.value
+                                          ? "opacity-100"
+                                          : "opacity-0"
+                                      )}
+                                    />
+                                  </CommandItem>
+                                ))}
                               </CommandList>
                             </Command>
                           </PopoverContent>
@@ -441,7 +451,7 @@ export function CheckoutForm() {
                                 <CommandGroup>
                                   {cities.map((city) => (
                                     <CommandItem
-                                      value={city.geonameId.toString()}
+                                      value={city.name.toString()}
                                       key={city.geonameId}
                                       onSelect={() => {
                                         form.setValue(
@@ -452,9 +462,11 @@ export function CheckoutForm() {
                                     >
                                       {city.name}
                                       <Check
+                                        width={20}
                                         className={cn(
                                           "ml-auto",
-                                          city.geonameId === field.value
+                                          city.geonameId.toString() ===
+                                            field.value
                                             ? "opacity-100"
                                             : "opacity-0"
                                         )}

@@ -208,7 +208,7 @@ const SignUpForm = (props: Props) => {
           Already have an account?&nbsp;
         </span>
         <Link
-          href={`/${params?.locale}/auth/login`}
+          href={`/${params?.locale}/auth/login?callBackUrl=${props.callBackUrl}`}
           className="text-primary hover:underline cursor-pointer"
         >
           Login

@@ -72,29 +72,21 @@ export default function CartDetail() {
                       )
                     }
                   ></Checkbox> */}
-                      <Link
-                        href={cartItem?.productName ?? ""}
-                        className="aspect-square w-24 block"
-                      >
+                      <div className="aspect-square w-20 block">
                         <Image
                           src={cartItem?.pictureUrl ?? ""}
                           alt={cartItem?.productName ?? ""}
                           width={96}
                           height={96}
-                          className="object-cover h-24 w-full block rounded-lg mb-4 min-w-24"
+                          className="object-cover h-20 w-full block rounded-lg mb-4 min-w-20"
                         />
-                      </Link>
+                      </div>
                       <div className="flex flex-col flex-1 overflow-hidden">
                         <TooltipProvider>
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <div className="flex gap-4 justify-between items-center">
-                                <Link
-                                  href={cartItem?.productName ?? ""}
-                                  className="font-normal hover:underline  block text-sm flex-1 truncate"
-                                >
-                                  {cartItem?.productName ?? ""}
-                                </Link>
+                                {cartItem?.productName ?? ""}
                               </div>
                             </TooltipTrigger>
                             <TooltipContent align="start">

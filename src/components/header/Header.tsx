@@ -26,7 +26,7 @@ export default async function Header({
   return (
     <>
       <nav className=" w-full px-2 bg-white/90 sticky top-0 z-40 backdrop-blur-sm border-b flex-none transition-colors duration-500  ">
-        <div className="container mx-auto items-center flex h-14 justify-between gap-4">
+        <div className="container mx-auto items-center flex h-14 justify-between gap-5">
           <div className="flex justify-start items-center">
             <Menu categories={categories} language={language} />
             <Link href="/" className="mr-4">

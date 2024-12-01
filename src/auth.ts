@@ -42,6 +42,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           const response = await service.client.loginWithGoogle(
             UserLoginWithGoogleRequest.fromJS({ idToken: account?.id_token })
           );
+          console.log(account?.id_token);
           token.id = response.id;
           token.name = response.name;
           token.email = response.email;
