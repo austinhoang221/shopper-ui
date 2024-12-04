@@ -27,7 +27,7 @@ type Props = {
   callBackUrl: string;
 };
 const FormSchema = z.object({
-  username: z.union([z.string().email(), z.string().regex(PHONE_NUMBER_REGEX)]),
+  username: z.string().email(),
   password: z.string().trim().regex(PASSWORD_REGEX),
 });
 const LoginForm = (props: Props) => {

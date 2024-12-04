@@ -3,7 +3,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import React from "react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
@@ -22,6 +22,7 @@ import { SignOut } from "@/lib/auth-action";
 const Authentication = () => {
   const { data: userData } = useSession();
   const [pathname, setPathname] = React.useState<string>("");
+  const router = useRouter();
   React.useEffect(() => {
     const path = window.location.pathname;
     try {
@@ -52,7 +53,11 @@ const Authentication = () => {
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56">
         <DropdownMenuGroup>
-          <DropdownMenuItem>My Account</DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => router.push(`/${params.locale}/user/profile`)}
+          >
+            My Account
+          </DropdownMenuItem>
           <DropdownMenuItem>My Orders</DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
