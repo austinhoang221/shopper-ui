@@ -6,7 +6,7 @@ import {
   UserLoginWithGoogleRequest,
 } from "./app/api/services/api";
 import Credentials from "next-auth/providers/credentials";
-import { userIdCookie } from "./utils/constants";
+import { authorizationCookie, userIdCookie } from "./utils/constants";
 
 import { cookies } from "next/headers";
 export const { handlers, signIn, signOut, auth } = NextAuth({
@@ -31,6 +31,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           expires: expires,
           path: "/",
         });
+
+        cookies().set({
+          name: authorizationCookie,
+          value: response?.accessToken ?? "",
+          expires: expires,
+          path: "/",
+        });
         return (response as User) ?? null;
       },
     }),
@@ -40,20 +47,30 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       try {
         if (account?.id_token) {
           const response = await service.client.loginWithGoogle(
-            UserLoginWithGoogleRequest.fromJS({ idToken: account?.id_token })
+            UserLoginWithGoogleRequest.fromJS({
+              id: cookies().get(userIdCookie)?.value,
+              idToken: account?.id_token,
+            })
           );
-          console.log(account?.id_token);
           token.id = response.id;
           token.name = response.name;
           token.email = response.email;
           token.phoneNumber = response.phoneNumber;
           token.photoUrl = response.photoUrl;
+          const expires = new Date();
+
           if (response?.id) {
-            const expires = new Date();
             expires.setDate(expires.getDate() + 7);
             cookies().set({
               name: userIdCookie,
               value: response?.id,
+              expires: expires,
+              path: "/",
+            });
+
+            cookies().set({
+              name: authorizationCookie,
+              value: response?.accessToken ?? "",
               expires: expires,
               path: "/",
             });

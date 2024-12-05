@@ -11323,7 +11323,7 @@ export class UserLoginWithGoogleRequest implements IUserLoginWithGoogleRequest {
 
   init(_data?: any) {
     if (_data) {
-      this.id = _data["id"] ? _data["id"] : new Ulid();
+      this.id = _data["id"] ? _data["id"] : "";
       this.idToken = _data["idToken"];
     }
   }

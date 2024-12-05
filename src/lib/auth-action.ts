@@ -1,7 +1,7 @@
 "use server";
 
 import { signIn, signOut } from "@/auth";
-import { userIdCookie } from "@/utils/constants";
+import { authorizationCookie, userIdCookie } from "@/utils/constants";
 import { AuthError } from "next-auth";
 import { cookies } from "next/headers";
 import { ulid } from "ulidx";
@@ -15,6 +15,7 @@ export async function SignOut() {
     expires: expires,
     path: "/",
   });
+  cookies().delete(authorizationCookie);
   return await signOut({ redirect: true });
 }
 

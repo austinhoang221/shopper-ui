@@ -13,7 +13,7 @@ import Link from "next/link";
 import { SignIn } from "@/lib/auth-action";
 import { Alert, AlertDescription } from "../ui/alert";
 import { AlertCircle } from "lucide-react";
-import { PASSWORD_REGEX, PHONE_NUMBER_REGEX } from "@/utils/constants";
+import { PASSWORD_REGEX } from "@/utils/constants";
 import {
   Tooltip,
   TooltipContent,
