@@ -186,7 +186,6 @@ export class Client {
   }
 
   /**
-   * (Auth)
    * @param body (optional)
    * @return OK
    */
@@ -250,14 +249,6 @@ export class Client {
           result400
         );
       });
-    } else if (status === 401) {
-      return response.text().then((_responseText) => {
-        return throwException("Unauthorized", status, _responseText, _headers);
-      });
-    } else if (status === 403) {
-      return response.text().then((_responseText) => {
-        return throwException("Forbidden", status, _responseText, _headers);
-      });
     } else if (status !== 200 && status !== 204) {
       return response.text().then((_responseText) => {
         return throwException(
@@ -272,7 +263,6 @@ export class Client {
   }
 
   /**
-   * (Auth)
    * @param body (optional)
    * @return OK
    */
@@ -331,14 +321,6 @@ export class Client {
           _headers,
           result400
         );
-      });
-    } else if (status === 401) {
-      return response.text().then((_responseText) => {
-        return throwException("Unauthorized", status, _responseText, _headers);
-      });
-    } else if (status === 403) {
-      return response.text().then((_responseText) => {
-        return throwException("Forbidden", status, _responseText, _headers);
       });
     } else if (status !== 200 && status !== 204) {
       return response.text().then((_responseText) => {
@@ -1504,7 +1486,7 @@ export class Client {
   usersPUT(
     id: string,
     body?: UpdateUserRequest | undefined
-  ): Promise<UpdateUserResponse> {
+  ): Promise<UserResponse> {
     let url_ = this.baseUrl + "/api/v1/users/{id}";
     if (id === undefined || id === null)
       throw new Error("The parameter 'id' must be defined.");
@@ -1531,7 +1513,7 @@ export class Client {
       });
   }
 
-  protected processUsersPUT(response: Response): Promise<UpdateUserResponse> {
+  protected processUsersPUT(response: Response): Promise<UserResponse> {
     const status = response.status;
     let _headers: any = {};
     if (response.headers && response.headers.forEach) {
@@ -1544,7 +1526,7 @@ export class Client {
           _responseText === ""
             ? null
             : JSON.parse(_responseText, this.jsonParseReviver);
-        result200 = UpdateUserResponse.fromJS(resultData200);
+        result200 = UserResponse.fromJS(resultData200);
         return result200;
       });
     } else if (status === 400) {
@@ -1581,7 +1563,7 @@ export class Client {
         );
       });
     }
-    return Promise.resolve<UpdateUserResponse>(null as any);
+    return Promise.resolve<UserResponse>(null as any);
   }
 
   /**
@@ -2544,6 +2526,246 @@ export class Client {
       });
     }
     return Promise.resolve<UserUploadPhotoResponse>(null as any);
+  }
+
+  /**
+   * (Auth)
+   * @param body (optional)
+   * @return OK
+   */
+  addresses(
+    id: string,
+    body?: UserUpdateAddressesRequest[] | undefined
+  ): Promise<UserUploadPhotoResponse> {
+    let url_ = this.baseUrl + "/api/v1/users/{id}/addresses";
+    if (id === undefined || id === null)
+      throw new Error("The parameter 'id' must be defined.");
+    url_ = url_.replace("{id}", encodeURIComponent("" + id));
+    url_ = url_.replace(/[?&]$/, "");
+
+    const content_ = JSON.stringify(body);
+
+    let options_: RequestInit = {
+      body: content_,
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json-patch+json",
+        Accept: "application/json",
+      },
+    };
+
+    return this.transformOptions(options_)
+      .then((transformedOptions_) => {
+        return this.http.fetch(url_, transformedOptions_);
+      })
+      .then((_response: Response) => {
+        return this.processAddresses(_response);
+      });
+  }
+
+  protected processAddresses(
+    response: Response
+  ): Promise<UserUploadPhotoResponse> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && response.headers.forEach) {
+      response.headers.forEach((v: any, k: any) => (_headers[k] = v));
+    }
+    if (status === 200) {
+      return response.text().then((_responseText) => {
+        let result200: any = null;
+        let resultData200 =
+          _responseText === ""
+            ? null
+            : JSON.parse(_responseText, this.jsonParseReviver);
+        result200 = UserUploadPhotoResponse.fromJS(resultData200);
+        return result200;
+      });
+    } else if (status === 400) {
+      return response.text().then((_responseText) => {
+        let result400: any = null;
+        let resultData400 =
+          _responseText === ""
+            ? null
+            : JSON.parse(_responseText, this.jsonParseReviver);
+        result400 = ProblemDetails.fromJS(resultData400);
+        return throwException(
+          "Bad Request",
+          status,
+          _responseText,
+          _headers,
+          result400
+        );
+      });
+    } else if (status === 401) {
+      return response.text().then((_responseText) => {
+        return throwException("Unauthorized", status, _responseText, _headers);
+      });
+    } else if (status === 403) {
+      return response.text().then((_responseText) => {
+        return throwException("Forbidden", status, _responseText, _headers);
+      });
+    } else if (status !== 200 && status !== 204) {
+      return response.text().then((_responseText) => {
+        return throwException(
+          "An unexpected server error occurred.",
+          status,
+          _responseText,
+          _headers
+        );
+      });
+    }
+    return Promise.resolve<UserUploadPhotoResponse>(null as any);
+  }
+
+  /**
+   * @param email (optional)
+   * @return No Content
+   */
+  resendResetPasswordEmail(email?: string | undefined): Promise<NoContent> {
+    let url_ = this.baseUrl + "/api/v1/users/resend-reset-password-email?";
+    if (email === null)
+      throw new Error("The parameter 'email' cannot be null.");
+    else if (email !== undefined)
+      url_ += "Email=" + encodeURIComponent("" + email) + "&";
+    url_ = url_.replace(/[?&]$/, "");
+
+    let options_: RequestInit = {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+    };
+
+    return this.transformOptions(options_)
+      .then((transformedOptions_) => {
+        return this.http.fetch(url_, transformedOptions_);
+      })
+      .then((_response: Response) => {
+        return this.processResendResetPasswordEmail(_response);
+      });
+  }
+
+  protected processResendResetPasswordEmail(
+    response: Response
+  ): Promise<NoContent> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && response.headers.forEach) {
+      response.headers.forEach((v: any, k: any) => (_headers[k] = v));
+    }
+    if (status === 204) {
+      return response.text().then((_responseText) => {
+        let result204: any = null;
+        let resultData204 =
+          _responseText === ""
+            ? null
+            : JSON.parse(_responseText, this.jsonParseReviver);
+        result204 = NoContent.fromJS(resultData204);
+        return result204;
+      });
+    } else if (status === 400) {
+      return response.text().then((_responseText) => {
+        let result400: any = null;
+        let resultData400 =
+          _responseText === ""
+            ? null
+            : JSON.parse(_responseText, this.jsonParseReviver);
+        result400 = ProblemDetails.fromJS(resultData400);
+        return throwException(
+          "Bad Request",
+          status,
+          _responseText,
+          _headers,
+          result400
+        );
+      });
+    } else if (status !== 200 && status !== 204) {
+      return response.text().then((_responseText) => {
+        return throwException(
+          "An unexpected server error occurred.",
+          status,
+          _responseText,
+          _headers
+        );
+      });
+    }
+    return Promise.resolve<NoContent>(null as any);
+  }
+
+  /**
+   * @param email (optional)
+   * @return No Content
+   */
+  requestResetPassword(email?: string | undefined): Promise<NoContent> {
+    let url_ = this.baseUrl + "/api/v1/users/request-reset-password?";
+    if (email === null)
+      throw new Error("The parameter 'email' cannot be null.");
+    else if (email !== undefined)
+      url_ += "Email=" + encodeURIComponent("" + email) + "&";
+    url_ = url_.replace(/[?&]$/, "");
+
+    let options_: RequestInit = {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+    };
+
+    return this.transformOptions(options_)
+      .then((transformedOptions_) => {
+        return this.http.fetch(url_, transformedOptions_);
+      })
+      .then((_response: Response) => {
+        return this.processRequestResetPassword(_response);
+      });
+  }
+
+  protected processRequestResetPassword(
+    response: Response
+  ): Promise<NoContent> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && response.headers.forEach) {
+      response.headers.forEach((v: any, k: any) => (_headers[k] = v));
+    }
+    if (status === 204) {
+      return response.text().then((_responseText) => {
+        let result204: any = null;
+        let resultData204 =
+          _responseText === ""
+            ? null
+            : JSON.parse(_responseText, this.jsonParseReviver);
+        result204 = NoContent.fromJS(resultData204);
+        return result204;
+      });
+    } else if (status === 400) {
+      return response.text().then((_responseText) => {
+        let result400: any = null;
+        let resultData400 =
+          _responseText === ""
+            ? null
+            : JSON.parse(_responseText, this.jsonParseReviver);
+        result400 = ProblemDetails.fromJS(resultData400);
+        return throwException(
+          "Bad Request",
+          status,
+          _responseText,
+          _headers,
+          result400
+        );
+      });
+    } else if (status !== 200 && status !== 204) {
+      return response.text().then((_responseText) => {
+        return throwException(
+          "An unexpected server error occurred.",
+          status,
+          _responseText,
+          _headers
+        );
+      });
+    }
+    return Promise.resolve<NoContent>(null as any);
   }
 }
 
@@ -4346,6 +4568,7 @@ export interface ICreatePaymentRequest {
 export class CreatePaymentResponse implements ICreatePaymentResponse {
   orderId?: string;
   transactionId?: string;
+  partnerTransactionId?: string | undefined;
 
   constructor(data?: ICreatePaymentResponse) {
     if (data) {
@@ -4362,6 +4585,7 @@ export class CreatePaymentResponse implements ICreatePaymentResponse {
       this.transactionId = _data["transactionId"]
         ? _data["transactionId"]
         : <any>undefined;
+      this.partnerTransactionId = _data["partnerTransactionId"];
     }
   }
 
@@ -4378,6 +4602,7 @@ export class CreatePaymentResponse implements ICreatePaymentResponse {
     data["transactionId"] = this.transactionId
       ? this.transactionId
       : <any>undefined;
+    data["partnerTransactionId"] = this.partnerTransactionId;
     return data;
   }
 }
@@ -4385,6 +4610,7 @@ export class CreatePaymentResponse implements ICreatePaymentResponse {
 export interface ICreatePaymentResponse {
   orderId?: string;
   transactionId?: string;
+  partnerTransactionId?: string | undefined;
 }
 
 export class CustomAttributeData implements ICustomAttributeData {
@@ -10979,8 +11205,7 @@ export interface IUpdateCartItemRequest {
 
 export class UpdateUserRequest implements IUpdateUserRequest {
   username?: string | undefined;
-  firstName?: string | undefined;
-  lastName?: string | undefined;
+  name?: string | undefined;
   email?: string | undefined;
   phoneNumber?: string | undefined;
 
@@ -10996,8 +11221,7 @@ export class UpdateUserRequest implements IUpdateUserRequest {
   init(_data?: any) {
     if (_data) {
       this.username = _data["username"];
-      this.firstName = _data["firstName"];
-      this.lastName = _data["lastName"];
+      this.name = _data["name"];
       this.email = _data["email"];
       this.phoneNumber = _data["phoneNumber"];
     }
@@ -11013,8 +11237,7 @@ export class UpdateUserRequest implements IUpdateUserRequest {
   toJSON(data?: any) {
     data = typeof data === "object" ? data : {};
     data["username"] = this.username;
-    data["firstName"] = this.firstName;
-    data["lastName"] = this.lastName;
+    data["name"] = this.name;
     data["email"] = this.email;
     data["phoneNumber"] = this.phoneNumber;
     return data;
@@ -11023,22 +11246,21 @@ export class UpdateUserRequest implements IUpdateUserRequest {
 
 export interface IUpdateUserRequest {
   username?: string | undefined;
-  firstName?: string | undefined;
-  lastName?: string | undefined;
+  name?: string | undefined;
   email?: string | undefined;
   phoneNumber?: string | undefined;
 }
 
-export class UpdateUserResponse implements IUpdateUserResponse {
-  id?: string;
-  username?: string | undefined;
-  name?: string | undefined;
-  lastName?: string | undefined;
-  email?: string | undefined;
+export class UserAddressResponse implements IUserAddressResponse {
+  country?: string | undefined;
+  city?: string | undefined;
+  state?: string | undefined;
+  region?: string | undefined;
+  street?: string | undefined;
+  detailedAddress?: string | undefined;
   phoneNumber?: string | undefined;
-  photoUrl?: string | undefined;
 
-  constructor(data?: IUpdateUserResponse) {
+  constructor(data?: IUserAddressResponse) {
     if (data) {
       for (var property in data) {
         if (data.hasOwnProperty(property))
@@ -11049,44 +11271,44 @@ export class UpdateUserResponse implements IUpdateUserResponse {
 
   init(_data?: any) {
     if (_data) {
-      this.id = _data["id"] ? _data["id"] : <any>undefined;
-      this.username = _data["username"];
-      this.name = _data["name"];
-      this.lastName = _data["lastName"];
-      this.email = _data["email"];
+      this.country = _data["country"];
+      this.city = _data["city"];
+      this.state = _data["state"];
+      this.region = _data["region"];
+      this.street = _data["street"];
+      this.detailedAddress = _data["detailedAddress"];
       this.phoneNumber = _data["phoneNumber"];
-      this.photoUrl = _data["photoUrl"];
     }
   }
 
-  static fromJS(data: any): UpdateUserResponse {
+  static fromJS(data: any): UserAddressResponse {
     data = typeof data === "object" ? data : {};
-    let result = new UpdateUserResponse();
+    let result = new UserAddressResponse();
     result.init(data);
     return result;
   }
 
   toJSON(data?: any) {
     data = typeof data === "object" ? data : {};
-    data["id"] = this.id ? this.id : <any>undefined;
-    data["username"] = this.username;
-    data["name"] = this.name;
-    data["lastName"] = this.lastName;
-    data["email"] = this.email;
+    data["country"] = this.country;
+    data["city"] = this.city;
+    data["state"] = this.state;
+    data["region"] = this.region;
+    data["street"] = this.street;
+    data["detailedAddress"] = this.detailedAddress;
     data["phoneNumber"] = this.phoneNumber;
-    data["photoUrl"] = this.photoUrl;
     return data;
   }
 }
 
-export interface IUpdateUserResponse {
-  id?: string;
-  username?: string | undefined;
-  name?: string | undefined;
-  lastName?: string | undefined;
-  email?: string | undefined;
+export interface IUserAddressResponse {
+  country?: string | undefined;
+  city?: string | undefined;
+  state?: string | undefined;
+  region?: string | undefined;
+  street?: string | undefined;
+  detailedAddress?: string | undefined;
   phoneNumber?: string | undefined;
-  photoUrl?: string | undefined;
 }
 
 export class UserCheckEmailExistRequest implements IUserCheckEmailExistRequest {
@@ -11323,7 +11545,7 @@ export class UserLoginWithGoogleRequest implements IUserLoginWithGoogleRequest {
 
   init(_data?: any) {
     if (_data) {
-      this.id = _data["id"] ? _data["id"] : "";
+      this.id = _data["id"] ? _data["id"] : new Ulid();
       this.idToken = _data["idToken"];
     }
   }
@@ -11548,6 +11770,137 @@ export interface IUserResetPasswordRequest {
   newPassword?: string | undefined;
   newConfirmPassword?: string | undefined;
   resetPasswordToken?: string | undefined;
+}
+
+export class UserResponse implements IUserResponse {
+  id?: string;
+  username?: string | undefined;
+  name?: string | undefined;
+  lastName?: string | undefined;
+  email?: string | undefined;
+  phoneNumber?: string | undefined;
+  photoUrl?: string | undefined;
+  addresses?: UserAddressResponse[] | undefined;
+
+  constructor(data?: IUserResponse) {
+    if (data) {
+      for (var property in data) {
+        if (data.hasOwnProperty(property))
+          (<any>this)[property] = (<any>data)[property];
+      }
+    }
+  }
+
+  init(_data?: any) {
+    if (_data) {
+      this.id = _data["id"] ? _data["id"] : <any>undefined;
+      this.username = _data["username"];
+      this.name = _data["name"];
+      this.lastName = _data["lastName"];
+      this.email = _data["email"];
+      this.phoneNumber = _data["phoneNumber"];
+      this.photoUrl = _data["photoUrl"];
+      if (Array.isArray(_data["addresses"])) {
+        this.addresses = [] as any;
+        for (let item of _data["addresses"])
+          this.addresses!.push(UserAddressResponse.fromJS(item));
+      }
+    }
+  }
+
+  static fromJS(data: any): UserResponse {
+    data = typeof data === "object" ? data : {};
+    let result = new UserResponse();
+    result.init(data);
+    return result;
+  }
+
+  toJSON(data?: any) {
+    data = typeof data === "object" ? data : {};
+    data["id"] = this.id ? this.id : <any>undefined;
+    data["username"] = this.username;
+    data["name"] = this.name;
+    data["lastName"] = this.lastName;
+    data["email"] = this.email;
+    data["phoneNumber"] = this.phoneNumber;
+    data["photoUrl"] = this.photoUrl;
+    if (Array.isArray(this.addresses)) {
+      data["addresses"] = [];
+      for (let item of this.addresses) data["addresses"].push(item.toJSON());
+    }
+    return data;
+  }
+}
+
+export interface IUserResponse {
+  id?: string;
+  username?: string | undefined;
+  name?: string | undefined;
+  lastName?: string | undefined;
+  email?: string | undefined;
+  phoneNumber?: string | undefined;
+  photoUrl?: string | undefined;
+  addresses?: UserAddressResponse[] | undefined;
+}
+
+export class UserUpdateAddressesRequest implements IUserUpdateAddressesRequest {
+  country?: string | undefined;
+  city?: string | undefined;
+  state?: string | undefined;
+  region?: string | undefined;
+  street?: string | undefined;
+  detailedAddress?: string | undefined;
+  phoneNumber?: string | undefined;
+
+  constructor(data?: IUserUpdateAddressesRequest) {
+    if (data) {
+      for (var property in data) {
+        if (data.hasOwnProperty(property))
+          (<any>this)[property] = (<any>data)[property];
+      }
+    }
+  }
+
+  init(_data?: any) {
+    if (_data) {
+      this.country = _data["country"];
+      this.city = _data["city"];
+      this.state = _data["state"];
+      this.region = _data["region"];
+      this.street = _data["street"];
+      this.detailedAddress = _data["detailedAddress"];
+      this.phoneNumber = _data["phoneNumber"];
+    }
+  }
+
+  static fromJS(data: any): UserUpdateAddressesRequest {
+    data = typeof data === "object" ? data : {};
+    let result = new UserUpdateAddressesRequest();
+    result.init(data);
+    return result;
+  }
+
+  toJSON(data?: any) {
+    data = typeof data === "object" ? data : {};
+    data["country"] = this.country;
+    data["city"] = this.city;
+    data["state"] = this.state;
+    data["region"] = this.region;
+    data["street"] = this.street;
+    data["detailedAddress"] = this.detailedAddress;
+    data["phoneNumber"] = this.phoneNumber;
+    return data;
+  }
+}
+
+export interface IUserUpdateAddressesRequest {
+  country?: string | undefined;
+  city?: string | undefined;
+  state?: string | undefined;
+  region?: string | undefined;
+  street?: string | undefined;
+  detailedAddress?: string | undefined;
+  phoneNumber?: string | undefined;
 }
 
 export class UserUploadPhotoResponse implements IUserUploadPhotoResponse {

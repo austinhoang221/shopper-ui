@@ -17,16 +17,13 @@ import { toast } from "@/components/hooks/use-toast";
 import { UpdateUserRequest } from "@/app/api/services/api";
 
 const FormSchema = z.object({
-  firstName: z.string(),
-  lastName: z.string(),
-  username: z.string(),
-  email: z
-    .string()
-    .min(1, {
-      message: "Email is required",
-    })
-    .email(),
-  phoneNumber: z.string().trim().regex(PHONE_NUMBER_REGEX),
+  name: z.string(),
+  username: z.string().optional(),
+  email: z.string().email(),
+  // phoneNumber: z.union([
+  //   z.string().optional(),
+  //   z.string().trim().regex(PHONE_NUMBER_REGEX),
+  // ]),
 });
 const UserInfo = () => {
   const { data: userData } = useSession();
@@ -36,8 +33,7 @@ const UserInfo = () => {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      firstName: "",
-      lastName: "",
+      name: "",
       username: "",
       phoneNumber: "",
       email: "",
@@ -45,36 +41,27 @@ const UserInfo = () => {
   });
 
   React.useEffect(() => {
-    const fetchData = async () => {
-      const data = await service.client.usersGET(userId as string);
-      // form.reset({
-      //   firstName: data.firstName || "",
-      //   lastName: data.lastName || "",
-      //   username: data.username || "",
-      //   phoneNumber: data.phoneNumber || "",
-      //   email: data.email || "",
-      // });
-      setIsLoading(false);
-    };
-    fetchData();
-  }, []);
+    form.setValue("name", userData?.user?.name ?? "");
+    form.setValue("username", userData?.user?.username ?? "");
+    // form.setValue("phoneNumber", userData?.user?.phoneNumber ?? "");
+    form.setValue("email", userData?.user?.email ?? "");
+  }, [userData]);
 
   const onSubmit = async () => {
     form.trigger();
     const formValue = form.getValues();
-    console.log(formValue);
-    const result = FormSchema.safeParse(formValue);
-
-    if (result.success) {
+    if (form.formState.isValid) {
       const model = UpdateUserRequest.fromJS({
-        firstName: formValue?.firstName,
-        lastName: formValue?.lastName,
+        name: formValue?.name,
         username: formValue?.username,
         email: formValue?.email,
-        phoneNumber: formValue?.phoneNumber
+        // phoneNumber: formValue?.phoneNumber,
       });
-
-      await service.client.usersPUT(userId as string, model);
+      try {
+        const response = await service.client.usersPUT(userId as string, model);
+      } catch (error) {
+        console.log(error);
+      }
     } else {
       toast({
         title: "Please input all required fields",
@@ -98,25 +85,11 @@ const UserInfo = () => {
                   <div className="col-span-4">
                     <FormField
                       control={form.control}
-                      name="firstName"
+                      name="name"
                       render={({ field }) => (
                         <FormItem>
                           <FormControl>
-                            <Input placeholder="First Name ..." {...field} />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  <div className="col-span-1"></div>
-                  <div className="col-span-4">
-                    <FormField
-                      control={form.control}
-                      name="lastName"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormControl>
-                            <Input placeholder="Last Name ..." {...field} />
+                            <Input placeholder="Name" {...field} />
                           </FormControl>
                         </FormItem>
                       )}
@@ -159,9 +132,9 @@ const UserInfo = () => {
                     />
                   </div>
                 </div>
-                <div className="grid grid-cols-12 pb-2">
+                {/* <div className="grid grid-cols-12 pb-2">
                   <span className="text-muted-foreground col-span-3">
-                    Phone 
+                    Phone
                   </span>
                   <div className="col-span-9">
                     <FormField
@@ -176,7 +149,7 @@ const UserInfo = () => {
                       )}
                     />
                   </div>
-                </div>
+                </div> */}
               </form>
             </Form>
           </div>
@@ -190,7 +163,6 @@ const UserInfo = () => {
             />
             <Button
               loading={isLoadingBtn}
-              disabled={!form.formState.isValid || isLoadingBtn}
               onClick={() => onSubmit()}
               variant="outline"
             >
@@ -202,8 +174,8 @@ const UserInfo = () => {
         <Button
           type="submit"
           loading={isLoadingBtn}
-          disabled={!form.formState.isValid || isLoadingBtn}
           onClick={() => onSubmit()}
+          disabled={!form.formState.isValid || isLoadingBtn}
         >
           Change Information
         </Button>

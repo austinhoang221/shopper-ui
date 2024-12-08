@@ -13,6 +13,8 @@ import { Button } from "@/components/ui/button";
 import { service } from "@/app/api/services/service";
 import { getCookie } from "cookies-next";
 import { toast } from "@/components/hooks/use-toast";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
 
 const FormSchema = z.object({
   oldPassword: z.string(),
@@ -40,13 +42,12 @@ const Address = () => {
     const result = FormSchema.safeParse(formValue);
 
     if (result.success) {
-    //   const model = UpdateUserRequest.fromJS({
-    //     oldPassword: formValue?.oldPassword,
-    //     newPassword: formValue?.newPassword,
-    //     confirmPassword: formValue?.confirmPassword
-    //   });
-
-    //   await service.client.usersPUT(userId as string, model);
+      //   const model = UpdateUserRequest.fromJS({
+      //     oldPassword: formValue?.oldPassword,
+      //     newPassword: formValue?.newPassword,
+      //     confirmPassword: formValue?.confirmPassword
+      //   });
+      //   await service.client.usersPUT(userId as string, model);
     } else {
       toast({
         title: "Please input all required fields",
@@ -58,10 +59,17 @@ const Address = () => {
   return (
     <Card className="mt-4">
       <CardHeader>
-        <CardTitle>My Address</CardTitle>
+        <CardTitle>
+          My Address
+          <Button>
+            <FontAwesomeIcon icon={faPlus} />
+            Add new address
+          </Button>
+        </CardTitle>
       </CardHeader>
+
       <CardContent>
-        <div>hehe</div>
+        <div className="flex justify-between"></div>
       </CardContent>
     </Card>
   );

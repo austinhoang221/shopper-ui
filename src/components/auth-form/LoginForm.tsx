@@ -128,7 +128,9 @@ const LoginForm = (props: Props) => {
             />
           </div>
         </form>
-        <div className="text-right opacity-60">Forgot Password?</div>
+        <Link href="forgot-password" className="text-right opacity-60">
+          Forgot Password?
+        </Link>
         <Button
           type="submit"
           loading={isLoadingBtn}

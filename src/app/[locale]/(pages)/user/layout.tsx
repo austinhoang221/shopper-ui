@@ -1,9 +1,9 @@
 "use client";
 import { SessionProvider } from "next-auth/react";
-import { useParams, useRouter, usePathname } from "next/navigation";
+import Link from "next/link";
+import { useParams, usePathname } from "next/navigation";
 
 export default function Layout({ children }: A) {
-  const router = useRouter();
   const params = useParams();
   const pathname = usePathname();
   const menuItems = [
@@ -13,24 +13,26 @@ export default function Layout({ children }: A) {
       path: `/${params.locale}/user/change-password`,
     },
     { label: "Address", path: `/${params.locale}/user/address` },
+    { label: "Orders", path: `/${params.locale}/user/orders` },
   ];
   return (
-    <SessionProvider>
-      <div className="grid grid-cols-12 mt-4">
-        <div className="col-span-2 pr-2">
-          <ul className="space-y-4 pt-5">
+    <SessionProvider refetchInterval={30} refetchOnWindowFocus={false}>
+      <div className="grid grid-cols-12 mt-4 gap-4">
+        <div className="col-span-2 pr-2 border-r-[1px]">
+          <div className="flex gap-2"></div>
+          <ul className="pt-5">
             {menuItems.map((item) => (
-              <li key={item.path}>
-                <button
-                  onClick={() => router.push(item.path)}
-                  className={`w-full text-left border-r-4 ${
+              <li key={item.path} className="my-1">
+                <Link
+                  href={item.path}
+                  className={`w-full block text-left rounded-md hover:text-primary  p-2 ${
                     pathname === item.path
-                      ? "font-bold border-[--primary] text-[--primary]"
-                      : "border-transparent text-gray-700 hover:text-[--primary]"
+                      ? "font-bold bg-secondary text-primary"
+                      : "border-transparent hover:bg-secondary text-gray-700 hover:text-primary"
                   }`}
                 >
                   {item.label}
-                </button>
+                </Link>
               </li>
             ))}
           </ul>

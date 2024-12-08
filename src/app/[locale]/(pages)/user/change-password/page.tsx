@@ -3,7 +3,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 
-import { userIdCookie } from "@/utils/constants";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSession } from "next-auth/react";
 import React from "react";
@@ -11,19 +10,28 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { service } from "@/app/api/services/service";
-import { getCookie } from "cookies-next";
 import { toast } from "@/components/hooks/use-toast";
+import { UserResetPasswordRequest } from "@/app/api/services/api";
+import { PASSWORD_REGEX } from "@/utils/constants";
 
-const FormSchema = z.object({
-  oldPassword: z.string(),
-  newPassword: z.string(),
-  confirmPassword: z.string(),
-});
+const FormSchema = z
+  .object({
+    oldPassword: z.string().trim().regex(PASSWORD_REGEX),
+    newPassword: z.string().trim().regex(PASSWORD_REGEX),
+    confirmPassword: z.string().trim().regex(PASSWORD_REGEX),
+  })
+  .superRefine(({ confirmPassword, newPassword }, ctx) => {
+    if (confirmPassword !== newPassword) {
+      ctx.addIssue({
+        code: "custom",
+        message: "Password did not match",
+        path: ["confirmPassword"],
+      });
+    }
+  });
 const ChangePass = () => {
   const { data: userData } = useSession();
   const [isLoadingBtn, setIsLoadingBtn] = React.useState<boolean>(false);
-  const userId = getCookie(userIdCookie);
-  const [isLoading, setIsLoading] = React.useState<boolean>(true);
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -38,20 +46,23 @@ const ChangePass = () => {
     const formValue = form.getValues();
     console.log(formValue);
     const result = FormSchema.safeParse(formValue);
-
+    setIsLoadingBtn(true);
     if (result.success) {
-    //   const model = UpdateUserRequest.fromJS({
-    //     oldPassword: formValue?.oldPassword,
-    //     newPassword: formValue?.newPassword,
-    //     confirmPassword: formValue?.confirmPassword
-    //   });
+      const model = UserResetPasswordRequest.fromJS({
+        email: userData?.user?.email,
+        oldPassword: formValue?.oldPassword,
+        newPassword: formValue?.newPassword,
+        newConfirmPassword: formValue?.confirmPassword,
+      });
 
-    //   await service.client.usersPUT(userId as string, model);
+      await service.client.resetPassword(model);
+      setIsLoadingBtn(false);
     } else {
       toast({
         title: "Please input all required fields",
         variant: "destructive",
       });
+      setIsLoadingBtn(false);
     }
   };
 
@@ -66,7 +77,9 @@ const ChangePass = () => {
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)}>
                 <div className="grid grid-cols-12 pb-2">
-                  <span className="text-muted-foreground col-span-3">Old Password</span>
+                  <span className="text-muted-foreground col-span-3">
+                    Old Password
+                  </span>
                   <div className="col-span-9">
                     <FormField
                       control={form.control}
