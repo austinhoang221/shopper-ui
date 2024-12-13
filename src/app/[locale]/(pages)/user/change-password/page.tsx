@@ -13,6 +13,7 @@ import { service } from "@/app/api/services/service";
 import { toast } from "@/components/hooks/use-toast";
 import { UserResetPasswordRequest } from "@/app/api/services/api";
 import { PASSWORD_REGEX } from "@/utils/constants";
+import withAuth from "@/hoc/Auth";
 
 const FormSchema = z
   .object({
@@ -148,4 +149,4 @@ const ChangePass = () => {
   );
 };
 
-export default ChangePass;
+export default withAuth(ChangePass);

@@ -1,4 +1,4 @@
-import { CheckoutForm } from "@/components/checkout/CheckoutForm";
+import CheckoutForm from "@/components/checkout/CheckoutForm";
 import { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Checkout",

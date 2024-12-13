@@ -15,6 +15,7 @@ import { service } from "@/app/api/services/service";
 import { getCookie } from "cookies-next";
 import { toast } from "@/components/hooks/use-toast";
 import { UpdateUserRequest } from "@/app/api/services/api";
+import withAuth from "@/hoc/Auth";
 
 const FormSchema = z.object({
   name: z.string(),
@@ -35,7 +36,6 @@ const UserInfo = () => {
     defaultValues: {
       name: "",
       username: "",
-      phoneNumber: "",
       email: "",
     },
   });
@@ -43,7 +43,6 @@ const UserInfo = () => {
   React.useEffect(() => {
     form.setValue("name", userData?.user?.name ?? "");
     form.setValue("username", userData?.user?.username ?? "");
-    // form.setValue("phoneNumber", userData?.user?.phoneNumber ?? "");
     form.setValue("email", userData?.user?.email ?? "");
   }, [userData]);
 
@@ -59,6 +58,9 @@ const UserInfo = () => {
       });
       try {
         const response = await service.client.usersPUT(userId as string, model);
+        toast({
+          title: "Updated profile",
+        });
       } catch (error) {
         console.log(error);
       }
@@ -175,7 +177,9 @@ const UserInfo = () => {
           type="submit"
           loading={isLoadingBtn}
           onClick={() => onSubmit()}
-          disabled={!form.formState.isValid || isLoadingBtn}
+          disabled={
+            (!form.formState.isValid && form.formState.isDirty) || isLoadingBtn
+          }
         >
           Change Information
         </Button>
@@ -184,4 +188,4 @@ const UserInfo = () => {
   );
 };
 
-export default UserInfo;
+export default withAuth(UserInfo);

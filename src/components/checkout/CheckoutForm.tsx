@@ -48,7 +48,9 @@ import {
   CommandList,
 } from "../ui/command";
 import { cn } from "@/lib/utils";
+
 import { IconButton } from "../ui/icon-button";
+import withAuth from "@/hoc/Auth";
 
 const FormSchema = z.object({
   username: z.string().trim().min(1, {
@@ -83,7 +85,7 @@ const FormSchema = z.object({
   note: z.string(),
 });
 
-export function CheckoutForm() {
+const CheckoutForm = () => {
   const { cartItems } = useAppSelector((state) => state.cart);
   const [countries, setCountries] = useState<Place[]>([]);
   const [selectedCountry, setSelectedCountry] = useState<string | null>(
@@ -611,4 +613,5 @@ export function CheckoutForm() {
       </div>
     </div>
   );
-}
+};
+export default withAuth(CheckoutForm);
