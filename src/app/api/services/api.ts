@@ -2619,6 +2619,94 @@ export class Client {
   }
 
   /**
+   * (Auth)
+   * @return OK
+   */
+  addressesAll(id: string): Promise<UserAddressResponse[]> {
+    let url_ = this.baseUrl + "/api/v1/users/{id}/addresses";
+    if (id === undefined || id === null)
+      throw new Error("The parameter 'id' must be defined.");
+    url_ = url_.replace("{id}", encodeURIComponent("" + id));
+    url_ = url_.replace(/[?&]$/, "");
+
+    let options_: RequestInit = {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+    };
+
+    return this.transformOptions(options_)
+      .then((transformedOptions_) => {
+        return this.http.fetch(url_, transformedOptions_);
+      })
+      .then((_response: Response) => {
+        return this.processAddressesAll(_response);
+      });
+  }
+
+  protected processAddressesAll(
+    response: Response
+  ): Promise<UserAddressResponse[]> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && response.headers.forEach) {
+      response.headers.forEach((v: any, k: any) => (_headers[k] = v));
+    }
+    if (status === 200) {
+      return response.text().then((_responseText) => {
+        let result200: any = null;
+        let resultData200 =
+          _responseText === ""
+            ? null
+            : JSON.parse(_responseText, this.jsonParseReviver);
+        if (Array.isArray(resultData200)) {
+          result200 = [] as any;
+          for (let item of resultData200)
+            result200!.push(UserAddressResponse.fromJS(item));
+        } else {
+          result200 = <any>null;
+        }
+        return result200;
+      });
+    } else if (status === 400) {
+      return response.text().then((_responseText) => {
+        let result400: any = null;
+        let resultData400 =
+          _responseText === ""
+            ? null
+            : JSON.parse(_responseText, this.jsonParseReviver);
+        result400 = ProblemDetails.fromJS(resultData400);
+        return throwException(
+          "Bad Request",
+          status,
+          _responseText,
+          _headers,
+          result400
+        );
+      });
+    } else if (status === 401) {
+      return response.text().then((_responseText) => {
+        return throwException("Unauthorized", status, _responseText, _headers);
+      });
+    } else if (status === 403) {
+      return response.text().then((_responseText) => {
+        return throwException("Forbidden", status, _responseText, _headers);
+      });
+    } else if (status !== 200 && status !== 204) {
+      return response.text().then((_responseText) => {
+        return throwException(
+          "An unexpected server error occurred.",
+          status,
+          _responseText,
+          _headers
+        );
+      });
+    }
+    return Promise.resolve<UserAddressResponse[]>(null as any);
+  }
+
+  /**
    * @param email (optional)
    * @return No Content
    */
@@ -3715,7 +3803,7 @@ export interface ICancellationToken {
 
 export class CapturePaymentRequest implements ICapturePaymentRequest {
   orderId?: string;
-  transactionId?: string;
+  partnerTransactionId?: string | undefined;
 
   constructor(data?: ICapturePaymentRequest) {
     if (data) {
@@ -3729,9 +3817,7 @@ export class CapturePaymentRequest implements ICapturePaymentRequest {
   init(_data?: any) {
     if (_data) {
       this.orderId = _data["orderId"] ? _data["orderId"] : <any>undefined;
-      this.transactionId = _data["transactionId"]
-        ? _data["transactionId"]
-        : <any>undefined;
+      this.partnerTransactionId = _data["partnerTransactionId"];
     }
   }
 
@@ -3745,16 +3831,14 @@ export class CapturePaymentRequest implements ICapturePaymentRequest {
   toJSON(data?: any) {
     data = typeof data === "object" ? data : {};
     data["orderId"] = this.orderId ? this.orderId : <any>undefined;
-    data["transactionId"] = this.transactionId
-      ? this.transactionId
-      : <any>undefined;
+    data["partnerTransactionId"] = this.partnerTransactionId;
     return data;
   }
 }
 
 export interface ICapturePaymentRequest {
   orderId?: string;
-  transactionId?: string;
+  partnerTransactionId?: string | undefined;
 }
 
 export enum CartStatus {
@@ -4567,7 +4651,6 @@ export interface ICreatePaymentRequest {
 
 export class CreatePaymentResponse implements ICreatePaymentResponse {
   orderId?: string;
-  transactionId?: string;
   partnerTransactionId?: string | undefined;
 
   constructor(data?: ICreatePaymentResponse) {
@@ -4582,9 +4665,6 @@ export class CreatePaymentResponse implements ICreatePaymentResponse {
   init(_data?: any) {
     if (_data) {
       this.orderId = _data["orderId"] ? _data["orderId"] : <any>undefined;
-      this.transactionId = _data["transactionId"]
-        ? _data["transactionId"]
-        : <any>undefined;
       this.partnerTransactionId = _data["partnerTransactionId"];
     }
   }
@@ -4599,9 +4679,6 @@ export class CreatePaymentResponse implements ICreatePaymentResponse {
   toJSON(data?: any) {
     data = typeof data === "object" ? data : {};
     data["orderId"] = this.orderId ? this.orderId : <any>undefined;
-    data["transactionId"] = this.transactionId
-      ? this.transactionId
-      : <any>undefined;
     data["partnerTransactionId"] = this.partnerTransactionId;
     return data;
   }
@@ -4609,7 +4686,6 @@ export class CreatePaymentResponse implements ICreatePaymentResponse {
 
 export interface ICreatePaymentResponse {
   orderId?: string;
-  transactionId?: string;
   partnerTransactionId?: string | undefined;
 }
 
@@ -8803,12 +8879,59 @@ export interface IProblemDetails {
   [key: string]: any;
 }
 
+export class ProductAttributeDetailResponse
+  implements IProductAttributeDetailResponse
+{
+  id?: string;
+  name?: string | undefined;
+  value?: string | undefined;
+
+  constructor(data?: IProductAttributeDetailResponse) {
+    if (data) {
+      for (var property in data) {
+        if (data.hasOwnProperty(property))
+          (<any>this)[property] = (<any>data)[property];
+      }
+    }
+  }
+
+  init(_data?: any) {
+    if (_data) {
+      this.id = _data["id"] ? _data["id"] : <any>undefined;
+      this.name = _data["name"];
+      this.value = _data["value"];
+    }
+  }
+
+  static fromJS(data: any): ProductAttributeDetailResponse {
+    data = typeof data === "object" ? data : {};
+    let result = new ProductAttributeDetailResponse();
+    result.init(data);
+    return result;
+  }
+
+  toJSON(data?: any) {
+    data = typeof data === "object" ? data : {};
+    data["id"] = this.id ? this.id : <any>undefined;
+    data["name"] = this.name;
+    data["value"] = this.value;
+    return data;
+  }
+}
+
+export interface IProductAttributeDetailResponse {
+  id?: string;
+  name?: string | undefined;
+  value?: string | undefined;
+}
+
 export class ProductAttributeResponse implements IProductAttributeResponse {
   id?: string;
   attributeName?: string | undefined;
   defaultValue?: string | undefined;
   required?: boolean;
   type?: string | undefined;
+  details?: ProductAttributeDetailResponse[] | undefined;
 
   constructor(data?: IProductAttributeResponse) {
     if (data) {
@@ -8826,6 +8949,11 @@ export class ProductAttributeResponse implements IProductAttributeResponse {
       this.defaultValue = _data["defaultValue"];
       this.required = _data["required"];
       this.type = _data["type"];
+      if (Array.isArray(_data["details"])) {
+        this.details = [] as any;
+        for (let item of _data["details"])
+          this.details!.push(ProductAttributeDetailResponse.fromJS(item));
+      }
     }
   }
 
@@ -8843,6 +8971,10 @@ export class ProductAttributeResponse implements IProductAttributeResponse {
     data["defaultValue"] = this.defaultValue;
     data["required"] = this.required;
     data["type"] = this.type;
+    if (Array.isArray(this.details)) {
+      data["details"] = [];
+      for (let item of this.details) data["details"].push(item.toJSON());
+    }
     return data;
   }
 }
@@ -8853,6 +8985,7 @@ export interface IProductAttributeResponse {
   defaultValue?: string | undefined;
   required?: boolean;
   type?: string | undefined;
+  details?: ProductAttributeDetailResponse[] | undefined;
 }
 
 export class ProductCategoryResponse implements IProductCategoryResponse {
@@ -11207,7 +11340,6 @@ export class UpdateUserRequest implements IUpdateUserRequest {
   username?: string | undefined;
   name?: string | undefined;
   email?: string | undefined;
-  phoneNumber?: string | undefined;
 
   constructor(data?: IUpdateUserRequest) {
     if (data) {
@@ -11223,7 +11355,6 @@ export class UpdateUserRequest implements IUpdateUserRequest {
       this.username = _data["username"];
       this.name = _data["name"];
       this.email = _data["email"];
-      this.phoneNumber = _data["phoneNumber"];
     }
   }
 
@@ -11239,7 +11370,6 @@ export class UpdateUserRequest implements IUpdateUserRequest {
     data["username"] = this.username;
     data["name"] = this.name;
     data["email"] = this.email;
-    data["phoneNumber"] = this.phoneNumber;
     return data;
   }
 }
@@ -11248,10 +11378,11 @@ export interface IUpdateUserRequest {
   username?: string | undefined;
   name?: string | undefined;
   email?: string | undefined;
-  phoneNumber?: string | undefined;
 }
 
 export class UserAddressResponse implements IUserAddressResponse {
+  id?: string;
+  name?: string | undefined;
   country?: string | undefined;
   city?: string | undefined;
   state?: string | undefined;
@@ -11259,6 +11390,7 @@ export class UserAddressResponse implements IUserAddressResponse {
   street?: string | undefined;
   detailedAddress?: string | undefined;
   phoneNumber?: string | undefined;
+  isDefault?: boolean;
 
   constructor(data?: IUserAddressResponse) {
     if (data) {
@@ -11271,6 +11403,8 @@ export class UserAddressResponse implements IUserAddressResponse {
 
   init(_data?: any) {
     if (_data) {
+      this.id = _data["id"] ? _data["id"] : <any>undefined;
+      this.name = _data["name"];
       this.country = _data["country"];
       this.city = _data["city"];
       this.state = _data["state"];
@@ -11278,6 +11412,7 @@ export class UserAddressResponse implements IUserAddressResponse {
       this.street = _data["street"];
       this.detailedAddress = _data["detailedAddress"];
       this.phoneNumber = _data["phoneNumber"];
+      this.isDefault = _data["isDefault"];
     }
   }
 
@@ -11290,6 +11425,8 @@ export class UserAddressResponse implements IUserAddressResponse {
 
   toJSON(data?: any) {
     data = typeof data === "object" ? data : {};
+    data["id"] = this.id ? this.id : <any>undefined;
+    data["name"] = this.name;
     data["country"] = this.country;
     data["city"] = this.city;
     data["state"] = this.state;
@@ -11297,11 +11434,14 @@ export class UserAddressResponse implements IUserAddressResponse {
     data["street"] = this.street;
     data["detailedAddress"] = this.detailedAddress;
     data["phoneNumber"] = this.phoneNumber;
+    data["isDefault"] = this.isDefault;
     return data;
   }
 }
 
 export interface IUserAddressResponse {
+  id?: string;
+  name?: string | undefined;
   country?: string | undefined;
   city?: string | undefined;
   state?: string | undefined;
@@ -11309,6 +11449,7 @@ export interface IUserAddressResponse {
   street?: string | undefined;
   detailedAddress?: string | undefined;
   phoneNumber?: string | undefined;
+  isDefault?: boolean;
 }
 
 export class UserCheckEmailExistRequest implements IUserCheckEmailExistRequest {
@@ -11844,6 +11985,7 @@ export interface IUserResponse {
 }
 
 export class UserUpdateAddressesRequest implements IUserUpdateAddressesRequest {
+  name?: string | undefined;
   country?: string | undefined;
   city?: string | undefined;
   state?: string | undefined;
@@ -11851,6 +11993,7 @@ export class UserUpdateAddressesRequest implements IUserUpdateAddressesRequest {
   street?: string | undefined;
   detailedAddress?: string | undefined;
   phoneNumber?: string | undefined;
+  isDefault?: boolean;
 
   constructor(data?: IUserUpdateAddressesRequest) {
     if (data) {
@@ -11863,6 +12006,7 @@ export class UserUpdateAddressesRequest implements IUserUpdateAddressesRequest {
 
   init(_data?: any) {
     if (_data) {
+      this.name = _data["name"];
       this.country = _data["country"];
       this.city = _data["city"];
       this.state = _data["state"];
@@ -11870,6 +12014,7 @@ export class UserUpdateAddressesRequest implements IUserUpdateAddressesRequest {
       this.street = _data["street"];
       this.detailedAddress = _data["detailedAddress"];
       this.phoneNumber = _data["phoneNumber"];
+      this.isDefault = _data["isDefault"];
     }
   }
 
@@ -11882,6 +12027,7 @@ export class UserUpdateAddressesRequest implements IUserUpdateAddressesRequest {
 
   toJSON(data?: any) {
     data = typeof data === "object" ? data : {};
+    data["name"] = this.name;
     data["country"] = this.country;
     data["city"] = this.city;
     data["state"] = this.state;
@@ -11889,11 +12035,13 @@ export class UserUpdateAddressesRequest implements IUserUpdateAddressesRequest {
     data["street"] = this.street;
     data["detailedAddress"] = this.detailedAddress;
     data["phoneNumber"] = this.phoneNumber;
+    data["isDefault"] = this.isDefault;
     return data;
   }
 }
 
 export interface IUserUpdateAddressesRequest {
+  name?: string | undefined;
   country?: string | undefined;
   city?: string | undefined;
   state?: string | undefined;
@@ -11901,6 +12049,7 @@ export interface IUserUpdateAddressesRequest {
   street?: string | undefined;
   detailedAddress?: string | undefined;
   phoneNumber?: string | undefined;
+  isDefault?: boolean;
 }
 
 export class UserUploadPhotoResponse implements IUserUploadPhotoResponse {
