@@ -45,7 +45,7 @@ const DetailContent = (props: Props) => {
   const [detailProduct, setDetailProduct] = React.useState<
     GetByAttributeDetailIdsResponse | undefined
   >();
-
+  console.log(product);
   const initialValue = product?.attributes?.reduce(
     (acc: ProductAttribute[], attr) => {
       const flat: ProductAttribute[] = [];
@@ -129,6 +129,10 @@ const DetailContent = (props: Props) => {
     return !!selectedAttributes.find((attr) => attr.id === id);
   };
 
+  const onClickBuyNow = async () => {
+    await onAddToCart(detailProduct?.id ?? "");
+    router.push(`/${language}/cart`);
+  };
   const onRenderAttributes = () => {
     return product?.attributes?.map((attr) => {
       return (
@@ -252,7 +256,7 @@ const DetailContent = (props: Props) => {
               disabled={isLoading || isLoadingButton}
               className="relative flex w-full items-center justify-center rounded-full mt-2 p-6"
               variant="default"
-              onClick={() => router.push(`/${language}/cart`)}
+              onClick={() => onClickBuyNow()}
             >
               <span className="mr-2">Buy now</span>
               <FontAwesomeIcon

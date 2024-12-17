@@ -35,12 +35,14 @@ import { useRouter } from "next/navigation";
 import React from "react";
 import { IconButton } from "@/components/ui/icon-button";
 import { ArrowRightIcon } from "lucide-react";
+import { useSession } from "next-auth/react";
 
 const ListCart = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { cartItems } = useAppSelector((state) => state.cart);
   const userId = getCookie(userIdCookie);
+  const { data: userData } = useSession();
 
   const [isLoadingDeleteBtn, setIsLoadingDeleteBtn] =
     React.useState<boolean>(false);
@@ -70,6 +72,7 @@ const ListCart = () => {
   });
 
   const goToCheckOut = () => {
+    // if()
     router.push("cart/checkout");
   };
 

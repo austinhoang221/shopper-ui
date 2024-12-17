@@ -37,7 +37,7 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="mt-4  flex justify-center items-center">
+    <div className="mt-4 container flex justify-center items-center">
       <Card className="mx-auto max-w-screen-md min-w-96  sm:rounded-lg justify-center ">
         <CardHeader>
           <div className="flex items-center">

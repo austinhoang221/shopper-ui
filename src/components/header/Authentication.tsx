@@ -37,6 +37,7 @@ const Authentication = () => {
       <DropdownMenuTrigger asChild>
         {userData?.user?.photoUrl ? (
           <Image
+            className="rounded-full"
             src={userData?.user?.photoUrl}
             alt={userData?.user?.name ?? userData?.user?.photoUrl}
             width={30}
@@ -58,7 +59,11 @@ const Authentication = () => {
           >
             My Account
           </DropdownMenuItem>
-          <DropdownMenuItem>My Orders</DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => router.push(`/${params.locale}/user/orders`)}
+          >
+            My Orders
+          </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem
