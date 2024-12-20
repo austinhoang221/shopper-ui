@@ -55,14 +55,9 @@ const FormSchema = z.object({
   name: z.string().min(1, {
     message: "Name is required",
   }),
-  phoneNumber: z
-    .string()
-    .min(1, {
-      message: "Phone number is required",
-    })
-    .regex(PHONE_NUMBER_REGEX, {
-      message: "Phone must in correct format",
-    }),
+  phoneNumber: z.string().regex(PHONE_NUMBER_REGEX, {
+    message: "Phone must in correct format",
+  }),
   city: z.string().min(1, {
     message: "City required",
   }),
@@ -87,7 +82,6 @@ type Props = {
 const CreateModal = (props: Props) => {
   const userId = getCookie(userIdCookie);
   const [isLoadingBtn, setIsLoadingBtn] = React.useState<boolean>(false);
-
   const [countries, setCountries] = React.useState<Place[]>([]);
   const [selectedCountry, setSelectedCountry] = React.useState<string | null>(
     "3017382"
@@ -118,9 +112,10 @@ const CreateModal = (props: Props) => {
   React.useEffect(() => {
     if (props.isOpen && props.address) {
       form.setValue("name", props.address.name ?? "");
-      form.setValue("city", props.address.city ?? "");
+      form.setValue("city", props.address.cityCode ?? "");
       form.setValue("phoneNumber", props.address.phoneNumber ?? "");
-      form.setValue("region", props.address.region ?? "");
+      form.setValue("region", props.address.regionCode ?? "");
+      setSelectedRegion(props.address.regionCode);
       form.setValue("detailedAddress", props.address.detailedAddress ?? "");
     }
   }, [props.isOpen, props.address]);
@@ -150,20 +145,22 @@ const CreateModal = (props: Props) => {
 
   const onSubmit = async () => {
     const formValue = form.getValues();
-
+    await form.trigger();
     if (form.formState.isValid) {
       setIsLoadingBtn(true);
       const model = UserUpdateAddressesRequest.fromJS({
         name: formValue.name,
-        country:
-          countries.find((country) => country.geonameId == selectedCountry)
-            ?.countryCode ?? "",
+        country: "France" ?? "",
+        cityCode: form.watch("city")?.toString() ?? "",
         city:
           cities.find((city) => city.geonameId == form.watch("city"))?.name ??
           "",
         street:
           regions.find((region) => region.geonameId == selectedRegion)?.name ??
           "",
+        stateCode: selectedRegion?.toString() ?? "",
+        regionCode: selectedRegion?.toString(),
+        streetCode: "Fixed",
         state:
           regions.find((region) => region.geonameId == selectedRegion)?.name ??
           "",
