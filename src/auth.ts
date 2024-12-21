@@ -52,14 +52,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
               idToken: account?.id_token,
             })
           );
-          token.id = response.id;
-          token.name = response.name;
-          token.email = response.email;
-          token.phoneNumber = response.phoneNumber;
-          token.photoUrl = response.photoUrl;
-          const expires = new Date();
 
           if (response?.id) {
+            token.id = response.id;
+            token.name = response.name;
+            token.email = response.email;
+            token.phoneNumber = response.phoneNumber;
+            token.photoUrl = response.photoUrl;
+            const expires = new Date();
+
             expires.setDate(expires.getDate() + 7);
             cookies().set({
               name: userIdCookie,

@@ -2,6 +2,7 @@ import { authorizationCookie, userIdCookie } from "@/utils/constants";
 import { HTTPStatusCodeType } from "../enums/HttpStatusCodeType";
 import { Client } from "./api";
 import { getCookie } from "cookies-next";
+import { redirect } from "next/navigation";
 
 const baseUrl = "http://localhost:5283";
 async function authorizedFetchFunction(
@@ -26,22 +27,30 @@ async function authorizedFetchFunction(
 }
 
 const catchServiceErrors = <T>(target: T): T => {
-  // const prototype = Object.getPrototypeOf(target);
-  // for (const key of Object.getOwnPropertyNames(prototype)) {
-  //   const descriptor = Object.getOwnPropertyDescriptor(prototype, key);
-  //   if (descriptor && typeof descriptor.value === "function") {
-  //     const originalMethod = descriptor.value;
-  //     descriptor.value = async function (...args: A[]) {
-  //       try {
-  //         const res = await originalMethod.apply(this, args);
-  //         return res;
-  //       } catch (error: A) {
-  //         handleServiceError(error);
-  //       }
-  //     };
-  //     Object.defineProperty(prototype, key, descriptor);
-  //   }
-  // }
+  const prototype = Object.getPrototypeOf(target);
+  for (const key of Object.getOwnPropertyNames(prototype)) {
+    const descriptor = Object.getOwnPropertyDescriptor(prototype, key);
+    if (descriptor && typeof descriptor.value === "function") {
+      const originalMethod = descriptor.value;
+      descriptor.value = async function (...args: A[]) {
+        let redirectPath: string | null = null;
+        try {
+          const res = await originalMethod.apply(this, args);
+          return res;
+        } catch (error: A) {
+          redirectPath = `/${getCookie(
+            "content-language"
+          )}/auth/login?from=user`;
+          handleServiceError(error);
+        } finally {
+          if (redirectPath) {
+            // window.location.href = redirectPath;
+          }
+        }
+      };
+      Object.defineProperty(prototype, key, descriptor);
+    }
+  }
   return target;
 };
 
@@ -49,6 +58,7 @@ const handleServiceError = (error: A) => {
   // Handle service error
   switch (error.status) {
     case HTTPStatusCodeType.UNAUTHORIZED:
+      console.error("unauthorized");
       throw new Error("unauthorized");
     case HTTPStatusCodeType.BAD_REQUEST:
       throw new Error(error?.errors?.[0].message);

@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 
-import { PHONE_NUMBER_REGEX, userIdCookie } from "@/utils/constants";
+import { userIdCookie } from "@/utils/constants";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSession } from "next-auth/react";
 import React from "react";
@@ -47,19 +47,19 @@ const UserInfo = () => {
   }, [userData]);
 
   const onSubmit = async () => {
-    form.trigger();
+    await form.trigger();
     const formValue = form.getValues();
     if (form.formState.isValid) {
       const model = UpdateUserRequest.fromJS({
         name: formValue?.name,
         username: formValue?.username,
         email: formValue?.email,
-        // phoneNumber: formValue?.phoneNumber,
+        // phoneNumber: formValue?.phdoneNumber,
       });
       try {
-        const response = await service.client.usersPUT(userId as string, model);
+        await service.client.usersPUT(userId as string, model);
         toast({
-          title: "Updated profile",
+          title: "Successfully updated profile",
         });
       } catch (error) {
         console.log(error);
@@ -84,7 +84,7 @@ const UserInfo = () => {
               <form onSubmit={form.handleSubmit(onSubmit)}>
                 <div className="grid grid-cols-12 pb-2">
                   <span className="text-muted-foreground col-span-3">Name</span>
-                  <div className="col-span-4">
+                  <div className="col-span-9">
                     <FormField
                       control={form.control}
                       name="name"

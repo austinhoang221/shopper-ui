@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "../ui/textarea";
 // import PaymentOption from "./PaymentOption/PaymentOption";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-import ProductOrder from "./ProductOrder/ProductOrder";
+import ProductOrder from "./product-order/ProductOrder";
 import React, { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import {
@@ -33,6 +33,7 @@ import { service } from "@/app/api/services/service";
 import {
   CreateOrderItemRequest,
   CreateOrderRequest,
+  UserAddressResponse,
 } from "@/app/api/services/api";
 import { getCookie } from "cookies-next";
 import { PHONE_NUMBER_REGEX, userIdCookie } from "@/utils/constants";
@@ -51,6 +52,10 @@ import { cn } from "@/lib/utils";
 
 import { IconButton } from "../ui/icon-button";
 import withAuth from "@/hoc/Auth";
+import { useSession } from "next-auth/react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faLocationDot } from "@fortawesome/free-solid-svg-icons";
+import UpdateAddressModal from "./update-address-modal/UpdateAddressModal";
 
 const FormSchema = z.object({
   username: z.string().trim().min(1, {
@@ -87,6 +92,7 @@ const FormSchema = z.object({
 
 const CheckoutForm = () => {
   const { cartItems } = useAppSelector((state) => state.cart);
+  const { data: userData } = useSession();
   const [countries, setCountries] = useState<Place[]>([]);
   const [selectedCountry, setSelectedCountry] = useState<string | null>(
     "3017382"
@@ -98,7 +104,15 @@ const CheckoutForm = () => {
   const [debounceTimeout, setDebounceTimeout] = useState<NodeJS.Timeout | null>(
     null
   );
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const [isAddressLoaded, setIsAddressLoaded] = React.useState<boolean>(false);
+  const [isOpenUpdateModal, setIsOpenUpdateModal] =
+    React.useState<boolean>(false);
 
+  const [addresses, setAddresses] = React.useState<UserAddressResponse[]>([]);
+
+  const [selectedAddress, setSelectedAddress] =
+    React.useState<UserAddressResponse | null>(null);
   const userId = getCookie(userIdCookie);
 
   // useEffect(() => {
@@ -129,6 +143,21 @@ const CheckoutForm = () => {
 
     fetchCities();
   }, [selectedRegion]);
+
+  React.useEffect(() => {
+    fetchAddress();
+  }, [userData]);
+
+  const fetchAddress = async () => {
+    if (userData && addresses?.length === 0 && !isAddressLoaded) {
+      setIsLoading(true);
+      const response = await service.client.addressesAll(userId ?? "");
+      setAddresses(response);
+      setSelectedAddress(response?.find((res) => res.isDefault) ?? null);
+      setIsLoading(false);
+      setIsAddressLoaded(true);
+    }
+  };
 
   const handleShippingCalculation = async () => {
     if (!form.watch("address") || !form.watch("zipcode")) return;
@@ -202,23 +231,23 @@ const CheckoutForm = () => {
   );
 
   const onSubmit = async () => {
-    form.trigger();
+    await form.trigger();
     const formValue = form.getValues();
-    console.log(formValue);
-    const result = FormSchema.safeParse(formValue);
 
-    if (result.success) {
+    if (form.formState.isValid || selectedAddress) {
       const model = CreateOrderRequest.fromJS({
-        street: formValue?.address,
-        city: formValue?.city,
-        state: formValue?.region,
-        country: formValue?.country,
+        street: selectedAddress ? selectedAddress.street : formValue?.address,
+        city: selectedAddress ? selectedAddress.city : formValue?.city,
+        state: selectedAddress ? selectedAddress.state : formValue?.region,
+        country: selectedAddress ? selectedAddress.country : formValue?.country,
         zipCode: formValue?.zipcode,
-        region: formValue?.region,
+        region: selectedAddress ? selectedAddress.region : formValue?.region,
         buyerId: userId,
-        buyerPhone: formValue?.phone,
-        buyerEmail: formValue?.email,
-        buyerName: formValue?.username,
+        buyerPhone: selectedAddress
+          ? selectedAddress.phoneNumber
+          : formValue?.phone,
+        buyerEmail: userData?.user?.email,
+        buyerName: selectedAddress ? selectedAddress.name : formValue?.username,
         description: formValue?.note,
         // orderCd: formValue?.,
         remark: formValue?.note,
@@ -233,7 +262,6 @@ const CheckoutForm = () => {
           });
         }),
       });
-
       await service.client.ordersPOST(userId, model);
     } else {
       toast({
@@ -253,64 +281,45 @@ const CheckoutForm = () => {
           <CardContent>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)}>
-                <div>
-                  <FormField
-                    control={form.control}
-                    name="username"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Name *</FormLabel>
-                        <div className="gap-4">
-                          <FormControl className="col-span-1">
-                            <Input placeholder="Name" {...field} />
+                {addresses?.length === 0 && !selectedAddress ? (
+                  <>
+                    <FormField
+                      control={form.control}
+                      name="username"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Name *</FormLabel>
+                          <div className="gap-4">
+                            <FormControl className="col-span-1">
+                              <Input placeholder="Name" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="address"
+                      render={({ field }) => (
+                        <FormItem className="mt-2">
+                          <FormLabel>Address *</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Address"
+                              {...field}
+                              onChange={(event) => {
+                                field.onChange(event);
+                                debounceShippingCalculation();
+                              }}
+                            />
                           </FormControl>
                           <FormMessage />
-                        </div>
-                      </FormItem>
-                    )}
-                  />
-
-                  {/* <FormField
-                    control={form.control}
-                    name="company"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          Company Name
-                          <span className="hidden md:inline"> (Optional)</span>
-                        </FormLabel>
-                        <FormControl>
-                          <Input placeholder="Company" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  /> */}
-                </div>
-
-                <FormField
-                  control={form.control}
-                  name="address"
-                  render={({ field }) => (
-                    <FormItem className="mt-2">
-                      <FormLabel>Address *</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Address"
-                          {...field}
-                          onChange={(event) => {
-                            field.onChange(event);
-                            debounceShippingCalculation();
-                          }}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-2">
-                  {/* <FormField
+                        </FormItem>
+                      )}
+                    />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-2">
+                      {/* <FormField
                     control={form.control}
                     name="country"
                     render={({ field }) => (
@@ -344,198 +353,232 @@ const CheckoutForm = () => {
                     )}
                   /> */}
 
-                  <FormField
-                    control={form.control}
-                    name="region"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Region/State</FormLabel>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <FormControl>
-                              <Button
-                                variant="outline"
-                                role="combobox"
-                                className={cn(
-                                  "w-full justify-between",
-                                  !field.value && "text-muted-foreground"
-                                )}
-                              >
-                                {field.value
-                                  ? regions.find(
-                                      (language) =>
-                                        language.geonameId.toString() ===
-                                        field.value
-                                    )?.name
-                                  : "Select region"}
-                                <ChevronsUpDown className="opacity-50" />
-                              </Button>
-                            </FormControl>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-full p-0">
-                            <Command>
-                              <CommandInput
-                                placeholder="Search"
-                                className="h-9"
-                              />
-                              <CommandList>
-                                <CommandEmpty>No region found.</CommandEmpty>
-                                {regions.map((region) => (
-                                  <CommandItem
-                                    value={region.name}
-                                    key={region.geonameId}
-                                    onSelect={() => {
-                                      form.setValue(
-                                        "region",
-                                        region.geonameId.toString()
-                                      );
-                                      setSelectedRegion(region.geonameId);
-                                    }}
+                      <FormField
+                        control={form.control}
+                        name="region"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Region/State</FormLabel>
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <FormControl>
+                                  <Button
+                                    variant="outline"
+                                    role="combobox"
+                                    className={cn(
+                                      "w-full justify-between",
+                                      !field.value && "text-muted-foreground"
+                                    )}
                                   >
-                                    {region.name}
-                                    <Check
-                                      width={20}
-                                      className={cn(
-                                        "ml-auto",
-                                        region.geonameId.toString() ===
-                                          field.value
-                                          ? "opacity-100"
-                                          : "opacity-0"
-                                      )}
-                                    />
-                                  </CommandItem>
-                                ))}
-                              </CommandList>
-                            </Command>
-                          </PopoverContent>
-                        </Popover>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="city"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>City</FormLabel>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <FormControl>
-                              <Button
-                                variant="outline"
-                                role="combobox"
-                                className={cn(
-                                  "w-full justify-between",
-                                  !field.value && "text-muted-foreground"
-                                )}
-                              >
-                                {field.value
-                                  ? cities.find(
-                                      (city) =>
-                                        city.geonameId.toString() ===
-                                        field.value
-                                    )?.name
-                                  : "Select city"}
-                                <ChevronsUpDown className="opacity-50" />
-                              </Button>
-                            </FormControl>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-full p-0">
-                            <Command>
-                              <CommandInput
-                                placeholder="Search..."
-                                className="h-9"
-                              />
-                              <CommandList>
-                                <CommandEmpty>No city found.</CommandEmpty>
-                                <CommandGroup>
-                                  {cities.map((city) => (
-                                    <CommandItem
-                                      value={city.name.toString()}
-                                      key={city.geonameId}
-                                      onSelect={() => {
-                                        form.setValue(
-                                          "city",
-                                          city.geonameId.toString()
-                                        );
-                                      }}
-                                    >
-                                      {city.name}
-                                      <Check
-                                        width={20}
-                                        className={cn(
-                                          "ml-auto",
-                                          city.geonameId.toString() ===
+                                    {field.value
+                                      ? regions.find(
+                                          (language) =>
+                                            language.geonameId.toString() ===
                                             field.value
-                                            ? "opacity-100"
-                                            : "opacity-0"
-                                        )}
-                                      />
-                                    </CommandItem>
-                                  ))}
-                                </CommandGroup>
-                              </CommandList>
-                            </Command>
-                          </PopoverContent>
-                        </Popover>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                                        )?.name
+                                      : "Select region"}
+                                    <ChevronsUpDown className="opacity-50" />
+                                  </Button>
+                                </FormControl>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-full p-0">
+                                <Command>
+                                  <CommandInput
+                                    placeholder="Search"
+                                    className="h-9"
+                                  />
+                                  <CommandList>
+                                    <CommandEmpty>
+                                      No region found.
+                                    </CommandEmpty>
+                                    {regions.map((region) => (
+                                      <CommandItem
+                                        value={region.name}
+                                        key={region.geonameId}
+                                        onSelect={() => {
+                                          form.setValue(
+                                            "region",
+                                            region.geonameId.toString()
+                                          );
+                                          setSelectedRegion(region.geonameId);
+                                        }}
+                                      >
+                                        {region.name}
+                                        <Check
+                                          width={20}
+                                          className={cn(
+                                            "ml-auto",
+                                            region.geonameId.toString() ===
+                                              field.value
+                                              ? "opacity-100"
+                                              : "opacity-0"
+                                          )}
+                                        />
+                                      </CommandItem>
+                                    ))}
+                                  </CommandList>
+                                </Command>
+                              </PopoverContent>
+                            </Popover>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
-                  <FormField
-                    control={form.control}
-                    name="zipcode"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Zip Code</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Zip Code"
-                            {...field}
-                            onChange={(event) => {
-                              field.onChange(event);
-                              debounceShippingCalculation();
-                            }}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                      <FormField
+                        control={form.control}
+                        name="city"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>City</FormLabel>
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <FormControl>
+                                  <Button
+                                    variant="outline"
+                                    role="combobox"
+                                    className={cn(
+                                      "w-full justify-between",
+                                      !field.value && "text-muted-foreground"
+                                    )}
+                                  >
+                                    {field.value
+                                      ? cities.find(
+                                          (city) =>
+                                            city.geonameId.toString() ===
+                                            field.value
+                                        )?.name
+                                      : "Select city"}
+                                    <ChevronsUpDown className="opacity-50" />
+                                  </Button>
+                                </FormControl>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-full p-0">
+                                <Command>
+                                  <CommandInput
+                                    placeholder="Search..."
+                                    className="h-9"
+                                  />
+                                  <CommandList>
+                                    <CommandEmpty>No city found.</CommandEmpty>
+                                    <CommandGroup>
+                                      {cities.map((city) => (
+                                        <CommandItem
+                                          value={city.name.toString()}
+                                          key={city.geonameId}
+                                          onSelect={() => {
+                                            form.setValue(
+                                              "city",
+                                              city.geonameId.toString()
+                                            );
+                                          }}
+                                        >
+                                          {city.name}
+                                          <Check
+                                            width={20}
+                                            className={cn(
+                                              "ml-auto",
+                                              city.geonameId.toString() ===
+                                                field.value
+                                                ? "opacity-100"
+                                                : "opacity-0"
+                                            )}
+                                          />
+                                        </CommandItem>
+                                      ))}
+                                    </CommandGroup>
+                                  </CommandList>
+                                </Command>
+                              </PopoverContent>
+                            </Popover>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
-                <div className="grid grid-cols-2 gap-4 mt-2">
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email *</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Email" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                      <FormField
+                        control={form.control}
+                        name="zipcode"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Zip Code</FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="Zip Code"
+                                {...field}
+                                onChange={(event) => {
+                                  field.onChange(event);
+                                  debounceShippingCalculation();
+                                }}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4 mt-2">
+                      <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Email *</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Email" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
-                  <FormField
-                    control={form.control}
-                    name="phone"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Phone Number *</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Phone number" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                      <FormField
+                        control={form.control}
+                        name="phone"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Phone Number *</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Phone number" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </>
+                ) : (
+                  <div>
+                    <div className="text-primary">
+                      <FontAwesomeIcon className="mr-2" icon={faLocationDot} />
+                      <FormLabel>Address</FormLabel>
+                    </div>
+                    <div className="flex justify-between items-center gap-2">
+                      <div className="flex">
+                        <span className="font-bold">
+                          {selectedAddress?.name} {selectedAddress?.phoneNumber}
+                        </span>
+                      </div>
+                      <div className="w-full">
+                        <span className="mr-2">
+                          {selectedAddress?.detailedAddress}
+                        </span>
+                        <span className="border border-primary p-1 text-primary">
+                          Default
+                        </span>
+                      </div>
+                      <Button
+                        variant="link"
+                        className="p-0 mr-2"
+                        onClick={() => {
+                          setIsOpenUpdateModal(true);
+                        }}
+                      >
+                        Update
+                      </Button>
+                    </div>
+                  </div>
+                )}
 
                 {/* <FormField
                   control={form.control}
@@ -595,6 +638,15 @@ const CheckoutForm = () => {
           </CardContent>
         </Card>
       </div>
+      {selectedAddress && (
+        <UpdateAddressModal
+          isOpen={isOpenUpdateModal}
+          setIsOpen={setIsOpenUpdateModal}
+          addresses={addresses}
+          selectedAddress={selectedAddress}
+          updateSelectedAddress={setSelectedAddress}
+        />
+      )}
       <div className="block md:hidden col-span-12 md:col-span-4 order-2 md:order-3">
         <Card>
           <CardHeader>

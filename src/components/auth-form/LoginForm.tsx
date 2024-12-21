@@ -44,14 +44,13 @@ const LoginForm = (props: Props) => {
   });
 
   const onSubmit = async () => {
-    form.trigger();
+    await form.trigger();
     setErrorMsg("");
     const formValue = form.getValues();
     const result = FormSchema.safeParse(formValue);
     if (result.success) {
       setIsLoadingBtn(true);
       const response = await SignIn(props.callBackUrl, { ...formValue });
-      console.log(response);
       if (response?.error) {
         setErrorMsg(response?.error);
       } else {

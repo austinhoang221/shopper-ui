@@ -103,6 +103,7 @@ export class Client {
   }
 
   /**
+   * (Auth)
    * @param x_RequestId (optional)
    * @param body (optional)
    * @return Created
@@ -172,6 +173,14 @@ export class Client {
           result400
         );
       });
+    } else if (status === 401) {
+      return response.text().then((_responseText) => {
+        return throwException("Unauthorized", status, _responseText, _headers);
+      });
+    } else if (status === 403) {
+      return response.text().then((_responseText) => {
+        return throwException("Forbidden", status, _responseText, _headers);
+      });
     } else if (status !== 200 && status !== 204) {
       return response.text().then((_responseText) => {
         return throwException(
@@ -183,6 +192,89 @@ export class Client {
       });
     }
     return Promise.resolve<CreateOrderResponse>(null as any);
+  }
+
+  /**
+   * (Auth)
+   * @return OK
+   */
+  ordersAll(): Promise<OrderResponse[]> {
+    let url_ = this.baseUrl + "/api/v1/orders";
+    url_ = url_.replace(/[?&]$/, "");
+
+    let options_: RequestInit = {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+    };
+
+    return this.transformOptions(options_)
+      .then((transformedOptions_) => {
+        return this.http.fetch(url_, transformedOptions_);
+      })
+      .then((_response: Response) => {
+        return this.processOrdersAll(_response);
+      });
+  }
+
+  protected processOrdersAll(response: Response): Promise<OrderResponse[]> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && response.headers.forEach) {
+      response.headers.forEach((v: any, k: any) => (_headers[k] = v));
+    }
+    if (status === 200) {
+      return response.text().then((_responseText) => {
+        let result200: any = null;
+        let resultData200 =
+          _responseText === ""
+            ? null
+            : JSON.parse(_responseText, this.jsonParseReviver);
+        if (Array.isArray(resultData200)) {
+          result200 = [] as any;
+          for (let item of resultData200)
+            result200!.push(OrderResponse.fromJS(item));
+        } else {
+          result200 = <any>null;
+        }
+        return result200;
+      });
+    } else if (status === 400) {
+      return response.text().then((_responseText) => {
+        let result400: any = null;
+        let resultData400 =
+          _responseText === ""
+            ? null
+            : JSON.parse(_responseText, this.jsonParseReviver);
+        result400 = ProblemDetails.fromJS(resultData400);
+        return throwException(
+          "Bad Request",
+          status,
+          _responseText,
+          _headers,
+          result400
+        );
+      });
+    } else if (status === 401) {
+      return response.text().then((_responseText) => {
+        return throwException("Unauthorized", status, _responseText, _headers);
+      });
+    } else if (status === 403) {
+      return response.text().then((_responseText) => {
+        return throwException("Forbidden", status, _responseText, _headers);
+      });
+    } else if (status !== 200 && status !== 204) {
+      return response.text().then((_responseText) => {
+        return throwException(
+          "An unexpected server error occurred.",
+          status,
+          _responseText,
+          _headers
+        );
+      });
+    }
+    return Promise.resolve<OrderResponse[]>(null as any);
   }
 
   /**
@@ -2536,7 +2628,7 @@ export class Client {
   addresses(
     id: string,
     body?: UserUpdateAddressesRequest[] | undefined
-  ): Promise<UserUploadPhotoResponse> {
+  ): Promise<UserResponse> {
     let url_ = this.baseUrl + "/api/v1/users/{id}/addresses";
     if (id === undefined || id === null)
       throw new Error("The parameter 'id' must be defined.");
@@ -2563,9 +2655,7 @@ export class Client {
       });
   }
 
-  protected processAddresses(
-    response: Response
-  ): Promise<UserUploadPhotoResponse> {
+  protected processAddresses(response: Response): Promise<UserResponse> {
     const status = response.status;
     let _headers: any = {};
     if (response.headers && response.headers.forEach) {
@@ -2578,7 +2668,7 @@ export class Client {
           _responseText === ""
             ? null
             : JSON.parse(_responseText, this.jsonParseReviver);
-        result200 = UserUploadPhotoResponse.fromJS(resultData200);
+        result200 = UserResponse.fromJS(resultData200);
         return result200;
       });
     } else if (status === 400) {
@@ -2615,7 +2705,7 @@ export class Client {
         );
       });
     }
-    return Promise.resolve<UserUploadPhotoResponse>(null as any);
+    return Promise.resolve<UserResponse>(null as any);
   }
 
   /**
@@ -2842,6 +2932,94 @@ export class Client {
           _headers,
           result400
         );
+      });
+    } else if (status !== 200 && status !== 204) {
+      return response.text().then((_responseText) => {
+        return throwException(
+          "An unexpected server error occurred.",
+          status,
+          _responseText,
+          _headers
+        );
+      });
+    }
+    return Promise.resolve<NoContent>(null as any);
+  }
+
+  /**
+   * (Auth)
+   * @param body (optional)
+   * @return No Content
+   */
+  changePassword(
+    id: string,
+    body?: UserChangePasswordRequest | undefined
+  ): Promise<NoContent> {
+    let url_ = this.baseUrl + "/api/v1/users/{id}/change-password";
+    if (id === undefined || id === null)
+      throw new Error("The parameter 'id' must be defined.");
+    url_ = url_.replace("{id}", encodeURIComponent("" + id));
+    url_ = url_.replace(/[?&]$/, "");
+
+    const content_ = JSON.stringify(body);
+
+    let options_: RequestInit = {
+      body: content_,
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json-patch+json",
+        Accept: "application/json",
+      },
+    };
+
+    return this.transformOptions(options_)
+      .then((transformedOptions_) => {
+        return this.http.fetch(url_, transformedOptions_);
+      })
+      .then((_response: Response) => {
+        return this.processChangePassword(_response);
+      });
+  }
+
+  protected processChangePassword(response: Response): Promise<NoContent> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && response.headers.forEach) {
+      response.headers.forEach((v: any, k: any) => (_headers[k] = v));
+    }
+    if (status === 204) {
+      return response.text().then((_responseText) => {
+        let result204: any = null;
+        let resultData204 =
+          _responseText === ""
+            ? null
+            : JSON.parse(_responseText, this.jsonParseReviver);
+        result204 = NoContent.fromJS(resultData204);
+        return result204;
+      });
+    } else if (status === 400) {
+      return response.text().then((_responseText) => {
+        let result400: any = null;
+        let resultData400 =
+          _responseText === ""
+            ? null
+            : JSON.parse(_responseText, this.jsonParseReviver);
+        result400 = ProblemDetails.fromJS(resultData400);
+        return throwException(
+          "Bad Request",
+          status,
+          _responseText,
+          _headers,
+          result400
+        );
+      });
+    } else if (status === 401) {
+      return response.text().then((_responseText) => {
+        return throwException("Unauthorized", status, _responseText, _headers);
+      });
+    } else if (status === 403) {
+      return response.text().then((_responseText) => {
+        return throwException("Forbidden", status, _responseText, _headers);
       });
     } else if (status !== 200 && status !== 204) {
       return response.text().then((_responseText) => {
@@ -3217,7 +3395,7 @@ export class AsnEncodedData implements IAsnEncodedData {
 
   toJSON(data?: any) {
     data = typeof data === "object" ? data : {};
-    data["oid"] = this.oid ? this.oid.toJSON() : <any>undefined;
+    data["oid"] = this.oid ? this.oid : <any>undefined;
     data["rawData"] = this.rawData;
     return data;
   }
@@ -9817,7 +9995,7 @@ export class PublicKey implements IPublicKey {
       ? this.encodedParameters.toJSON()
       : <any>undefined;
     data["key"] = this.key ? this.key.toJSON() : <any>undefined;
-    data["oid"] = this.oid ? this.oid.toJSON() : <any>undefined;
+    data["oid"] = this.oid ? this.oid : <any>undefined;
     return data;
   }
 }
@@ -11385,9 +11563,13 @@ export class UserAddressResponse implements IUserAddressResponse {
   name?: string | undefined;
   country?: string | undefined;
   city?: string | undefined;
+  cityCode?: string | undefined;
   state?: string | undefined;
+  stateCode?: string | undefined;
   region?: string | undefined;
+  regionCode?: string | undefined;
   street?: string | undefined;
+  streetCode?: string | undefined;
   detailedAddress?: string | undefined;
   phoneNumber?: string | undefined;
   isDefault?: boolean;
@@ -11407,9 +11589,13 @@ export class UserAddressResponse implements IUserAddressResponse {
       this.name = _data["name"];
       this.country = _data["country"];
       this.city = _data["city"];
+      this.cityCode = _data["cityCode"];
       this.state = _data["state"];
+      this.stateCode = _data["stateCode"];
       this.region = _data["region"];
+      this.regionCode = _data["regionCode"];
       this.street = _data["street"];
+      this.streetCode = _data["streetCode"];
       this.detailedAddress = _data["detailedAddress"];
       this.phoneNumber = _data["phoneNumber"];
       this.isDefault = _data["isDefault"];
@@ -11429,9 +11615,13 @@ export class UserAddressResponse implements IUserAddressResponse {
     data["name"] = this.name;
     data["country"] = this.country;
     data["city"] = this.city;
+    data["cityCode"] = this.cityCode;
     data["state"] = this.state;
+    data["stateCode"] = this.stateCode;
     data["region"] = this.region;
+    data["regionCode"] = this.regionCode;
     data["street"] = this.street;
+    data["streetCode"] = this.streetCode;
     data["detailedAddress"] = this.detailedAddress;
     data["phoneNumber"] = this.phoneNumber;
     data["isDefault"] = this.isDefault;
@@ -11444,12 +11634,60 @@ export interface IUserAddressResponse {
   name?: string | undefined;
   country?: string | undefined;
   city?: string | undefined;
+  cityCode?: string | undefined;
   state?: string | undefined;
+  stateCode?: string | undefined;
   region?: string | undefined;
+  regionCode?: string | undefined;
   street?: string | undefined;
+  streetCode?: string | undefined;
   detailedAddress?: string | undefined;
   phoneNumber?: string | undefined;
   isDefault?: boolean;
+}
+
+export class UserChangePasswordRequest implements IUserChangePasswordRequest {
+  oldPassword?: string | undefined;
+  newPassword?: string | undefined;
+  newConfirmPassword?: string | undefined;
+
+  constructor(data?: IUserChangePasswordRequest) {
+    if (data) {
+      for (var property in data) {
+        if (data.hasOwnProperty(property))
+          (<any>this)[property] = (<any>data)[property];
+      }
+    }
+  }
+
+  init(_data?: any) {
+    if (_data) {
+      this.oldPassword = _data["oldPassword"];
+      this.newPassword = _data["newPassword"];
+      this.newConfirmPassword = _data["newConfirmPassword"];
+    }
+  }
+
+  static fromJS(data: any): UserChangePasswordRequest {
+    data = typeof data === "object" ? data : {};
+    let result = new UserChangePasswordRequest();
+    result.init(data);
+    return result;
+  }
+
+  toJSON(data?: any) {
+    data = typeof data === "object" ? data : {};
+    data["oldPassword"] = this.oldPassword;
+    data["newPassword"] = this.newPassword;
+    data["newConfirmPassword"] = this.newConfirmPassword;
+    return data;
+  }
+}
+
+export interface IUserChangePasswordRequest {
+  oldPassword?: string | undefined;
+  newPassword?: string | undefined;
+  newConfirmPassword?: string | undefined;
 }
 
 export class UserCheckEmailExistRequest implements IUserCheckEmailExistRequest {
@@ -11988,9 +12226,13 @@ export class UserUpdateAddressesRequest implements IUserUpdateAddressesRequest {
   name?: string | undefined;
   country?: string | undefined;
   city?: string | undefined;
+  cityCode?: string | undefined;
   state?: string | undefined;
+  stateCode?: string | undefined;
   region?: string | undefined;
+  regionCode?: string | undefined;
   street?: string | undefined;
+  streetCode?: string | undefined;
   detailedAddress?: string | undefined;
   phoneNumber?: string | undefined;
   isDefault?: boolean;
@@ -12009,9 +12251,13 @@ export class UserUpdateAddressesRequest implements IUserUpdateAddressesRequest {
       this.name = _data["name"];
       this.country = _data["country"];
       this.city = _data["city"];
+      this.cityCode = _data["cityCode"];
       this.state = _data["state"];
+      this.stateCode = _data["stateCode"];
       this.region = _data["region"];
+      this.regionCode = _data["regionCode"];
       this.street = _data["street"];
+      this.streetCode = _data["streetCode"];
       this.detailedAddress = _data["detailedAddress"];
       this.phoneNumber = _data["phoneNumber"];
       this.isDefault = _data["isDefault"];
@@ -12030,9 +12276,13 @@ export class UserUpdateAddressesRequest implements IUserUpdateAddressesRequest {
     data["name"] = this.name;
     data["country"] = this.country;
     data["city"] = this.city;
+    data["cityCode"] = this.cityCode;
     data["state"] = this.state;
+    data["stateCode"] = this.stateCode;
     data["region"] = this.region;
+    data["regionCode"] = this.regionCode;
     data["street"] = this.street;
+    data["streetCode"] = this.streetCode;
     data["detailedAddress"] = this.detailedAddress;
     data["phoneNumber"] = this.phoneNumber;
     data["isDefault"] = this.isDefault;
@@ -12044,9 +12294,13 @@ export interface IUserUpdateAddressesRequest {
   name?: string | undefined;
   country?: string | undefined;
   city?: string | undefined;
+  cityCode?: string | undefined;
   state?: string | undefined;
+  stateCode?: string | undefined;
   region?: string | undefined;
+  regionCode?: string | undefined;
   street?: string | undefined;
+  streetCode?: string | undefined;
   detailedAddress?: string | undefined;
   phoneNumber?: string | undefined;
   isDefault?: boolean;
@@ -12237,7 +12491,7 @@ export class X500DistinguishedName implements IX500DistinguishedName {
 
   toJSON(data?: any) {
     data = typeof data === "object" ? data : {};
-    data["oid"] = this.oid ? this.oid.toJSON() : <any>undefined;
+    data["oid"] = this.oid ? this.oid : <any>undefined;
     data["rawData"] = this.rawData;
     data["name"] = this.name;
     return data;
@@ -12438,7 +12692,7 @@ export class X509Extension implements IX509Extension {
 
   toJSON(data?: any) {
     data = typeof data === "object" ? data : {};
-    data["oid"] = this.oid ? this.oid.toJSON() : <any>undefined;
+    data["oid"] = this.oid ? this.oid : <any>undefined;
     data["rawData"] = this.rawData;
     data["critical"] = this.critical;
     return data;

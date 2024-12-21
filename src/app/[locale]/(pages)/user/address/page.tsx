@@ -120,7 +120,7 @@ const Address = () => {
             </AnimatePresence>
           ) : (
             <>
-              {!addresses?.length > 0 ? (
+              {addresses?.length === 0 ? (
                 <Empty />
               ) : (
                 <>

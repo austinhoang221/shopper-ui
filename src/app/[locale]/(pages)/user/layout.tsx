@@ -1,5 +1,13 @@
 "use client";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  faFileLines,
+  faLocationDot,
+  faLocationPin,
+  faLock,
+  faUser,
+} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
@@ -10,13 +18,26 @@ export default function Layout({ children }: A) {
   const pathname = usePathname();
   const { data: userData, status } = useSession();
   const menuItems = [
-    { label: "General", path: `/${params.locale}/user/profile` },
     {
+      icon: faUser,
+      label: "General",
+      path: `/${params.locale}/user/profile`,
+    },
+    {
+      icon: faLock,
       label: "Change Password",
       path: `/${params.locale}/user/change-password`,
     },
-    { label: "Address", path: `/${params.locale}/user/address` },
-    { label: "Orders", path: `/${params.locale}/user/orders` },
+    {
+      icon: faLocationDot,
+      label: "Address",
+      path: `/${params.locale}/user/address`,
+    },
+    {
+      icon: faFileLines,
+      label: "Orders",
+      path: `/${params.locale}/user/orders`,
+    },
   ];
   return (
     <div className="grid grid-cols-12 mt-4 gap-4">
@@ -47,6 +68,10 @@ export default function Layout({ children }: A) {
                       : "border-transparent hover:bg-secondary text-gray-700 hover:text-primary"
                   }`}
                 >
+                  <FontAwesomeIcon
+                    icon={item.icon}
+                    className="text-primary mr-2"
+                  />
                   {item.label}
                 </Link>
               </li>
