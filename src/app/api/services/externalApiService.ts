@@ -2,11 +2,13 @@ const username = process.env.NEXT_PUBLIC_GEONAMES_USERNAME;
 const baseUrl = process.env.NEXT_PUBLIC_GEONAMES_BASE_URL;
 const shippoApiKey = process.env.NEXT_PUBLIC_SHIPPO_API_KEY;
 
-export interface Place {
-    geonameId: string;
+interface Place {
+    geonameId: number;
     name: string;
-    countryName?: string;
-    countryCode?: string;
+    lat: number;
+    lng: number;
+    countryCode: string;
+    population: number;
 }
 
 export interface ShippingRate {
@@ -43,6 +45,32 @@ export const getCities = async (regionId: string): Promise<Place[]> => {
         return data.geonames || [];
     } catch (error) {
         console.error('Error fetching cities:', error);
+        return [];
+    }
+};
+
+export const autocomplete = async (query: string): Promise<Place[]> => {
+    const url = `${baseUrl}searchJSON?q=${query}&maxRows=10&username=${username}`;
+
+    try {
+        const res = await fetch(url);
+        const data = await res.json();
+
+        // Kiểm tra nếu dữ liệu trả về có trường geonames
+        if (data.geonames) {
+            return data.geonames.map((place: A) => ({
+                geonameId: place.geonameId,
+                name: place.name,
+                lat: place.lat,
+                lng: place.lng,
+                countryCode: place.countryCode,
+                population: place.population,
+            }));
+        }
+
+        return [];
+    } catch (error) {
+        console.error('Error fetching autocomplete results:', error);
         return [];
     }
 };
