@@ -1,12 +1,15 @@
 const username = process.env.NEXT_PUBLIC_GEONAMES_USERNAME;
 const baseUrl = process.env.NEXT_PUBLIC_GEONAMES_BASE_URL;
 const shippoApiKey = process.env.NEXT_PUBLIC_SHIPPO_API_KEY;
+const mapboxAccessToken = process.env.MAPBOX_ACCESS_TOKEN;
 
-export interface Place {
-    geonameId: string;
+interface Place {
+    geonameId: number;
     name: string;
-    countryName?: string;
-    countryCode?: string;
+    lat: number;
+    lng: number;
+    countryCode: string;
+    population: number;
 }
 
 export interface ShippingRate {
@@ -45,6 +48,30 @@ export const getCities = async (regionId: string): Promise<Place[]> => {
         console.error('Error fetching cities:', error);
         return [];
     }
+};
+
+export const autocomplete = async (query: string): Promise<A[]> => {
+    if (!query) return [];
+
+  const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${mapboxAccessToken}&autocomplete=true&limit=5`;
+    console.log(url);
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (data.features) {
+        return data.features.filter((feature: A) => feature.place_type.includes('place')).map((feature: A) => ({
+        id: feature.id,
+        name: feature.place_name,
+        coordinates: feature.geometry.coordinates,
+      }));
+    }
+
+    return [];
+  } catch (error) {
+    console.error("Error fetching places:", error);
+    return [];
+  }
 };
 
 export const calculateShipping = async (

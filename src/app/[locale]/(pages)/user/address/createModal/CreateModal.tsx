@@ -38,6 +38,7 @@ import { service } from "@/app/api/services/service";
 import { toast } from "@/components/hooks/use-toast";
 import { z } from "zod";
 import {
+  autocomplete,
   getCities,
   getRegions,
   Place,
@@ -50,7 +51,8 @@ import {
 } from "@/app/api/services/api";
 import { getCookie } from "cookies-next";
 import { PHONE_NUMBER_REGEX, userIdCookie } from "@/utils/constants";
-import { Textarea } from "@/components/ui/textarea";
+import debounce from "lodash.debounce";
+
 const FormSchema = z.object({
   name: z.string().min(1, {
     message: "Name is required",
@@ -79,16 +81,46 @@ type Props = {
   onOpenChange: (open: boolean) => void;
   addresses: UserAddressResponse[];
 };
+
 const CreateModal = (props: Props) => {
   const userId = getCookie(userIdCookie);
   const [isLoadingBtn, setIsLoadingBtn] = React.useState<boolean>(false);
-  const [countries, setCountries] = React.useState<Place[]>([]);
   const [selectedCountry, setSelectedCountry] = React.useState<string | null>(
     "3017382"
   );
   const [regions, setRegions] = React.useState<Place[]>([]);
   const [selectedRegion, setSelectedRegion] = React.useState<string | null>();
   const [cities, setCities] = React.useState<Place[]>([]);
+  const [query, setQuery] = React.useState("");
+  const [results, setResults] = React.useState<Place[]>([]);
+
+  const debouncedFetchAutocomplete = React.useCallback(
+    debounce(async (query: string) => {
+      if (query.length > 2) {
+        try {
+          const places = await autocomplete(query);
+          console.log(places);
+          setResults(places);
+        } catch (error) {
+          console.error("Error fetching autocomplete results:", error);
+        }
+      } else {
+        setResults([]);
+      }
+    }, 500),
+    []
+  );
+
+  React.useEffect(() => {
+    debouncedFetchAutocomplete(query);
+    return () => debouncedFetchAutocomplete.cancel();
+  }, [query, debouncedFetchAutocomplete]);
+
+  const getAddress = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    setQuery(value);
+    form.setValue("detailedAddress", value ?? "");
+  };
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -392,7 +424,15 @@ const CreateModal = (props: Props) => {
                   <FormItem className="mb-3">
                     <div className="gap-4">
                       <FormControl className="col-span-1">
-                        <Textarea placeholder="Address" {...field} />
+                        <Input
+                          placeholder="Address"
+                          value={field.value}
+                          // {...field}
+                          onChange={getAddress}
+                        />
+                        {/* {results.map((place) => (
+                          <li key={place.id}>{place.name}</li>
+                        ))} */}
                       </FormControl>
                       <FormMessage />
                     </div>
