@@ -44,20 +44,24 @@ const ImageGallery = (props: Props) => {
         className="w-full max-w-sm mx-auto mt-4"
       >
         <CarouselContent>
-          {props.products?.reduce((acc: A[], child) => {
-            const flat =
-              child.attachments?.map(
-                (attach) =>
-                  ({ ...child, imageUrl: attach.link } as DetailProduct)
-              ) || [];
-            return acc.concat(flat);
-          }, []) ??
-            [].map((product: DetailProduct, index) => (
+          {props.products
+            ?.reduce((acc: DetailProduct[], child) => {
+              const flat =
+                child.attachments?.map(
+                  (attach) =>
+                    ({
+                      ...child,
+                      imageUrl: attach.link,
+                    } as DetailProduct)
+                ) || [];
+              return acc.concat(flat);
+            }, [])
+            .map((product: DetailProduct, index) => (
               <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/4">
                 <div className="p-1">
                   <Card
                     onClick={() =>
-                      onViewImage?.(product.imageUrl, product.name ?? "")
+                      onViewImage(product.imageUrl, product.name ?? "")
                     }
                     className="cursor-pointer"
                   >
@@ -66,8 +70,8 @@ const ImageGallery = (props: Props) => {
                         width={500}
                         height={500}
                         className="w-full h-full object-cover max-w-full max-h-full"
-                        src={product.imageUrl}
-                        alt="Your alt text"
+                        src={product.imageUrl ?? ""}
+                        alt={product.name ?? "Product image"}
                       />
                     </CardContent>
                   </Card>

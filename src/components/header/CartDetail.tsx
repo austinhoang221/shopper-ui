@@ -143,7 +143,7 @@ export default function CartDetail() {
                 <span>
                   Total:{" "}
                   <span className="text-lg font-bold text-primary">
-                    {calculateTotalCart}$
+                    {calculateTotalCart}&euro;
                   </span>
                 </span>
               </div>

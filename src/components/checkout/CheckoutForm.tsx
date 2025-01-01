@@ -56,6 +56,8 @@ import { useSession } from "next-auth/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLocationDot } from "@fortawesome/free-solid-svg-icons";
 import UpdateAddressModal from "./update-address-modal/UpdateAddressModal";
+import Loading from "../motion/Loading";
+import PaymentOption from "./payment-option/PaymentOption";
 
 const FormSchema = z.object({
   username: z.string().trim().min(1, {
@@ -92,7 +94,7 @@ const FormSchema = z.object({
 
 const CheckoutForm = () => {
   const { cartItems } = useAppSelector((state) => state.cart);
-  const { data: userData } = useSession();
+  const { data: userData, status } = useSession();
   const [countries, setCountries] = useState<Place[]>([]);
   const [selectedCountry, setSelectedCountry] = useState<string | null>(
     "3017382"
@@ -114,15 +116,6 @@ const CheckoutForm = () => {
   const [selectedAddress, setSelectedAddress] =
     React.useState<UserAddressResponse | null>(null);
   const userId = getCookie(userIdCookie);
-
-  // useEffect(() => {
-  //   const fetchCountries = async () => {
-  //     const countryData = await getCountries();
-  //     setCountries(countryData);
-  //   };
-
-  //   fetchCountries();
-  // }, []);
 
   useEffect(() => {
     if (!selectedCountry) return;
@@ -230,38 +223,48 @@ const CheckoutForm = () => {
     </IconButton>
   );
 
+  const buildOrderRequest = () => {
+    const formValue = form.getValues();
+    return CreateOrderRequest.fromJS({
+      street: selectedAddress ? selectedAddress.street : formValue?.address,
+      city: selectedAddress ? selectedAddress.city : formValue?.city,
+      state: selectedAddress ? selectedAddress.state : formValue?.region,
+      country: selectedAddress ? selectedAddress.country : formValue?.country,
+      zipCode: formValue?.zipcode,
+      region: selectedAddress ? selectedAddress.region : formValue?.region,
+      detailedAddress: selectedAddress
+        ? selectedAddress.detailedAddress
+        : formValue?.address,
+      buyerId: userId,
+      buyerPhone: selectedAddress
+        ? selectedAddress.phoneNumber
+        : formValue?.phone,
+      phoneNumber: selectedAddress
+        ? selectedAddress.phoneNumber
+        : formValue?.phone,
+      buyerEmail: userData?.user?.email,
+      buyerName: selectedAddress ? selectedAddress.name : formValue?.username,
+      description: formValue?.note,
+      // orderCd: formValue?.,
+      remark: formValue?.note,
+      orderItems: cartItems?.map((item) => {
+        return CreateOrderItemRequest.fromJS({
+          productId: item.productId,
+          productName: item.productName,
+          unitPrice: item.unitPrice,
+          discounts: 0,
+          pictureUrl: item.pictureUrl,
+          units: item.quantity,
+        });
+      }),
+    });
+  };
+
   const onSubmit = async () => {
     await form.trigger();
-    const formValue = form.getValues();
 
     if (form.formState.isValid || selectedAddress) {
-      const model = CreateOrderRequest.fromJS({
-        street: selectedAddress ? selectedAddress.street : formValue?.address,
-        city: selectedAddress ? selectedAddress.city : formValue?.city,
-        state: selectedAddress ? selectedAddress.state : formValue?.region,
-        country: selectedAddress ? selectedAddress.country : formValue?.country,
-        zipCode: formValue?.zipcode,
-        region: selectedAddress ? selectedAddress.region : formValue?.region,
-        buyerId: userId,
-        buyerPhone: selectedAddress
-          ? selectedAddress.phoneNumber
-          : formValue?.phone,
-        buyerEmail: userData?.user?.email,
-        buyerName: selectedAddress ? selectedAddress.name : formValue?.username,
-        description: formValue?.note,
-        // orderCd: formValue?.,
-        remark: formValue?.note,
-        orderItems: cartItems?.map((item) => {
-          return CreateOrderItemRequest.fromJS({
-            productId: item.productId,
-            productName: item.productName,
-            unitPrice: item.unitPrice,
-            discounts: 0,
-            pictureUrl: item.pictureUrl,
-            units: item.quantity,
-          });
-        }),
-      });
+      const model = buildOrderRequest();
       await service.client.ordersPOST(userId, model);
     } else {
       toast({
@@ -279,47 +282,50 @@ const CheckoutForm = () => {
             <CardTitle>Billing Information</CardTitle>
           </CardHeader>
           <CardContent>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)}>
-                {addresses?.length === 0 && !selectedAddress ? (
-                  <>
-                    <FormField
-                      control={form.control}
-                      name="username"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Name *</FormLabel>
-                          <div className="gap-4">
-                            <FormControl className="col-span-1">
-                              <Input placeholder="Name" {...field} />
+            {status === "loading" || isLoading ? (
+              <Loading />
+            ) : (
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)}>
+                  {addresses?.length === 0 && !selectedAddress ? (
+                    <>
+                      <FormField
+                        control={form.control}
+                        name="username"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Name *</FormLabel>
+                            <div className="gap-4">
+                              <FormControl className="col-span-1">
+                                <Input placeholder="Name" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </div>
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="address"
+                        render={({ field }) => (
+                          <FormItem className="mt-2">
+                            <FormLabel>Address *</FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="Address"
+                                {...field}
+                                onChange={(event) => {
+                                  field.onChange(event);
+                                  debounceShippingCalculation();
+                                }}
+                              />
                             </FormControl>
                             <FormMessage />
-                          </div>
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="address"
-                      render={({ field }) => (
-                        <FormItem className="mt-2">
-                          <FormLabel>Address *</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="Address"
-                              {...field}
-                              onChange={(event) => {
-                                field.onChange(event);
-                                debounceShippingCalculation();
-                              }}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-2">
-                      {/* <FormField
+                          </FormItem>
+                        )}
+                      />
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-2">
+                        {/* <FormField
                     control={form.control}
                     name="country"
                     render={({ field }) => (
@@ -353,132 +359,62 @@ const CheckoutForm = () => {
                     )}
                   /> */}
 
-                      <FormField
-                        control={form.control}
-                        name="region"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Region/State</FormLabel>
-                            <Popover>
-                              <PopoverTrigger asChild>
-                                <FormControl>
-                                  <Button
-                                    variant="outline"
-                                    role="combobox"
-                                    className={cn(
-                                      "w-full justify-between",
-                                      !field.value && "text-muted-foreground"
-                                    )}
-                                  >
-                                    {field.value
-                                      ? regions.find(
-                                          (language) =>
-                                            language.geonameId.toString() ===
-                                            field.value
-                                        )?.name
-                                      : "Select region"}
-                                    <ChevronsUpDown className="opacity-50" />
-                                  </Button>
-                                </FormControl>
-                              </PopoverTrigger>
-                              <PopoverContent className="w-full p-0">
-                                <Command>
-                                  <CommandInput
-                                    placeholder="Search"
-                                    className="h-9"
-                                  />
-                                  <CommandList>
-                                    <CommandEmpty>
-                                      No region found.
-                                    </CommandEmpty>
-                                    {regions.map((region) => (
-                                      <CommandItem
-                                        value={region.name}
-                                        key={region.geonameId}
-                                        onSelect={() => {
-                                          form.setValue(
-                                            "region",
-                                            region.geonameId.toString()
-                                          );
-                                          setSelectedRegion(region.geonameId);
-                                        }}
-                                      >
-                                        {region.name}
-                                        <Check
-                                          width={20}
-                                          className={cn(
-                                            "ml-auto",
-                                            region.geonameId.toString() ===
+                        <FormField
+                          control={form.control}
+                          name="region"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Region/State</FormLabel>
+                              <Popover>
+                                <PopoverTrigger asChild>
+                                  <FormControl>
+                                    <Button
+                                      variant="outline"
+                                      role="combobox"
+                                      className={cn(
+                                        "w-full justify-between",
+                                        !field.value && "text-muted-foreground"
+                                      )}
+                                    >
+                                      {field.value
+                                        ? regions.find(
+                                            (language) =>
+                                              language.geonameId.toString() ===
                                               field.value
-                                              ? "opacity-100"
-                                              : "opacity-0"
-                                          )}
-                                        />
-                                      </CommandItem>
-                                    ))}
-                                  </CommandList>
-                                </Command>
-                              </PopoverContent>
-                            </Popover>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="city"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>City</FormLabel>
-                            <Popover>
-                              <PopoverTrigger asChild>
-                                <FormControl>
-                                  <Button
-                                    variant="outline"
-                                    role="combobox"
-                                    className={cn(
-                                      "w-full justify-between",
-                                      !field.value && "text-muted-foreground"
-                                    )}
-                                  >
-                                    {field.value
-                                      ? cities.find(
-                                          (city) =>
-                                            city.geonameId.toString() ===
-                                            field.value
-                                        )?.name
-                                      : "Select city"}
-                                    <ChevronsUpDown className="opacity-50" />
-                                  </Button>
-                                </FormControl>
-                              </PopoverTrigger>
-                              <PopoverContent className="w-full p-0">
-                                <Command>
-                                  <CommandInput
-                                    placeholder="Search..."
-                                    className="h-9"
-                                  />
-                                  <CommandList>
-                                    <CommandEmpty>No city found.</CommandEmpty>
-                                    <CommandGroup>
-                                      {cities.map((city) => (
+                                          )?.name
+                                        : "Select region"}
+                                      <ChevronsUpDown className="opacity-50" />
+                                    </Button>
+                                  </FormControl>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-full p-0">
+                                  <Command>
+                                    <CommandInput
+                                      placeholder="Search"
+                                      className="h-9"
+                                    />
+                                    <CommandList>
+                                      <CommandEmpty>
+                                        No region found.
+                                      </CommandEmpty>
+                                      {regions.map((region) => (
                                         <CommandItem
-                                          value={city.name.toString()}
-                                          key={city.geonameId}
+                                          value={region.name}
+                                          key={region.geonameId}
                                           onSelect={() => {
                                             form.setValue(
-                                              "city",
-                                              city.geonameId.toString()
+                                              "region",
+                                              region.geonameId.toString()
                                             );
+                                            setSelectedRegion(region.geonameId);
                                           }}
                                         >
-                                          {city.name}
+                                          {region.name}
                                           <Check
                                             width={20}
                                             className={cn(
                                               "ml-auto",
-                                              city.geonameId.toString() ===
+                                              region.geonameId.toString() ===
                                                 field.value
                                                 ? "opacity-100"
                                                 : "opacity-0"
@@ -486,101 +422,177 @@ const CheckoutForm = () => {
                                           />
                                         </CommandItem>
                                       ))}
-                                    </CommandGroup>
-                                  </CommandList>
-                                </Command>
-                              </PopoverContent>
-                            </Popover>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                                    </CommandList>
+                                  </Command>
+                                </PopoverContent>
+                              </Popover>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
 
-                      <FormField
-                        control={form.control}
-                        name="zipcode"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Zip Code</FormLabel>
-                            <FormControl>
-                              <Input
-                                placeholder="Zip Code"
-                                {...field}
-                                onChange={(event) => {
-                                  field.onChange(event);
-                                  debounceShippingCalculation();
-                                }}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4 mt-2">
-                      <FormField
-                        control={form.control}
-                        name="email"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Email *</FormLabel>
-                            <FormControl>
-                              <Input placeholder="Email" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                        <FormField
+                          control={form.control}
+                          name="city"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>City</FormLabel>
+                              <Popover>
+                                <PopoverTrigger asChild>
+                                  <FormControl>
+                                    <Button
+                                      variant="outline"
+                                      role="combobox"
+                                      className={cn(
+                                        "w-full justify-between",
+                                        !field.value && "text-muted-foreground"
+                                      )}
+                                    >
+                                      {field.value
+                                        ? cities.find(
+                                            (city) =>
+                                              city.geonameId.toString() ===
+                                              field.value
+                                          )?.name
+                                        : "Select city"}
+                                      <ChevronsUpDown className="opacity-50" />
+                                    </Button>
+                                  </FormControl>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-full p-0">
+                                  <Command>
+                                    <CommandInput
+                                      placeholder="Search..."
+                                      className="h-9"
+                                    />
+                                    <CommandList>
+                                      <CommandEmpty>
+                                        No city found.
+                                      </CommandEmpty>
+                                      <CommandGroup>
+                                        {cities.map((city) => (
+                                          <CommandItem
+                                            value={city.name.toString()}
+                                            key={city.geonameId}
+                                            onSelect={() => {
+                                              form.setValue(
+                                                "city",
+                                                city.geonameId.toString()
+                                              );
+                                            }}
+                                          >
+                                            {city.name}
+                                            <Check
+                                              width={20}
+                                              className={cn(
+                                                "ml-auto",
+                                                city.geonameId.toString() ===
+                                                  field.value
+                                                  ? "opacity-100"
+                                                  : "opacity-0"
+                                              )}
+                                            />
+                                          </CommandItem>
+                                        ))}
+                                      </CommandGroup>
+                                    </CommandList>
+                                  </Command>
+                                </PopoverContent>
+                              </Popover>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
 
-                      <FormField
-                        control={form.control}
-                        name="phone"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Phone Number *</FormLabel>
-                            <FormControl>
-                              <Input placeholder="Phone number" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                  </>
-                ) : (
-                  <div>
-                    <div className="text-primary">
-                      <FontAwesomeIcon className="mr-2" icon={faLocationDot} />
-                      <FormLabel>Address</FormLabel>
-                    </div>
-                    <div className="flex justify-between items-center gap-2">
-                      <div className="flex">
-                        <span className="font-bold">
-                          {selectedAddress?.name} {selectedAddress?.phoneNumber}
-                        </span>
+                        <FormField
+                          control={form.control}
+                          name="zipcode"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Zip Code</FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder="Zip Code"
+                                  {...field}
+                                  onChange={(event) => {
+                                    field.onChange(event);
+                                    debounceShippingCalculation();
+                                  }}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
                       </div>
-                      <div className="w-full">
-                        <span className="mr-2">
-                          {selectedAddress?.detailedAddress}
-                        </span>
-                        <span className="border border-primary p-1 text-primary">
-                          Default
-                        </span>
-                      </div>
-                      <Button
-                        variant="link"
-                        className="p-0 mr-2"
-                        onClick={() => {
-                          setIsOpenUpdateModal(true);
-                        }}
-                      >
-                        Update
-                      </Button>
-                    </div>
-                  </div>
-                )}
+                      <div className="grid grid-cols-2 gap-4 mt-2">
+                        <FormField
+                          control={form.control}
+                          name="email"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Email *</FormLabel>
+                              <FormControl>
+                                <Input placeholder="Email" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
 
-                {/* <FormField
+                        <FormField
+                          control={form.control}
+                          name="phone"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Phone Number *</FormLabel>
+                              <FormControl>
+                                <Input placeholder="Phone number" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </>
+                  ) : (
+                    <div>
+                      <div className="text-primary">
+                        <FontAwesomeIcon
+                          className="mr-2"
+                          icon={faLocationDot}
+                        />
+                        <FormLabel>Address</FormLabel>
+                      </div>
+                      <div className="flex justify-between items-center gap-2">
+                        <div className="flex">
+                          <span className="font-bold">
+                            {selectedAddress?.name}{" "}
+                            {selectedAddress?.phoneNumber}
+                          </span>
+                        </div>
+                        <div className="w-full">
+                          <span className="mr-2">
+                            {selectedAddress?.detailedAddress}
+                          </span>
+                          <span className="border border-primary p-1 text-primary">
+                            Default
+                          </span>
+                        </div>
+                        <Button
+                          variant="link"
+                          className="p-0 mr-2"
+                          onClick={() => {
+                            setIsOpenUpdateModal(true);
+                          }}
+                        >
+                          Update
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* <FormField
                   control={form.control}
                   name="isShip"
                   render={({ field }) => (
@@ -595,25 +607,27 @@ const CheckoutForm = () => {
                     </FormItem>
                   )}
                 /> */}
-                {/* <PaymentOption /> */}
-                <CardTitle className="py-6">Additional Information</CardTitle>
-                <FormField
-                  control={form.control}
-                  name="note"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Order Notes (Optional)</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="Notes about your order, e.g. special notes for delivery"
-                          {...field}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-              </form>
-            </Form>
+                  <CardTitle className="py-6">Additional Information</CardTitle>
+                  <FormField
+                    control={form.control}
+                    name="note"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Order Notes (Optional)</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            placeholder="Notes about your order, e.g. special notes for delivery"
+                            {...field}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <CardTitle className="py-6">Payment Option</CardTitle>
+                  <PaymentOption order={buildOrderRequest()} />
+                </form>
+              </Form>
+            )}
           </CardContent>
         </CardContent>
       </Card>
@@ -623,16 +637,22 @@ const CheckoutForm = () => {
             <CardTitle>Order Summary</CardTitle>
           </CardHeader>
           <CardContent>
-            {cartItems?.map((product) => (
-              <ProductOrder key={product.productId} product={product} />
-            ))}
+            {status === "loading" || isLoading ? (
+              <Loading />
+            ) : (
+              <>
+                {cartItems?.map((product) => (
+                  <ProductOrder key={product.productId} product={product} />
+                ))}
+              </>
+            )}
             <div className="hidden md:block">
               <OrderSummary
               // shippingRate={
               //   shippingRate.length > 0 ? shippingRate[0].amount : 0
               // }
               >
-                {onRenderCheckoutButton()}
+                {/* {onRenderCheckoutButton()} */}
               </OrderSummary>
             </div>
           </CardContent>
@@ -658,7 +678,7 @@ const CheckoutForm = () => {
             //   shippingRate.length > 0 ? shippingRate[0].amount : 0
             // }
             >
-              {onRenderCheckoutButton()}
+              {/* {onRenderCheckoutButton()} */}
             </OrderSummary>
           </CardContent>
         </Card>

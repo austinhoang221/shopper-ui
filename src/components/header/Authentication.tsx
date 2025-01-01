@@ -16,11 +16,10 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { SignOut } from "@/lib/auth-action";
-
-// import { verifyGoogleToken } from "@/app/api/services/googleService";
+import { Skeleton } from "../ui/skeleton";
 
 const Authentication = () => {
-  const { data: userData } = useSession();
+  const { data: userData, status } = useSession();
   const [pathname, setPathname] = React.useState<string>("");
   const router = useRouter();
   React.useEffect(() => {
@@ -98,6 +97,12 @@ const Authentication = () => {
       </Link>
     </div>
   );
-  return userData ? onRenderUser() : onRenderAuth();
+  return status === "loading" ? (
+    <Skeleton className="h-6 w-16 bg-gray-200" />
+  ) : userData ? (
+    onRenderUser()
+  ) : (
+    onRenderAuth()
+  );
 };
 export default Authentication;

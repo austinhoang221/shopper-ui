@@ -24,6 +24,10 @@ export class Client {
     this.baseUrl = baseUrl ?? "";
   }
 
+  /**
+   * (Auth)
+   * @return OK
+   */
   protected async transformOptions(options: RequestInit): Promise<RequestInit> {
     options.headers = {
       ...options.headers,
@@ -31,9 +35,6 @@ export class Client {
     };
     return Promise.resolve(options);
   }
-  /**
-   * @return OK
-   */
   ordersGET(id: string): Promise<OrderResponse> {
     let url_ = this.baseUrl + "/api/v1/orders/{id}";
     if (id === undefined || id === null)
@@ -88,6 +89,14 @@ export class Client {
           _headers,
           result404
         );
+      });
+    } else if (status === 401) {
+      return response.text().then((_responseText) => {
+        return throwException("Unauthorized", status, _responseText, _headers);
+      });
+    } else if (status === 403) {
+      return response.text().then((_responseText) => {
+        return throwException("Forbidden", status, _responseText, _headers);
       });
     } else if (status !== 200 && status !== 204) {
       return response.text().then((_responseText) => {
@@ -4541,66 +4550,6 @@ export interface ICreateOrderItemRequest {
   units?: number;
 }
 
-export class CreateOrderItemResponse implements ICreateOrderItemResponse {
-  id?: string;
-  productId?: string;
-  productName?: string | undefined;
-  unitPrice?: number;
-  discounts?: number;
-  pictureUrl?: string | undefined;
-  units?: number;
-
-  constructor(data?: ICreateOrderItemResponse) {
-    if (data) {
-      for (var property in data) {
-        if (data.hasOwnProperty(property))
-          (<any>this)[property] = (<any>data)[property];
-      }
-    }
-  }
-
-  init(_data?: any) {
-    if (_data) {
-      this.id = _data["id"] ? _data["id"] : <any>undefined;
-      this.productId = _data["productId"] ? _data["productId"] : <any>undefined;
-      this.productName = _data["productName"];
-      this.unitPrice = _data["unitPrice"];
-      this.discounts = _data["discounts"];
-      this.pictureUrl = _data["pictureUrl"];
-      this.units = _data["units"];
-    }
-  }
-
-  static fromJS(data: any): CreateOrderItemResponse {
-    data = typeof data === "object" ? data : {};
-    let result = new CreateOrderItemResponse();
-    result.init(data);
-    return result;
-  }
-
-  toJSON(data?: any) {
-    data = typeof data === "object" ? data : {};
-    data["id"] = this.id ? this.id : <any>undefined;
-    data["productId"] = this.productId ? this.productId : <any>undefined;
-    data["productName"] = this.productName;
-    data["unitPrice"] = this.unitPrice;
-    data["discounts"] = this.discounts;
-    data["pictureUrl"] = this.pictureUrl;
-    data["units"] = this.units;
-    return data;
-  }
-}
-
-export interface ICreateOrderItemResponse {
-  id?: string;
-  productId?: string;
-  productName?: string | undefined;
-  unitPrice?: number;
-  discounts?: number;
-  pictureUrl?: string | undefined;
-  units?: number;
-}
-
 export class CreateOrderRequest implements ICreateOrderRequest {
   street?: string | undefined;
   city?: string | undefined;
@@ -4615,6 +4564,8 @@ export class CreateOrderRequest implements ICreateOrderRequest {
   description?: string | undefined;
   remark?: string | undefined;
   orderItems?: CreateOrderItemRequest[] | undefined;
+  detailedAddress?: string | undefined;
+  phoneNumber?: string | undefined;
 
   constructor(data?: ICreateOrderRequest) {
     if (data) {
@@ -4644,6 +4595,8 @@ export class CreateOrderRequest implements ICreateOrderRequest {
         for (let item of _data["orderItems"])
           this.orderItems!.push(CreateOrderItemRequest.fromJS(item));
       }
+      this.detailedAddress = _data["detailedAddress"];
+      this.phoneNumber = _data["phoneNumber"];
     }
   }
 
@@ -4672,6 +4625,8 @@ export class CreateOrderRequest implements ICreateOrderRequest {
       data["orderItems"] = [];
       for (let item of this.orderItems) data["orderItems"].push(item.toJSON());
     }
+    data["detailedAddress"] = this.detailedAddress;
+    data["phoneNumber"] = this.phoneNumber;
     return data;
   }
 }
@@ -4690,23 +4645,13 @@ export interface ICreateOrderRequest {
   description?: string | undefined;
   remark?: string | undefined;
   orderItems?: CreateOrderItemRequest[] | undefined;
+  detailedAddress?: string | undefined;
+  phoneNumber?: string | undefined;
 }
 
 export class CreateOrderResponse implements ICreateOrderResponse {
   id?: string;
-  street?: string | undefined;
-  city?: string | undefined;
-  state?: string | undefined;
-  country?: string | undefined;
-  zipcode?: string | undefined;
-  region?: string | undefined;
-  buyerId?: string;
-  buyerPhone?: string | undefined;
-  buyerEmail?: string | undefined;
-  description?: string | undefined;
-  orderCd?: string | undefined;
-  remark?: string | undefined;
-  orderItems?: CreateOrderItemResponse[] | undefined;
+  partnerTransactionId?: string | undefined;
 
   constructor(data?: ICreateOrderResponse) {
     if (data) {
@@ -4720,23 +4665,7 @@ export class CreateOrderResponse implements ICreateOrderResponse {
   init(_data?: any) {
     if (_data) {
       this.id = _data["id"] ? _data["id"] : <any>undefined;
-      this.street = _data["street"];
-      this.city = _data["city"];
-      this.state = _data["state"];
-      this.country = _data["country"];
-      this.zipcode = _data["zipcode"];
-      this.region = _data["region"];
-      this.buyerId = _data["buyerId"] ? _data["buyerId"] : <any>undefined;
-      this.buyerPhone = _data["buyerPhone"];
-      this.buyerEmail = _data["buyerEmail"];
-      this.description = _data["description"];
-      this.orderCd = _data["orderCd"];
-      this.remark = _data["remark"];
-      if (Array.isArray(_data["orderItems"])) {
-        this.orderItems = [] as any;
-        for (let item of _data["orderItems"])
-          this.orderItems!.push(CreateOrderItemResponse.fromJS(item));
-      }
+      this.partnerTransactionId = _data["partnerTransactionId"];
     }
   }
 
@@ -4750,41 +4679,14 @@ export class CreateOrderResponse implements ICreateOrderResponse {
   toJSON(data?: any) {
     data = typeof data === "object" ? data : {};
     data["id"] = this.id ? this.id : <any>undefined;
-    data["street"] = this.street;
-    data["city"] = this.city;
-    data["state"] = this.state;
-    data["country"] = this.country;
-    data["zipcode"] = this.zipcode;
-    data["region"] = this.region;
-    data["buyerId"] = this.buyerId ? this.buyerId : <any>undefined;
-    data["buyerPhone"] = this.buyerPhone;
-    data["buyerEmail"] = this.buyerEmail;
-    data["description"] = this.description;
-    data["orderCd"] = this.orderCd;
-    data["remark"] = this.remark;
-    if (Array.isArray(this.orderItems)) {
-      data["orderItems"] = [];
-      for (let item of this.orderItems) data["orderItems"].push(item.toJSON());
-    }
+    data["partnerTransactionId"] = this.partnerTransactionId;
     return data;
   }
 }
 
 export interface ICreateOrderResponse {
   id?: string;
-  street?: string | undefined;
-  city?: string | undefined;
-  state?: string | undefined;
-  country?: string | undefined;
-  zipcode?: string | undefined;
-  region?: string | undefined;
-  buyerId?: string;
-  buyerPhone?: string | undefined;
-  buyerEmail?: string | undefined;
-  description?: string | undefined;
-  orderCd?: string | undefined;
-  remark?: string | undefined;
-  orderItems?: CreateOrderItemResponse[] | undefined;
+  partnerTransactionId?: string | undefined;
 }
 
 export class CreatePaymentRequest implements ICreatePaymentRequest {
@@ -8666,6 +8568,9 @@ export class OrderResponse implements IOrderResponse {
   orderCd?: string | undefined;
   remark?: string | undefined;
   orderItems?: OrderItemResponse[] | undefined;
+  orderDate?: Date;
+  detailedAddress?: string | undefined;
+  phoneNumber?: string | undefined;
 
   constructor(data?: IOrderResponse) {
     if (data) {
@@ -8695,6 +8600,11 @@ export class OrderResponse implements IOrderResponse {
         for (let item of _data["orderItems"])
           this.orderItems!.push(OrderItemResponse.fromJS(item));
       }
+      this.orderDate = _data["orderDate"]
+        ? new Date(_data["orderDate"].toString())
+        : <any>undefined;
+      this.detailedAddress = _data["detailedAddress"];
+      this.phoneNumber = _data["phoneNumber"];
     }
   }
 
@@ -8723,6 +8633,11 @@ export class OrderResponse implements IOrderResponse {
       data["orderItems"] = [];
       for (let item of this.orderItems) data["orderItems"].push(item.toJSON());
     }
+    data["orderDate"] = this.orderDate
+      ? this.orderDate.toISOString()
+      : <any>undefined;
+    data["detailedAddress"] = this.detailedAddress;
+    data["phoneNumber"] = this.phoneNumber;
     return data;
   }
 }
@@ -8741,6 +8656,9 @@ export interface IOrderResponse {
   orderCd?: string | undefined;
   remark?: string | undefined;
   orderItems?: OrderItemResponse[] | undefined;
+  orderDate?: Date;
+  detailedAddress?: string | undefined;
+  phoneNumber?: string | undefined;
 }
 
 export enum ParameterAttributes {
