@@ -1,6 +1,7 @@
 const username = process.env.NEXT_PUBLIC_GEONAMES_USERNAME;
 const baseUrl = process.env.NEXT_PUBLIC_GEONAMES_BASE_URL;
 const shippoApiKey = process.env.NEXT_PUBLIC_SHIPPO_API_KEY;
+const mapboxAccessToken = process.env.MAPBOX_ACCESS_TOKEN;
 
 interface Place {
     geonameId: number;
@@ -49,30 +50,28 @@ export const getCities = async (regionId: string): Promise<Place[]> => {
     }
 };
 
-export const autocomplete = async (query: string): Promise<Place[]> => {
-    const url = `${baseUrl}searchJSON?q=${query}&maxRows=10&username=${username}`;
+export const autocomplete = async (query: string): Promise<A[]> => {
+    if (!query) return [];
 
-    try {
-        const res = await fetch(url);
-        const data = await res.json();
+  const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${mapboxAccessToken}&autocomplete=true&limit=5`;
+    console.log(url);
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
 
-        // Kiểm tra nếu dữ liệu trả về có trường geonames
-        if (data.geonames) {
-            return data.geonames.map((place: A) => ({
-                geonameId: place.geonameId,
-                name: place.name,
-                lat: place.lat,
-                lng: place.lng,
-                countryCode: place.countryCode,
-                population: place.population,
-            }));
-        }
-
-        return [];
-    } catch (error) {
-        console.error('Error fetching autocomplete results:', error);
-        return [];
+    if (data.features) {
+        return data.features.filter((feature: A) => feature.place_type.includes('place')).map((feature: A) => ({
+        id: feature.id,
+        name: feature.place_name,
+        coordinates: feature.geometry.coordinates,
+      }));
     }
+
+    return [];
+  } catch (error) {
+    console.error("Error fetching places:", error);
+    return [];
+  }
 };
 
 export const calculateShipping = async (
