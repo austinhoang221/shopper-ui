@@ -165,11 +165,11 @@ const DetailContent = (props: Props) => {
   return (
     <Card className="mt-4">
       <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-        {/* <ImageGallery
+        <ImageGallery
           products={product.children ?? []}
           defaultAlt={product.i18nName ?? ""}
           defaultSrc={product.children?.[0]?.attachments?.[0]?.link ?? ""}
-        /> */}
+        />
         <div>
           {isLoading ? (
             <>

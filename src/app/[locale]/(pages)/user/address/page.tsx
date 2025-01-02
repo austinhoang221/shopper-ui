@@ -14,10 +14,10 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/hooks/use-toast";
 import { useSession } from "next-auth/react";
-import { AnimatePresence, motion } from "framer-motion";
-import { Ellipsis } from "lucide-react";
+
 import { Dialog, DialogContent, DialogFooter } from "@/components/ui/dialog";
 import Empty from "../../category/[category]/Empty";
+import Loading from "@/components/motion/Loading";
 
 const Address = () => {
   const userId = getCookie(userIdCookie);
@@ -110,14 +110,7 @@ const Address = () => {
         </CardHeader>
         <CardContent className="min-h-[50vh]">
           {status === "loading" || isLoading ? (
-            <AnimatePresence>
-              <motion.div
-                exit={{ opacity: 0, y: 15 }}
-                className="text-center flex items-center"
-              >
-                <Ellipsis className=" h-12 w-12 mx-auto animate-pulse text-primary" />
-              </motion.div>
-            </AnimatePresence>
+            <Loading />
           ) : (
             <>
               {addresses?.length === 0 ? (

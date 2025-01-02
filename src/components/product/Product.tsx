@@ -71,7 +71,7 @@ export default function Product({
         </Tooltip>
       </TooltipProvider>
 
-      <p className="font-bold text-primary">{product.sellingPrice}$</p>
+      <p className="font-bold text-primary">{product.sellingPrice}&euro;</p>
       {/* <Button
         className="w-full mt-2"
         variant="outline"

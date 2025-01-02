@@ -55,9 +55,7 @@ const SearchBox = (props: Props) => {
   };
   return (
     <div
-      className={`${
-        props.className + "items-center w-full mx-auto  basis-full"
-      }`}
+      className={`${props.className + "items-center w-full basis-full mx-2"}`}
     >
       <DropdownMenu>
         <DropdownMenuTrigger

@@ -41,3 +41,25 @@ export async function SignIn(callbackUrl: string, formData: A) {
     throw error;
   }
 }
+
+export async function getPayPalAccessToken() {
+  const { NEXT_PUBLIC_PAYPAL_CLIENT_ID, NEXT_PUBLIC_PAYPAL_CLIENT_SECRET } =
+    process.env;
+  const url = "https://api-m.sandbox.paypal.com/v1/oauth2/token";
+
+  const encodedToken = Buffer.from(
+    `${NEXT_PUBLIC_PAYPAL_CLIENT_ID}:${NEXT_PUBLIC_PAYPAL_CLIENT_SECRET}`
+  ).toString("base64");
+
+  const authResponse = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+      Accept: "application/json",
+      Authorization: "Basic " + encodedToken,
+    },
+    body: "grant_type=client_credentials",
+  });
+  const { access_token } = await authResponse.json();
+  return access_token;
+}

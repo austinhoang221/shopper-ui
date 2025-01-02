@@ -17,7 +17,6 @@ import Cart from "./Cart";
 import ChangeLanguage from "./ChangeLanguage";
 import { service } from "@/app/api/services/service";
 import Authentication from "./Authentication";
-import { SessionProvider } from "next-auth/react";
 
 export default async function Header({
   language,
@@ -74,9 +73,7 @@ export default async function Header({
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
-            <SessionProvider refetchInterval={30} refetchOnWindowFocus={false}>
-              <Authentication />
-            </SessionProvider>
+            <Authentication />
           </div>
         </div>
       </nav>

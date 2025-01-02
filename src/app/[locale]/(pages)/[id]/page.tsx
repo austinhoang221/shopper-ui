@@ -6,7 +6,6 @@ import PrallaxCarousel from "@/components/carousel/ParallaxCarousel";
 
 import DetailContent from "./DetailContent";
 import Breadcrumb, { IBreadcrumbState } from "@/components/header/Breadcrumb";
-import Product from "@/components/product/Product";
 import { convertStringToHandle } from "@/utils/utils";
 export async function generateMetadata({ params }: { params: { id: string } }) {
   const product = await service.client.products(params.id.split("-p.")?.[1]);
@@ -62,7 +61,7 @@ export default async function ProductDetail({
         <CardContent>
           {/* <PrallaxCarousel
             images={
-              product.attachments?.map((attach) => attach.link ?? "") ?? []
+              product.children ?? []
             }
           /> */}
         </CardContent>
