@@ -92,7 +92,7 @@ const CreateModal = (props: Props) => {
   const [regions, setRegions] = React.useState<Place[]>([]);
   const [selectedRegion, setSelectedRegion] = React.useState<string | null>();
   const [cities, setCities] = React.useState<Place[]>([]);
-  const [query, setQuery] = React.useState("");
+  const [query, setQuery] = React.useState<string>("");
   const [results, setResults] = React.useState<Place[]>([]);
 
   const debouncedFetchAutocomplete = React.useCallback(
@@ -100,7 +100,6 @@ const CreateModal = (props: Props) => {
       if (query.length > 2) {
         try {
           const places = await autocomplete(query);
-          console.log(places);
           setResults(places);
         } catch (error) {
           console.error("Error fetching autocomplete results:", error);
@@ -121,6 +120,11 @@ const CreateModal = (props: Props) => {
     const value = event.target.value;
     setQuery(value);
     form.setValue("detailedAddress", value ?? "");
+  };
+
+  const handlePlaceSelect = (place: string) => {
+    setQuery(place);
+    form.setValue("detailedAddress", place ?? "");
   };
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -464,7 +468,7 @@ const CreateModal = (props: Props) => {
             </DialogFooter>
           </div>
           <div>
-            <MapComponent />
+            <MapComponent onPlaceSelect={handlePlaceSelect}/>
           </div>
         </div>
       </DialogContent>
