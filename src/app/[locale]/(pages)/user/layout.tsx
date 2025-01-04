@@ -1,4 +1,5 @@
 "use client";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   faFileLines,
@@ -106,7 +107,7 @@ export default function Layout({ children }: A) {
             </li>
           ))}
         </ul>
-        {children}
+        <ScrollArea>{children}</ScrollArea>
       </div>
     </div>
   );

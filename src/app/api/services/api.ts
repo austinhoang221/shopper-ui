@@ -290,6 +290,87 @@ export class Client {
    * @param body (optional)
    * @return OK
    */
+  offset(
+    body?: OrderOffsetPageStaticQuery | undefined
+  ): Promise<OrderOffsetPageStaticResponseOffsetPageResponse> {
+    let url_ = this.baseUrl + "/api/v1/orders/offset";
+    url_ = url_.replace(/[?&]$/, "");
+
+    const content_ = JSON.stringify(body);
+
+    let options_: RequestInit = {
+      body: content_,
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json-patch+json",
+        Accept: "application/json",
+      },
+    };
+
+    return this.transformOptions(options_)
+      .then((transformedOptions_) => {
+        return this.http.fetch(url_, transformedOptions_);
+      })
+      .then((_response: Response) => {
+        return this.processOffset(_response);
+      });
+  }
+
+  protected processOffset(
+    response: Response
+  ): Promise<OrderOffsetPageStaticResponseOffsetPageResponse> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && response.headers.forEach) {
+      response.headers.forEach((v: any, k: any) => (_headers[k] = v));
+    }
+    if (status === 200) {
+      return response.text().then((_responseText) => {
+        let result200: any = null;
+        let resultData200 =
+          _responseText === ""
+            ? null
+            : JSON.parse(_responseText, this.jsonParseReviver);
+        result200 =
+          OrderOffsetPageStaticResponseOffsetPageResponse.fromJS(resultData200);
+        return result200;
+      });
+    } else if (status === 400) {
+      return response.text().then((_responseText) => {
+        let result400: any = null;
+        let resultData400 =
+          _responseText === ""
+            ? null
+            : JSON.parse(_responseText, this.jsonParseReviver);
+        result400 = ProblemDetails.fromJS(resultData400);
+        return throwException(
+          "Bad Request",
+          status,
+          _responseText,
+          _headers,
+          result400
+        );
+      });
+    } else if (status !== 200 && status !== 204) {
+      return response.text().then((_responseText) => {
+        return throwException(
+          "An unexpected server error occurred.",
+          status,
+          _responseText,
+          _headers
+        );
+      });
+    }
+    return Promise.resolve<OrderOffsetPageStaticResponseOffsetPageResponse>(
+      null as any
+    );
+  }
+
+  /**
+   * (Auth)
+   * @param body (optional)
+   * @return OK
+   */
   payments(
     body?: CreatePaymentRequest | undefined
   ): Promise<CreatePaymentResponse> {
@@ -350,6 +431,14 @@ export class Client {
           result400
         );
       });
+    } else if (status === 401) {
+      return response.text().then((_responseText) => {
+        return throwException("Unauthorized", status, _responseText, _headers);
+      });
+    } else if (status === 403) {
+      return response.text().then((_responseText) => {
+        return throwException("Forbidden", status, _responseText, _headers);
+      });
     } else if (status !== 200 && status !== 204) {
       return response.text().then((_responseText) => {
         return throwException(
@@ -364,6 +453,7 @@ export class Client {
   }
 
   /**
+   * (Auth)
    * @param body (optional)
    * @return OK
    */
@@ -422,6 +512,14 @@ export class Client {
           _headers,
           result400
         );
+      });
+    } else if (status === 401) {
+      return response.text().then((_responseText) => {
+        return throwException("Unauthorized", status, _responseText, _headers);
+      });
+    } else if (status === 403) {
+      return response.text().then((_responseText) => {
+        return throwException("Forbidden", status, _responseText, _headers);
       });
     } else if (status !== 200 && status !== 204) {
       return response.text().then((_responseText) => {
@@ -659,6 +757,83 @@ export class Client {
   /**
    * @return OK
    */
+  productsAll(id: string): Promise<ProductResponse[]> {
+    let url_ = this.baseUrl + "/api/v1/product-categories/{id}/products";
+    if (id === undefined || id === null)
+      throw new Error("The parameter 'id' must be defined.");
+    url_ = url_.replace("{id}", encodeURIComponent("" + id));
+    url_ = url_.replace(/[?&]$/, "");
+
+    let options_: RequestInit = {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+    };
+
+    return this.transformOptions(options_)
+      .then((transformedOptions_) => {
+        return this.http.fetch(url_, transformedOptions_);
+      })
+      .then((_response: Response) => {
+        return this.processProductsAll(_response);
+      });
+  }
+
+  protected processProductsAll(response: Response): Promise<ProductResponse[]> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && response.headers.forEach) {
+      response.headers.forEach((v: any, k: any) => (_headers[k] = v));
+    }
+    if (status === 200) {
+      return response.text().then((_responseText) => {
+        let result200: any = null;
+        let resultData200 =
+          _responseText === ""
+            ? null
+            : JSON.parse(_responseText, this.jsonParseReviver);
+        if (Array.isArray(resultData200)) {
+          result200 = [] as any;
+          for (let item of resultData200)
+            result200!.push(ProductResponse.fromJS(item));
+        } else {
+          result200 = <any>null;
+        }
+        return result200;
+      });
+    } else if (status === 400) {
+      return response.text().then((_responseText) => {
+        let result400: any = null;
+        let resultData400 =
+          _responseText === ""
+            ? null
+            : JSON.parse(_responseText, this.jsonParseReviver);
+        result400 = ProblemDetails.fromJS(resultData400);
+        return throwException(
+          "Bad Request",
+          status,
+          _responseText,
+          _headers,
+          result400
+        );
+      });
+    } else if (status !== 200 && status !== 204) {
+      return response.text().then((_responseText) => {
+        return throwException(
+          "An unexpected server error occurred.",
+          status,
+          _responseText,
+          _headers
+        );
+      });
+    }
+    return Promise.resolve<ProductResponse[]>(null as any);
+  }
+
+  /**
+   * @return OK
+   */
   productChildrenAll(): Promise<ListProductResponse[]> {
     let url_ = this.baseUrl + "/api/v1/product-children";
     url_ = url_.replace(/[?&]$/, "");
@@ -809,7 +984,7 @@ export class Client {
    * @param body (optional)
    * @return OK
    */
-  offset(
+  offset2(
     body?: ProductChildOffsetPageStaticQuery | undefined
   ): Promise<ProductChildResponseOffsetPageResponse> {
     let url_ = this.baseUrl + "/api/v1/product-children/offset";
@@ -831,11 +1006,11 @@ export class Client {
         return this.http.fetch(url_, transformedOptions_);
       })
       .then((_response: Response) => {
-        return this.processOffset(_response);
+        return this.processOffset2(_response);
       });
   }
 
-  protected processOffset(
+  protected processOffset2(
     response: Response
   ): Promise<ProductChildResponseOffsetPageResponse> {
     const status = response.status;
@@ -1043,7 +1218,7 @@ export class Client {
   /**
    * @return OK
    */
-  productsAll(): Promise<ListProductResponse[]> {
+  productsAll2(): Promise<ListProductResponse[]> {
     let url_ = this.baseUrl + "/api/v1/products";
     url_ = url_.replace(/[?&]$/, "");
 
@@ -1059,11 +1234,11 @@ export class Client {
         return this.http.fetch(url_, transformedOptions_);
       })
       .then((_response: Response) => {
-        return this.processProductsAll(_response);
+        return this.processProductsAll2(_response);
       });
   }
 
-  protected processProductsAll(
+  protected processProductsAll2(
     response: Response
   ): Promise<ListProductResponse[]> {
     const status = response.status;
@@ -1191,7 +1366,7 @@ export class Client {
    * @param body (optional)
    * @return OK
    */
-  offset2(
+  offset3(
     body?: ProductOffsetPageStaticQuery | undefined
   ): Promise<ProductOffsetPageStaticResponseOffsetPageResponse> {
     let url_ = this.baseUrl + "/api/v1/products/offset";
@@ -1213,11 +1388,11 @@ export class Client {
         return this.http.fetch(url_, transformedOptions_);
       })
       .then((_response: Response) => {
-        return this.processOffset2(_response);
+        return this.processOffset3(_response);
       });
   }
 
-  protected processOffset2(
+  protected processOffset3(
     response: Response
   ): Promise<ProductOffsetPageStaticResponseOffsetPageResponse> {
     const status = response.status;
@@ -2991,6 +3166,86 @@ export class Client {
   }
 
   protected processChangePassword(response: Response): Promise<NoContent> {
+    const status = response.status;
+    let _headers: any = {};
+    if (response.headers && response.headers.forEach) {
+      response.headers.forEach((v: any, k: any) => (_headers[k] = v));
+    }
+    if (status === 204) {
+      return response.text().then((_responseText) => {
+        let result204: any = null;
+        let resultData204 =
+          _responseText === ""
+            ? null
+            : JSON.parse(_responseText, this.jsonParseReviver);
+        result204 = NoContent.fromJS(resultData204);
+        return result204;
+      });
+    } else if (status === 400) {
+      return response.text().then((_responseText) => {
+        let result400: any = null;
+        let resultData400 =
+          _responseText === ""
+            ? null
+            : JSON.parse(_responseText, this.jsonParseReviver);
+        result400 = ProblemDetails.fromJS(resultData400);
+        return throwException(
+          "Bad Request",
+          status,
+          _responseText,
+          _headers,
+          result400
+        );
+      });
+    } else if (status === 401) {
+      return response.text().then((_responseText) => {
+        return throwException("Unauthorized", status, _responseText, _headers);
+      });
+    } else if (status === 403) {
+      return response.text().then((_responseText) => {
+        return throwException("Forbidden", status, _responseText, _headers);
+      });
+    } else if (status !== 200 && status !== 204) {
+      return response.text().then((_responseText) => {
+        return throwException(
+          "An unexpected server error occurred.",
+          status,
+          _responseText,
+          _headers
+        );
+      });
+    }
+    return Promise.resolve<NoContent>(null as any);
+  }
+
+  /**
+   * (Auth)
+   * @return No Content
+   */
+  cartsDELETE2(id: string): Promise<NoContent> {
+    let url_ = this.baseUrl + "/api/v1/users/{id}/carts";
+    if (id === undefined || id === null)
+      throw new Error("The parameter 'id' must be defined.");
+    url_ = url_.replace("{id}", encodeURIComponent("" + id));
+    url_ = url_.replace(/[?&]$/, "");
+
+    let options_: RequestInit = {
+      method: "DELETE",
+      headers: {
+        Accept: "application/json",
+      },
+    };
+
+    return this.transformOptions(options_)
+      .then((transformedOptions_) => {
+        return this.http.fetch(url_, transformedOptions_);
+      })
+      .then((_response: Response) => {
+        return this.processCartsDELETE2(_response);
+      });
+  }
+
+  protected processCartsDELETE2(response: Response): Promise<NoContent> {
     const status = response.status;
     let _headers: any = {};
     if (response.headers && response.headers.forEach) {
@@ -8498,6 +8753,64 @@ export interface IOid {
   friendlyName?: string | undefined;
 }
 
+export class OrderItemOffsetPageStaticResponse
+  implements IOrderItemOffsetPageStaticResponse
+{
+  productId?: string;
+  productName?: string | undefined;
+  unitPrice?: number;
+  discounts?: number;
+  pictureUrl?: string | undefined;
+  units?: number;
+
+  constructor(data?: IOrderItemOffsetPageStaticResponse) {
+    if (data) {
+      for (var property in data) {
+        if (data.hasOwnProperty(property))
+          (<any>this)[property] = (<any>data)[property];
+      }
+    }
+  }
+
+  init(_data?: any) {
+    if (_data) {
+      this.productId = _data["productId"] ? _data["productId"] : <any>undefined;
+      this.productName = _data["productName"];
+      this.unitPrice = _data["unitPrice"];
+      this.discounts = _data["discounts"];
+      this.pictureUrl = _data["pictureUrl"];
+      this.units = _data["units"];
+    }
+  }
+
+  static fromJS(data: any): OrderItemOffsetPageStaticResponse {
+    data = typeof data === "object" ? data : {};
+    let result = new OrderItemOffsetPageStaticResponse();
+    result.init(data);
+    return result;
+  }
+
+  toJSON(data?: any) {
+    data = typeof data === "object" ? data : {};
+    data["productId"] = this.productId ? this.productId : <any>undefined;
+    data["productName"] = this.productName;
+    data["unitPrice"] = this.unitPrice;
+    data["discounts"] = this.discounts;
+    data["pictureUrl"] = this.pictureUrl;
+    data["units"] = this.units;
+    return data;
+  }
+}
+
+export interface IOrderItemOffsetPageStaticResponse {
+  productId?: string;
+  productName?: string | undefined;
+  unitPrice?: number;
+  discounts?: number;
+  pictureUrl?: string | undefined;
+  units?: number;
+}
+
 export class OrderItemResponse implements IOrderItemResponse {
   productId?: string;
   productName?: string | undefined;
@@ -8552,6 +8865,242 @@ export interface IOrderItemResponse {
   discounts?: number;
   pictureUrl?: string | undefined;
   units?: number;
+}
+
+export class OrderOffsetPageStaticQuery implements IOrderOffsetPageStaticQuery {
+  filter?: OrderStaticFilter;
+  sortBy?: OrderStaticSortBy;
+  page?: OffsetPage;
+
+  constructor(data?: IOrderOffsetPageStaticQuery) {
+    if (data) {
+      for (var property in data) {
+        if (data.hasOwnProperty(property))
+          (<any>this)[property] = (<any>data)[property];
+      }
+    }
+  }
+
+  init(_data?: any) {
+    if (_data) {
+      this.filter = _data["filter"]
+        ? OrderStaticFilter.fromJS(_data["filter"])
+        : <any>undefined;
+      this.sortBy = _data["sortBy"]
+        ? OrderStaticSortBy.fromJS(_data["sortBy"])
+        : <any>undefined;
+      this.page = _data["page"]
+        ? OffsetPage.fromJS(_data["page"])
+        : <any>undefined;
+    }
+  }
+
+  static fromJS(data: any): OrderOffsetPageStaticQuery {
+    data = typeof data === "object" ? data : {};
+    let result = new OrderOffsetPageStaticQuery();
+    result.init(data);
+    return result;
+  }
+
+  toJSON(data?: any) {
+    data = typeof data === "object" ? data : {};
+    data["filter"] = this.filter ? this.filter.toJSON() : <any>undefined;
+    data["sortBy"] = this.sortBy ? this.sortBy.toJSON() : <any>undefined;
+    data["page"] = this.page ? this.page.toJSON() : <any>undefined;
+    return data;
+  }
+}
+
+export interface IOrderOffsetPageStaticQuery {
+  filter?: OrderStaticFilter;
+  sortBy?: OrderStaticSortBy;
+  page?: OffsetPage;
+}
+
+export class OrderOffsetPageStaticResponse
+  implements IOrderOffsetPageStaticResponse
+{
+  id?: string;
+  street?: string | undefined;
+  city?: string | undefined;
+  state?: string | undefined;
+  country?: string | undefined;
+  zipcode?: string | undefined;
+  region?: string | undefined;
+  buyerId?: string;
+  buyerPhone?: string | undefined;
+  buyerEmail?: string | undefined;
+  description?: string | undefined;
+  orderCd?: string | undefined;
+  remark?: string | undefined;
+  orderItems?: OrderItemOffsetPageStaticResponse[] | undefined;
+  orderDate?: Date;
+  detailedAddress?: string | undefined;
+  phoneNumber?: string | undefined;
+
+  constructor(data?: IOrderOffsetPageStaticResponse) {
+    if (data) {
+      for (var property in data) {
+        if (data.hasOwnProperty(property))
+          (<any>this)[property] = (<any>data)[property];
+      }
+    }
+  }
+
+  init(_data?: any) {
+    if (_data) {
+      this.id = _data["id"] ? _data["id"] : <any>undefined;
+      this.street = _data["street"];
+      this.city = _data["city"];
+      this.state = _data["state"];
+      this.country = _data["country"];
+      this.zipcode = _data["zipcode"];
+      this.region = _data["region"];
+      this.buyerId = _data["buyerId"] ? _data["buyerId"] : <any>undefined;
+      this.buyerPhone = _data["buyerPhone"];
+      this.buyerEmail = _data["buyerEmail"];
+      this.description = _data["description"];
+      this.orderCd = _data["orderCd"];
+      this.remark = _data["remark"];
+      if (Array.isArray(_data["orderItems"])) {
+        this.orderItems = [] as any;
+        for (let item of _data["orderItems"])
+          this.orderItems!.push(OrderItemOffsetPageStaticResponse.fromJS(item));
+      }
+      this.orderDate = _data["orderDate"]
+        ? new Date(_data["orderDate"].toString())
+        : <any>undefined;
+      this.detailedAddress = _data["detailedAddress"];
+      this.phoneNumber = _data["phoneNumber"];
+    }
+  }
+
+  static fromJS(data: any): OrderOffsetPageStaticResponse {
+    data = typeof data === "object" ? data : {};
+    let result = new OrderOffsetPageStaticResponse();
+    result.init(data);
+    return result;
+  }
+
+  toJSON(data?: any) {
+    data = typeof data === "object" ? data : {};
+    data["id"] = this.id ? this.id : <any>undefined;
+    data["street"] = this.street;
+    data["city"] = this.city;
+    data["state"] = this.state;
+    data["country"] = this.country;
+    data["zipcode"] = this.zipcode;
+    data["region"] = this.region;
+    data["buyerId"] = this.buyerId ? this.buyerId : <any>undefined;
+    data["buyerPhone"] = this.buyerPhone;
+    data["buyerEmail"] = this.buyerEmail;
+    data["description"] = this.description;
+    data["orderCd"] = this.orderCd;
+    data["remark"] = this.remark;
+    if (Array.isArray(this.orderItems)) {
+      data["orderItems"] = [];
+      for (let item of this.orderItems) data["orderItems"].push(item.toJSON());
+    }
+    data["orderDate"] = this.orderDate
+      ? this.orderDate.toISOString()
+      : <any>undefined;
+    data["detailedAddress"] = this.detailedAddress;
+    data["phoneNumber"] = this.phoneNumber;
+    return data;
+  }
+}
+
+export interface IOrderOffsetPageStaticResponse {
+  id?: string;
+  street?: string | undefined;
+  city?: string | undefined;
+  state?: string | undefined;
+  country?: string | undefined;
+  zipcode?: string | undefined;
+  region?: string | undefined;
+  buyerId?: string;
+  buyerPhone?: string | undefined;
+  buyerEmail?: string | undefined;
+  description?: string | undefined;
+  orderCd?: string | undefined;
+  remark?: string | undefined;
+  orderItems?: OrderItemOffsetPageStaticResponse[] | undefined;
+  orderDate?: Date;
+  detailedAddress?: string | undefined;
+  phoneNumber?: string | undefined;
+}
+
+export class OrderOffsetPageStaticResponseOffsetPageResponse
+  implements IOrderOffsetPageStaticResponseOffsetPageResponse
+{
+  readonly items?: OrderOffsetPageStaticResponse[] | undefined;
+  readonly totalItemsCount?: number;
+  readonly totalPages?: number;
+  readonly currentPage?: number;
+  readonly itemsFrom?: number;
+  readonly itemsTo?: number;
+  readonly hasPreviousPage?: boolean;
+  readonly hasNextPage?: boolean;
+
+  constructor(data?: IOrderOffsetPageStaticResponseOffsetPageResponse) {
+    if (data) {
+      for (var property in data) {
+        if (data.hasOwnProperty(property))
+          (<any>this)[property] = (<any>data)[property];
+      }
+    }
+  }
+
+  init(_data?: any) {
+    if (_data) {
+      if (Array.isArray(_data["items"])) {
+        (<any>this).items = [] as any;
+        for (let item of _data["items"])
+          (<any>this).items!.push(OrderOffsetPageStaticResponse.fromJS(item));
+      }
+      (<any>this).totalItemsCount = _data["totalItemsCount"];
+      (<any>this).totalPages = _data["totalPages"];
+      (<any>this).currentPage = _data["currentPage"];
+      (<any>this).itemsFrom = _data["itemsFrom"];
+      (<any>this).itemsTo = _data["itemsTo"];
+      (<any>this).hasPreviousPage = _data["hasPreviousPage"];
+      (<any>this).hasNextPage = _data["hasNextPage"];
+    }
+  }
+
+  static fromJS(data: any): OrderOffsetPageStaticResponseOffsetPageResponse {
+    data = typeof data === "object" ? data : {};
+    let result = new OrderOffsetPageStaticResponseOffsetPageResponse();
+    result.init(data);
+    return result;
+  }
+
+  toJSON(data?: any) {
+    data = typeof data === "object" ? data : {};
+    if (Array.isArray(this.items)) {
+      data["items"] = [];
+      for (let item of this.items) data["items"].push(item.toJSON());
+    }
+    data["totalItemsCount"] = this.totalItemsCount;
+    data["totalPages"] = this.totalPages;
+    data["currentPage"] = this.currentPage;
+    data["itemsFrom"] = this.itemsFrom;
+    data["itemsTo"] = this.itemsTo;
+    data["hasPreviousPage"] = this.hasPreviousPage;
+    data["hasNextPage"] = this.hasNextPage;
+    return data;
+  }
+}
+
+export interface IOrderOffsetPageStaticResponseOffsetPageResponse {
+  items?: OrderOffsetPageStaticResponse[] | undefined;
+  totalItemsCount?: number;
+  totalPages?: number;
+  currentPage?: number;
+  itemsFrom?: number;
+  itemsTo?: number;
+  hasPreviousPage?: boolean;
+  hasNextPage?: boolean;
 }
 
 export class OrderResponse implements IOrderResponse {
@@ -8660,6 +9209,69 @@ export interface IOrderResponse {
   detailedAddress?: string | undefined;
   phoneNumber?: string | undefined;
 }
+
+export class OrderStaticFilter implements IOrderStaticFilter {
+  userId?: string;
+
+  constructor(data?: IOrderStaticFilter) {
+    if (data) {
+      for (var property in data) {
+        if (data.hasOwnProperty(property))
+          (<any>this)[property] = (<any>data)[property];
+      }
+    }
+  }
+
+  init(_data?: any) {
+    if (_data) {
+      this.userId = _data["userId"] ? _data["userId"] : <any>undefined;
+    }
+  }
+
+  static fromJS(data: any): OrderStaticFilter {
+    data = typeof data === "object" ? data : {};
+    let result = new OrderStaticFilter();
+    result.init(data);
+    return result;
+  }
+
+  toJSON(data?: any) {
+    data = typeof data === "object" ? data : {};
+    data["userId"] = this.userId ? this.userId : <any>undefined;
+    return data;
+  }
+}
+
+export interface IOrderStaticFilter {
+  userId?: string;
+}
+
+export class OrderStaticSortBy implements IOrderStaticSortBy {
+  constructor(data?: IOrderStaticSortBy) {
+    if (data) {
+      for (var property in data) {
+        if (data.hasOwnProperty(property))
+          (<any>this)[property] = (<any>data)[property];
+      }
+    }
+  }
+
+  init(_data?: any) {}
+
+  static fromJS(data: any): OrderStaticSortBy {
+    data = typeof data === "object" ? data : {};
+    let result = new OrderStaticSortBy();
+    result.init(data);
+    return result;
+  }
+
+  toJSON(data?: any) {
+    data = typeof data === "object" ? data : {};
+    return data;
+  }
+}
+
+export interface IOrderStaticSortBy {}
 
 export enum ParameterAttributes {
   _0 = 0,
@@ -9641,6 +10253,68 @@ export interface IProductOffsetPageStaticResponseOffsetPageResponse {
   itemsTo?: number;
   hasPreviousPage?: boolean;
   hasNextPage?: boolean;
+}
+
+export class ProductResponse implements IProductResponse {
+  id?: string;
+  categoryId?: string;
+  name?: string | undefined;
+  supplierId?: string | undefined;
+  txDesc?: string | undefined;
+  unit?: string | undefined;
+  weight?: number;
+
+  constructor(data?: IProductResponse) {
+    if (data) {
+      for (var property in data) {
+        if (data.hasOwnProperty(property))
+          (<any>this)[property] = (<any>data)[property];
+      }
+    }
+  }
+
+  init(_data?: any) {
+    if (_data) {
+      this.id = _data["id"] ? _data["id"] : <any>undefined;
+      this.categoryId = _data["categoryId"]
+        ? _data["categoryId"]
+        : <any>undefined;
+      this.name = _data["name"];
+      this.supplierId = _data["supplierId"];
+      this.txDesc = _data["txDesc"];
+      this.unit = _data["unit"];
+      this.weight = _data["weight"];
+    }
+  }
+
+  static fromJS(data: any): ProductResponse {
+    data = typeof data === "object" ? data : {};
+    let result = new ProductResponse();
+    result.init(data);
+    return result;
+  }
+
+  toJSON(data?: any) {
+    data = typeof data === "object" ? data : {};
+    data["id"] = this.id ? this.id : <any>undefined;
+    data["categoryId"] = this.categoryId ? this.categoryId : <any>undefined;
+    data["name"] = this.name;
+    data["supplierId"] = this.supplierId;
+    data["txDesc"] = this.txDesc;
+    data["unit"] = this.unit;
+    data["weight"] = this.weight;
+    return data;
+  }
+}
+
+export interface IProductResponse {
+  id?: string;
+  categoryId?: string;
+  name?: string | undefined;
+  supplierId?: string | undefined;
+  txDesc?: string | undefined;
+  unit?: string | undefined;
+  weight?: number;
 }
 
 export class ProductStaticFilter implements IProductStaticFilter {
