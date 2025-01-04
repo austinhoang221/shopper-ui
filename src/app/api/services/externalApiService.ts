@@ -17,7 +17,7 @@ export interface ShippingRate {
     currency: string;
     estimated_days: number;
     duration_terms: string;
-  }
+}
 
 export const getCountries = async (): Promise<Place[]> => {
     const url = `http://api.geonames.org/countryInfoJSON?username=${username}`;
@@ -53,32 +53,53 @@ export const getCities = async (regionId: string): Promise<Place[]> => {
 export const autocomplete = async (query: string): Promise<A[]> => {
     if (!query) return [];
 
-  const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${mapboxAccessToken}&autocomplete=true&limit=5`;
+    const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${mapboxAccessToken}&autocomplete=true&limit=5`;
     console.log(url);
-  try {
-    const response = await fetch(url);
-    const data = await response.json();
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
 
-    if (data.features) {
-        return data.features.filter((feature: A) => feature.place_type.includes('place')).map((feature: A) => ({
-        id: feature.id,
-        name: feature.place_name,
-        coordinates: feature.geometry.coordinates,
-      }));
+        if (data.features) {
+            return data.features.filter((feature: A) => feature.place_type.includes('place')).map((feature: A) => ({
+                id: feature.id,
+                name: feature.place_name,
+                coordinates: feature.geometry.coordinates,
+            }));
+        }
+
+        return [];
+    } catch (error) {
+        console.error("Error fetching places:", error);
+        return [];
     }
+};
 
-    return [];
-  } catch (error) {
-    console.error("Error fetching places:", error);
-    return [];
-  }
+export const reverseGeocode = async (lng: number, lat: number): Promise<A | null> => {
+    const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${mapboxAccessToken}`;
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (data.features && data.features.length > 0) {
+            const feature = data.features[0];
+            return {
+                id: feature.id,
+                name: feature.place_name,
+                coordinates: feature.geometry.coordinates,
+            };
+        }
+        return null;
+    } catch (error) {
+        console.error('Error fetching reverse geocode:', error);
+        return null;
+    }
 };
 
 export const calculateShipping = async (
     address: { name: string, street: string, city: string; state: string; zip: string; country: string },
     parcel: { length: number; width: number; height: number; weight: number }
 ) => {
-    
+
     const shipmentRequest = {
         address_from: {
             name: 'John Doe',
