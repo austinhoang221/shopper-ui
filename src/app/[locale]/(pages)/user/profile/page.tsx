@@ -2,7 +2,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
-
 import { userIdCookie } from "@/utils/constants";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSession } from "next-auth/react";
@@ -16,6 +15,10 @@ import { getCookie } from "cookies-next";
 import { toast } from "@/components/hooks/use-toast";
 import { UpdateUserRequest } from "@/app/api/services/api";
 import withAuth from "@/hoc/Auth";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faUser } from "@fortawesome/free-solid-svg-icons";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 const FormSchema = z.object({
   name: z.string(),
@@ -27,10 +30,10 @@ const FormSchema = z.object({
   // ]),
 });
 const UserInfo = () => {
-  const { data: userData } = useSession();
+  const { data: userData, update } = useSession();
   const [isLoadingBtn, setIsLoadingBtn] = React.useState<boolean>(false);
+  const [imgErrorMsg, setImgErrorMsg] = React.useState<string>("");
   const userId = getCookie(userIdCookie);
-  const [isLoading, setIsLoading] = React.useState<boolean>(true);
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -49,7 +52,9 @@ const UserInfo = () => {
   const onSubmit = async () => {
     await form.trigger();
     const formValue = form.getValues();
+
     if (form.formState.isValid) {
+      setIsLoadingBtn(true);
       const model = UpdateUserRequest.fromJS({
         name: formValue?.name,
         username: formValue?.username,
@@ -58,16 +63,56 @@ const UserInfo = () => {
       });
       try {
         await service.client.usersPUT(userId as string, model);
+        update({
+          ...userData,
+          user: {
+            ...userData?.user,
+            name: formValue?.name,
+            username: formValue?.username,
+            email: formValue?.email,
+          },
+        });
         toast({
           title: "Successfully updated profile",
         });
       } catch (error) {
         console.log(error);
+      } finally {
+        setIsLoadingBtn(false);
       }
     } else {
       toast({
         title: "Please input all required fields",
         variant: "destructive",
+      });
+    }
+  };
+
+  const handleFileChange = async (event: A) => {
+    const file = event.target.files[0];
+
+    if (file) {
+      const maxSize = 2 * 1024 * 1024;
+
+      if (!file.type.startsWith("image/")) {
+        setImgErrorMsg("File must be in image format.");
+        event.target.value = "";
+        return;
+      }
+
+      if (file.size > maxSize) {
+        setImgErrorMsg("File size exceeds the 2MB limit.");
+        event.target.value = "";
+        return;
+      }
+
+      const response = await service.client.uploadPhoto(userId!, file);
+      update({
+        ...userData,
+        user: {
+          ...userData?.user,
+          photoUrl: response.photoUrl,
+        },
       });
     }
   };
@@ -156,20 +201,37 @@ const UserInfo = () => {
             </Form>
           </div>
           <div className="col-span-4 mx-auto flex flex-col items-center gap-4">
-            <Image
-              className="rounded-full"
-              src={userData?.user?.image ?? ""}
-              alt={userData?.user?.name ?? userData?.user?.email ?? ""}
-              width={100}
-              height={100}
-            />
-            <Button
-              loading={isLoadingBtn}
-              onClick={() => onSubmit()}
-              variant="outline"
-            >
-              Change Avatar
-            </Button>
+            {userData?.user?.photoUrl ? (
+              <Image
+                className="rounded-full"
+                src={userData?.user?.photoUrl ?? ""}
+                alt={userData?.user?.name ?? userData?.user?.photoUrl ?? ""}
+                width={100}
+                height={100}
+              ></Image>
+            ) : (
+              <FontAwesomeIcon
+                icon={faUser}
+                className="text-primary"
+                width={100}
+                height={100}
+              />
+            )}
+            {imgErrorMsg && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{imgErrorMsg}</AlertDescription>
+              </Alert>
+            )}
+            <div className="grid w-full lg:max-w-sm items-center gap-1.5">
+              <Input
+                id="picture"
+                type="file"
+                accept="image/*"
+                className="file:bg-secondary file:text-primary cursor-pointer"
+                onChange={handleFileChange}
+              />
+            </div>
           </div>
         </div>
 

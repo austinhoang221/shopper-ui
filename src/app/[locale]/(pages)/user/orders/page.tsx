@@ -21,6 +21,15 @@ import { format } from "date-fns";
 import Loading from "@/components/motion/Loading";
 import InfiniteScroll from "@/components/ui/infinite-scroll";
 import { defaultPageSize } from "@/utils/constants";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faChevronCircleDown } from "@fortawesome/free-solid-svg-icons";
 
 const Orders = () => {
   const { status } = useSession();
@@ -72,8 +81,24 @@ const Orders = () => {
 
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="flex justify-between">
         <CardTitle>Orders</CardTitle>
+        <DropdownMenu>
+          <DropdownMenuTrigger type="button">
+            <FontAwesomeIcon
+              className="ml-2"
+              icon={faChevronCircleDown}
+              width={18}
+              height={18}
+            />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent aria-label="Static Actions">
+            <DropdownMenuGroup>
+              <DropdownMenuItem key="asc">Price: Low to High</DropdownMenuItem>
+              <DropdownMenuItem key="dsc">Price: High to Low</DropdownMenuItem>
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </CardHeader>
       <CardContent className="min-h-[50vh] ">
         <>

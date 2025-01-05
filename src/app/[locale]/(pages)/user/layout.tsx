@@ -1,10 +1,10 @@
 "use client";
+import Loading from "@/components/motion/Loading";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   faFileLines,
   faLocationDot,
-  faLocationPin,
   faLock,
   faUser,
 } from "@fortawesome/free-solid-svg-icons";
@@ -47,15 +47,24 @@ export default function Layout({ children }: A) {
           {status === "loading" ? (
             <Skeleton className="h-6 w-w-3/4 bg-gray-200" />
           ) : (
-            <div className="flex gap-2">
-              <Image
-                className="rounded-full"
-                src={userData?.user?.photoUrl ?? ""}
-                alt={userData?.user?.name ?? userData?.user?.photoUrl ?? ""}
-                width={30}
-                height={30}
-              ></Image>
-              <span>{userData?.user?.username}</span>
+            <div className="flex gap-2 items-center">
+              {userData?.user?.photoUrl ? (
+                <Image
+                  className="rounded-full"
+                  src={userData?.user?.photoUrl ?? ""}
+                  alt={userData?.user?.name ?? userData?.user?.photoUrl ?? ""}
+                  width={30}
+                  height={30}
+                ></Image>
+              ) : (
+                <FontAwesomeIcon
+                  icon={faUser}
+                  className="text-primary"
+                  width={30}
+                  height={30}
+                />
+              )}
+              <span className="truncate">{userData?.user?.username}</span>
             </div>
           )}
           <ul className="pt-2">
@@ -82,14 +91,23 @@ export default function Layout({ children }: A) {
       </div>
       <div className="col-span-12 md:col-span-10">
         <div className="flex md:hidden  gap-2">
-          <Image
-            className="rounded-full"
-            src={userData?.user?.photoUrl ?? ""}
-            alt={userData?.user?.name ?? userData?.user?.photoUrl ?? ""}
-            width={30}
-            height={30}
-          ></Image>
-          <span>{userData?.user?.username}</span>
+          {userData?.user?.photoUrl ? (
+            <Image
+              className="rounded-full"
+              src={userData?.user?.photoUrl ?? ""}
+              alt={userData?.user?.name ?? userData?.user?.photoUrl ?? ""}
+              width={30}
+              height={30}
+            ></Image>
+          ) : (
+            <FontAwesomeIcon
+              icon={faUser}
+              className="text-primary"
+              width={30}
+              height={30}
+            />
+          )}
+          <span className="truncate">{userData?.user?.username}</span>
         </div>
         <ul className="pt-2 flex md:hidden mb-2">
           {menuItems.map((item) => (
@@ -107,7 +125,11 @@ export default function Layout({ children }: A) {
             </li>
           ))}
         </ul>
-        <ScrollArea>{children}</ScrollArea>
+        {status === "loading" ? (
+          <Loading />
+        ) : (
+          <ScrollArea>{children}</ScrollArea>
+        )}
       </div>
     </div>
   );

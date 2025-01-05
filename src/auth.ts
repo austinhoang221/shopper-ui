@@ -43,7 +43,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }),
   ],
   callbacks: {
-    async jwt({ token, user, account }) {
+    async jwt({ token, user, account, trigger, session }) {
       try {
         if (account?.id_token) {
           const response = await service.client.loginWithGoogle(
@@ -56,6 +56,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           if (response?.id) {
             token.id = response.id;
             token.name = response.name;
+            token.username = response.username;
             token.email = response.email;
             token.phoneNumber = response.phoneNumber;
             token.photoUrl = response.photoUrl;
@@ -80,28 +81,42 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           if (user?.id) {
             token.id = user?.id;
             token.name = user?.name;
+            token.username = user?.username;
             token.email = user?.email;
             token.phoneNumber = user?.phoneNumber;
-            token.photoUrl = user?.photoUrl;
+            token.photoUrl = user?.photoUrl ? user?.photoUrl : user?.image;
           }
         }
       } catch (error) {
         console.error("Error:", error);
       }
-
+      if (trigger == "update") {
+        if (session?.user) {
+          token.email = session.user.email;
+          token.name = session.user.name;
+          token.username = session.user.username;
+        }
+      }
       return token;
     },
     signIn({}) {
       return true;
     },
 
-    session({ session, token }) {
+    session({ session, token, user }) {
       if (token && session.user) {
-        session.user.id = token.id as string;
         session.user.name = token.name;
+        session.user.username = (token.username as string) ?? "";
         session.user.email = token.email ?? "";
         session.user.phoneNumber = (token.phoneNumber as string) ?? "";
-        session.user.photoUrl = (token.photoUrl as string) ?? "";
+        session.user.photoUrl =
+          ((token.photoUrl as string)
+            ? (token.photoUrl as string)
+            : user.image) ?? "";
+      }
+      if (user) {
+        console.log(user);
+        session.user = user;
       }
       return session;
     },

@@ -9247,6 +9247,9 @@ export interface IOrderStaticFilter {
 }
 
 export class OrderStaticSortBy implements IOrderStaticSortBy {
+  orderCode?: SortDirection;
+  orderDate?: SortDirection;
+
   constructor(data?: IOrderStaticSortBy) {
     if (data) {
       for (var property in data) {
@@ -9256,7 +9259,12 @@ export class OrderStaticSortBy implements IOrderStaticSortBy {
     }
   }
 
-  init(_data?: any) {}
+  init(_data?: any) {
+    if (_data) {
+      this.orderCode = _data["orderCode"];
+      this.orderDate = _data["orderDate"];
+    }
+  }
 
   static fromJS(data: any): OrderStaticSortBy {
     data = typeof data === "object" ? data : {};
@@ -9267,11 +9275,16 @@ export class OrderStaticSortBy implements IOrderStaticSortBy {
 
   toJSON(data?: any) {
     data = typeof data === "object" ? data : {};
+    data["orderCode"] = this.orderCode;
+    data["orderDate"] = this.orderDate;
     return data;
   }
 }
 
-export interface IOrderStaticSortBy {}
+export interface IOrderStaticSortBy {
+  orderCode?: SortDirection;
+  orderDate?: SortDirection;
+}
 
 export enum ParameterAttributes {
   _0 = 0,
