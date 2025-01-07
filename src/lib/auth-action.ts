@@ -20,7 +20,23 @@ export async function SignOut() {
 }
 
 export async function SignInGoogle(callbackUrl: string) {
-  await signIn("google", { redirectTo: callbackUrl });
+  try {
+    if (!callbackUrl) await signIn("google", { redirectTo: "/" });
+    else await signIn("google", { redirectTo: callbackUrl });
+  } catch (error) {
+    console.log(error);
+    if (error instanceof AuthError) {
+      switch (error.type) {
+        case "CredentialsSignin":
+        case "CallbackRouteError":
+          return { error: "Email/Phone number or Password incorrect" };
+        default:
+          return { error: "Something went wrong" };
+      }
+    }
+
+    throw error;
+  }
 }
 
 export async function SignIn(callbackUrl: string, formData: A) {

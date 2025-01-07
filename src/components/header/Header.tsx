@@ -10,13 +10,13 @@ import {
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
 import SearchBox from "./SearchBox";
-import Menu from "../menu/Menu";
 import DeliverTo from "./DeliverTo";
 import Cart from "./Cart";
 
 import ChangeLanguage from "./ChangeLanguage";
 import { service } from "@/app/api/services/service";
 import Authentication from "./Authentication";
+import Menu from "../Menu/Menu";
 
 export default async function Header({
   language,
