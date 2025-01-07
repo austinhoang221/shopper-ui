@@ -19,6 +19,7 @@ import { userIdCookie } from "@/utils/constants";
 import { faCartShopping } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { getCookie } from "cookies-next";
+import { useSession } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";
 import React from "react";
 
@@ -34,6 +35,7 @@ interface ProductAttribute {
 const DetailContent = (props: Props) => {
   const { product } = props;
   const userId = getCookie(userIdCookie);
+  const { data: userData } = useSession();
   const { toast } = useToast();
   const router = useRouter();
   const params = useParams();
@@ -45,7 +47,15 @@ const DetailContent = (props: Props) => {
   const [detailProduct, setDetailProduct] = React.useState<
     GetByAttributeDetailIdsResponse | undefined
   >();
-  console.log(product);
+  const [pathname, setPathname] = React.useState<string>("");
+  React.useEffect(() => {
+    const path = window.location.pathname;
+    try {
+      setPathname(path);
+    } catch {
+      console.error("Error parsing user data");
+    }
+  }, []);
   const initialValue = product?.attributes?.reduce(
     (acc: ProductAttribute[], attr) => {
       const flat: ProductAttribute[] = [];
@@ -131,7 +141,14 @@ const DetailContent = (props: Props) => {
 
   const onClickBuyNow = async () => {
     await onAddToCart(detailProduct?.id ?? "");
-    router.push(`/${language}/cart`);
+    if (userData) {
+      router.push(`/${language}/cart`);
+    } else
+      router.push(
+        `/${params.locale}/auth/login?callbackUrl=${encodeURIComponent(
+          pathname
+        )}`
+      );
   };
   const onRenderAttributes = () => {
     return product?.attributes?.map((attr) => {

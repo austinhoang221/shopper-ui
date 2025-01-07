@@ -112,7 +112,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         session.user.photoUrl =
           ((token.photoUrl as string)
             ? (token.photoUrl as string)
-            : user.image) ?? "";
+            : user?.image) ?? "";
       }
       if (user) {
         console.log(user);

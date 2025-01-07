@@ -14,15 +14,15 @@ export function OrderSummary({ children }: { children?: ReactNode }) {
     <>
       <div className="flex justify-between">
         <span className="text-muted-foreground">Sub-total</span>
-        <span>&euro{calculateTotalCart}</span>
+        <span>{calculateTotalCart}&euro;</span>
       </div>
       <div className="flex justify-between">
         <span className="text-muted-foreground">Shipping</span>
-        <span>&euro{ship.toFixed(2)}</span>
+        <span>{ship.toFixed(2)}&euro;</span>
       </div>
       <div className="flex justify-between">
         <span className="text-muted-foreground">Discount</span>
-        <span>&euro{discount.toFixed(2)}</span>
+        <span>{discount.toFixed(2)}&euro;</span>
       </div>
 
       <Separator className="bg-[#d5dbdb] mt-4" />

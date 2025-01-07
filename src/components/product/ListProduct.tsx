@@ -56,7 +56,7 @@ const ListProduct = (props: Props) => {
         page: pageModel,
         filter: modelFilter,
       });
-      const data = await service.client.offset2(model);
+      const data = await service.client.offset3(model);
       if (itemCount.current + defaultPageSize >= data.totalItemsCount!) {
         hasMore.current = false;
       }
