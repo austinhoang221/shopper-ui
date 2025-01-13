@@ -429,24 +429,57 @@ const CreateModal = (props: Props) => {
                       </FormItem>
                     )}
                   />
-
                   <FormField
                     control={form.control}
                     name="detailedAddress"
                     render={({ field }) => (
                       <FormItem className="mb-3">
                         <div className="gap-4">
-                          <FormControl className="col-span-1">
-                            <Input
-                              placeholder="Address"
-                              value={field.value}
-                              // {...field}
-                              onChange={getAddress}
-                            />
-                            {/* {results.map((place) => (
-                          <li key={place.id}>{place.name}</li>
-                        ))} */}
-                          </FormControl>
+                          <Popover open={true}>
+                            <PopoverTrigger asChild>
+                              <FormControl className="col-span-1">
+                                <div>
+                                  <Input
+                                    placeholder="Address"
+                                    value={field.value}
+                                    onChange={getAddress}
+                                  />
+                                </div>
+                              </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-full p-0" onMouseDown={(e) => e.preventDefault()}>
+                              <Command>
+                                <CommandList className="max-h-[200px]">
+                                  <CommandGroup>
+                                    {results.map((place) => (
+                                      <CommandItem
+                                        value={place.id}
+                                        key={place.id}
+                                        onSelect={() => {
+                                          form.setValue(
+                                            "detailedAddress",
+                                            place.name.toString()
+                                          );
+                                        }}
+                                      >
+                                        {place.name}
+                                        <Check
+                                          width={20}
+                                          className={cn(
+                                            "ml-auto",
+                                            place.name.toString() ===
+                                              field.value
+                                              ? "opacity-100"
+                                              : "opacity-0"
+                                          )}
+                                        />
+                                      </CommandItem>
+                                    ))}
+                                  </CommandGroup>
+                                </CommandList>
+                              </Command>
+                            </PopoverContent>
+                          </Popover>
                           <FormMessage />
                         </div>
                       </FormItem>
@@ -467,8 +500,8 @@ const CreateModal = (props: Props) => {
               </Button>
             </DialogFooter>
           </div>
-          <div>
-            <MapComponent onPlaceSelect={handlePlaceSelect}/>
+          <div className="h-[40vh] w-full">
+            <MapComponent onPlaceSelect={handlePlaceSelect} />
           </div>
         </div>
       </DialogContent>
