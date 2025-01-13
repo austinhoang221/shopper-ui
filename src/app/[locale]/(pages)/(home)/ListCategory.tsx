@@ -23,7 +23,7 @@ export const ListCategory: React.FC<Props> = async ({ language }) => {
   const categories = await service.client.productCategoriesAll();
   return (
     <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-x-12 gap-y-4 mt-6">
-      {categories.map((category: ListProductCategoryResponse) => {
+      {categories?.map((category: ListProductCategoryResponse) => {
         return (
           <div className="text-center" key={category.id?.toString()}>
             <Link

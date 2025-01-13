@@ -26,6 +26,22 @@ const nextConfig = {
         protocol: "https",
         hostname: "lh3.googleusercontent.com",
       },
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
+      },
+      {
+        protocol: "http",
+        hostname: "localhost:3000",
+      },
+      {
+        protocol: "http",
+        hostname: "api.xtnginternational.com",
+      },
+      {
+        protocol: "http",
+        hostname: "xtnginternational.com",
+      },
     ],
   },
 };

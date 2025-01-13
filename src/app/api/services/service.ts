@@ -2,9 +2,9 @@ import { authorizationCookie, userIdCookie } from "@/utils/constants";
 import { HTTPStatusCodeType } from "../enums/HttpStatusCodeType";
 import { Client } from "./api";
 import { getCookie } from "cookies-next";
-import { redirect } from "next/navigation";
+// import { redirect } from "next/navigation";
 
-const baseUrl = "http://localhost:5283";
+const baseUrl = "http://api.xtnginternational.com";
 async function authorizedFetchFunction(
   url: RequestInfo,
   init: RequestInit
@@ -22,7 +22,7 @@ async function authorizedFetchFunction(
 
   if (authorize) headers["Authorization"] = "Bearer " + authorize;
 
-  init.headers = { ...init.headers, ...(headers as A) };
+  init.headers = { ...init.headers, ...headers };
   return fetch(url, init);
 }
 

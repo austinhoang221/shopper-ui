@@ -19,7 +19,7 @@ const Home: React.FC<A> = async ({ params: { locale } }) => {
         Best Seller in Fashion
       </h1>
       <Suspense fallback={<p>Loading feed...</p>}>
-        <PrallaxCarousel images={flat.map((image) => image?.link ?? "")} />
+        <PrallaxCarousel images={flat?.map((image) => image?.link ?? "")} />
       </Suspense>
 
       <h1 className="text-center text-bolder text-2xl my-16">Spotlight</h1>

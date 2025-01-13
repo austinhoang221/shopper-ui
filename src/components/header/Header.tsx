@@ -36,7 +36,9 @@ export default async function Header({
             <div className="w-full flex gap-3 items-center basis-full">
               <DeliverTo />
               <SearchBox
-                categories={JSON.parse(JSON.stringify(categories))}
+                categories={
+                  categories ? JSON.parse(JSON.stringify(categories)) : []
+                }
                 language={language}
                 className="hidden md:flex basis-full"
               />

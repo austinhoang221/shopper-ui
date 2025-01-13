@@ -67,6 +67,11 @@ export default function ProductByCategory({
         }, []) || [];
       setCriteriaValues([...new Set(initialCriteriaValue)]);
       setPriceRange(data?.priceRange ?? undefined);
+      setPriceRangeValue(
+        data?.priceRange
+          ? [data?.priceRange?.fromPrice ?? 0, data?.priceRange?.toPrice ?? 0]
+          : []
+      );
       setIsLoading(false);
     };
     fetchData();
