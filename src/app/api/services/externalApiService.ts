@@ -3,7 +3,7 @@ const baseUrl = process.env.NEXT_PUBLIC_GEONAMES_BASE_URL;
 const shippoApiKey = process.env.NEXT_PUBLIC_SHIPPO_API_KEY;
 const mapboxAccessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
-interface Place {
+export interface Place {
   geonameId: number;
   name: string;
   lat: number;

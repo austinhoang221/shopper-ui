@@ -159,15 +159,18 @@ const CheckoutForm = () => {
         name: form.watch("username"),
         street: form.watch("address"),
         city:
-          cities.find((city) => city.geonameId == form.watch("city"))?.name ??
-          "",
+          cities.find(
+            (city) => city.geonameId.toString() === form.watch("city")
+          )?.name ?? "",
         state:
-          regions.find((region) => region.geonameId == selectedRegion)?.name ??
-          "",
+          regions.find(
+            (region) => region.geonameId.toString() === selectedRegion
+          )?.name ?? "",
         zip: form.watch("zipcode"),
         country:
-          countries.find((country) => country.geonameId == selectedCountry)
-            ?.countryCode ?? "",
+          countries.find(
+            (country) => country.geonameId.toString() === selectedCountry
+          )?.countryCode ?? "",
       };
       const parcel = {
         length: 10,
@@ -406,7 +409,9 @@ const CheckoutForm = () => {
                                               "region",
                                               region.geonameId.toString()
                                             );
-                                            setSelectedRegion(region.geonameId);
+                                            setSelectedRegion(
+                                              region.geonameId.toString()
+                                            );
                                           }}
                                         >
                                           {region.name}

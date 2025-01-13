@@ -12,8 +12,8 @@ import { defaultPageSize } from "@/utils/constants";
 import { Skeleton } from "../ui/skeleton";
 import Product from "./Product";
 import { useSearchParams } from "next/navigation";
-import { CriteriaContext } from "@/app/[locale]/(pages)/category/[category]/page";
 import Empty from "@/app/[locale]/(pages)/category/[category]/Empty";
+import { CriteriaContext } from "@/app/[locale]/(pages)/category/[category]/CriteriaContext";
 
 type Props = {
   category: string;

@@ -1,6 +1,6 @@
 import { getPayPalAccessToken } from "@/lib/auth-action";
 
-export async function POST(req) {
+export async function POST(req: A) {
   const accessToken = await getPayPalAccessToken();
   const body = await req.json();
   const response = await fetch(

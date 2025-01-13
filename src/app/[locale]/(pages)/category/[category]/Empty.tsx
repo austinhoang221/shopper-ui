@@ -3,9 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useSearchParams } from "next/navigation";
 import React from "react";
 
-type Props = {};
-
-const Empty = (props: Props) => {
+const Empty = () => {
   const searchParams = useSearchParams();
   const searchValue = searchParams.get("q");
 

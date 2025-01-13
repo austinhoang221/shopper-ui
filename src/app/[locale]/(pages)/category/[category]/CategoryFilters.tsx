@@ -3,10 +3,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Slider } from "@/components/ui/slider";
 import React, { useContext } from "react";
-import { CriteriaContext } from "./page";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+import { CriteriaContext } from "./CriteriaContext";
 
 export type ListCriteria = {
   parent: string;

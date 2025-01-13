@@ -9,7 +9,8 @@ import {
 import { useCookies } from "react-cookie";
 import resourcesToBackend from "i18next-resources-to-backend";
 import LanguageDetector from "i18next-browser-languagedetector";
-import { contentLanguageCookie, getOptions, languages } from "./setting";
+import { getOptions, languages } from "./setting";
+import { contentLanguageCookie } from "@/utils/constants";
 
 const runsOnServerSide = typeof window === "undefined";
 
@@ -52,9 +53,9 @@ export function useTranslation(lng: string) {
     }, [lng, i18n]);
     // eslint-disable-next-line react-hooks/rules-of-hooks
     useEffect(() => {
-      if (cookies.i18next === lng) return;
+      if (cookies["content-language"] === lng) return;
       setCookie(contentLanguageCookie, lng, { path: "/" });
-    }, [lng, cookies.i18next, setCookie]);
+    }, [lng, cookies, setCookie]);
   }
   return ret;
 }

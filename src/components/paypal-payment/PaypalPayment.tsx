@@ -68,7 +68,7 @@ export default function PaypalPayment(props: Props) {
     }
   }
 
-  function onError(error) {
+  function onError(error: A) {
     // Do something with the error from the SDK
   }
 

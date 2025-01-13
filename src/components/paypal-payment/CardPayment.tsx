@@ -17,9 +17,7 @@ import {
 import { Alert, AlertDescription } from "../ui/alert";
 import { AlertCircle } from "lucide-react";
 
-type Props = {};
-
-const CardPayment = (props: Props) => {
+const CardPayment = () => {
   const [isValid, setIsValid] = React.useState(true);
   const { cardFieldsForm } = usePayPalCardFields();
 
