@@ -4,7 +4,7 @@ import { Client } from "./api";
 import { getCookie } from "cookies-next";
 // import { redirect } from "next/navigation";
 
-const baseUrl = "http://api.xtnginternational.com";
+const baseUrl = "https://api.xtnginternational.com";
 async function authorizedFetchFunction(
   url: RequestInfo,
   init: RequestInit
