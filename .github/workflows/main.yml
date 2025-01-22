@@ -1,28 +1,33 @@
 name: Deploy to Lightsail instance
 
-on: 
-  push:
-    branches: [main]
-     pull_request:
-    branches: [main]
+on:
+  pull_request:
+    branches:
+      - main
 
 jobs:
   deploy:
     name: Deploy to AWS Lightsail
     runs-on: ubuntu-latest
 
-     steps:
+    steps:
       # Checkout the repository
-      - name: Checkout Code 
+      - name: Checkout Code
         uses: actions/checkout@v3
 
+      # Set up Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18 # Specify your Node.js version
+
+      # Deploy to Lightsail
       - name: Deploy to AWS Lightsail
         env:
           HOST: ${{ secrets.LIGHTSAIL_HOST }}
           USER: ${{ secrets.LIGHTSAIL_USER }}
           PRIVATE_KEY: ${{ secrets.LIGHTSAIL_PRIVATE_KEY }}
-
-         run: 
+        run: |
           # Add the Lightsail private key to SSH agent
           echo "${PRIVATE_KEY}" > lightsail.pem
           chmod 600 lightsail.pem
@@ -40,7 +45,7 @@ jobs:
             npm run build
 
             # Restart the app using pm2
-            pm2 start npm --name "shopper" -- restart -- -p 3000
+            pm2 start npm --name "shopper-prod" -- restart -- -p 3000
 
             # Clean up old logs (optional)
             pm2 flush
