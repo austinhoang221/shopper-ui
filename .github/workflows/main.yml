@@ -1,0 +1,50 @@
+name: Deploy to Lightsail instance
+
+on: 
+  push:
+    branches: [main]
+     pull_request:
+    branches: [main]
+
+jobs:
+  deploy:
+    name: Deploy to AWS Lightsail
+    runs-on: ubuntu-latest
+
+     steps:
+      # Checkout the repository
+      - name: Checkout Code 
+        uses: actions/checkout@v3
+
+      - name: Deploy to AWS Lightsail
+        env:
+          HOST: ${{ secrets.LIGHTSAIL_HOST }}
+          USER: ${{ secrets.LIGHTSAIL_USER }}
+          PRIVATE_KEY: ${{ secrets.LIGHTSAIL_PRIVATE_KEY }}
+
+         run: 
+          # Add the Lightsail private key to SSH agent
+          echo "${PRIVATE_KEY}" > lightsail.pem
+          chmod 600 lightsail.pem
+
+          # SSH into the Lightsail instance and run deployment commands
+          ssh -o StrictHostKeyChecking=no -i lightsail.pem $USER@$HOST << 'EOF'
+            # Navigate to your application directory
+            cd shopper-ui
+
+            # Pull the latest code from the GitHub repository
+            git pull origin main
+
+            # Install dependencies and build the app
+            npm ci
+            npm run build
+
+            # Restart the app using pm2
+            pm2 start npm --name "shopper" -- restart -- -p 3000
+
+            # Clean up old logs (optional)
+            pm2 flush
+          EOF
+
+          # Clean up the SSH private key
+          rm lightsail.pem

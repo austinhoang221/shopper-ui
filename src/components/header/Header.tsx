@@ -27,7 +27,12 @@ export default async function Header({
       <nav className=" w-full px-2 bg-white/90 sticky top-0 z-40 backdrop-blur-sm border-b flex-none transition-colors duration-500  ">
         <div className="container mx-auto items-center flex h-14 justify-between gap-5">
           <div className="flex justify-start items-center">
-            <Menu categories={categories} language={language} />
+            <Menu
+              categories={
+                categories ? JSON.parse(JSON.stringify(categories)) : []
+              }
+              language={language}
+            />
             <Link href="/" className="mr-4">
               <p className="font-bold text-inherit">LOGO</p>
             </Link>
@@ -80,7 +85,7 @@ export default async function Header({
         </div>
       </nav>
       <SearchBox
-        categories={JSON.parse(JSON.stringify(categories))}
+        categories={categories ? JSON.parse(JSON.stringify(categories)) : []}
         language={language}
         className="flex md:hidden mb-2 px-2"
       />

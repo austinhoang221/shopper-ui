@@ -38,7 +38,7 @@ const SearchBox = (props: Props) => {
   const handleSearch = () => {
     if (inputValue) {
       const href = `/${props.language}/category/${convertStringToHandle(
-        selectedCategory.name
+        selectedCategory?.name
       )}-cat.${selectedCategory?.id?.toString()}?q=${encodeURIComponent(
         inputValue
       )}`;
@@ -63,7 +63,7 @@ const SearchBox = (props: Props) => {
           className="h-[40px] p-2 border-2 border-primary rounded-none border-r-0 flex-grow whitespace-nowrap"
         >
           <span className="bg-primary text-white font-semibold">
-            {selectedCategory.name}
+            {selectedCategory?.name}
 
             <FontAwesomeIcon
               icon={faChevronCircleDown}
@@ -103,7 +103,7 @@ const SearchBox = (props: Props) => {
             href={`${
               props.language
             }/?q=${inputValue}/category/${convertStringToHandle(
-              selectedCategory.name
+              selectedCategory?.name
             )}-cat.${selectedCategory?.id?.toString()}`}
           >
             <FontAwesomeIcon
