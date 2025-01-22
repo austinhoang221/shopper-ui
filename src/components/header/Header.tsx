@@ -34,7 +34,7 @@ export default async function Header({
               language={language}
             />
             <Link href="/" className="mr-4">
-              <p className="font-bold text-inherit">LOGO</p>
+              <p className="font-bold text-inherit">TEST</p>
             </Link>
           </div>
           <div className="basis-full flex justify-center">
