@@ -10395,6 +10395,7 @@ export interface IProductStaticFilter {
 }
 
 export class ProductStaticSortBy implements IProductStaticSortBy {
+  sellingPrice?: number;
   constructor(data?: IProductStaticSortBy) {
     if (data) {
       for (var property in data) {
@@ -10404,7 +10405,9 @@ export class ProductStaticSortBy implements IProductStaticSortBy {
     }
   }
 
-  init(_data?: any) {}
+  init(_data?: any) {
+    this.sellingPrice = _data["sellingPrice"];
+  }
 
   static fromJS(data: any): ProductStaticSortBy {
     data = typeof data === "object" ? data : {};
@@ -10415,6 +10418,7 @@ export class ProductStaticSortBy implements IProductStaticSortBy {
 
   toJSON(data?: any) {
     data = typeof data === "object" ? data : {};
+    data["sellingPrice"] = this.sellingPrice;
     return data;
   }
 }

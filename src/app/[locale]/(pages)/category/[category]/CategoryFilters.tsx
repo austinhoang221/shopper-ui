@@ -79,7 +79,7 @@ const CategoryFilters = () => {
             className="w-full"
           />
           <div className="italic text-muted-foreground mt-2 text-center">
-            {priceRangeFilter?.[0]} to {priceRangeFilter?.[1]}
+            {priceRangeFilter?.[0]}&euro; to {priceRangeFilter?.[1]}&euro;
           </div>
           <Button
             className="w-full mt-4"

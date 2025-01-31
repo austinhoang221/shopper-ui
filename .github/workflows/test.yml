@@ -45,7 +45,7 @@ jobs:
             npm run build
 
             # Restart the app
-            pm2 start npm --name "shopper-test" -- run start -- --port 3001
+            pm2 restart shopper-test
             sudo systemctl reload nginx
 
             # Clean up old logs (optional)

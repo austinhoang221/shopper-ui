@@ -44,8 +44,10 @@ jobs:
             npm ci
             npm run build
 
-            # Restart the app using pm2
-            pm2 start npm --name "shopper-prod" -- restart -- -p 3000
+            # Restart the app
+            pm2 restart shopper
+            pm2 start npm --name <name> -- run start -- --port <port>
+            sudo systemctl reload nginx
 
             # Clean up old logs (optional)
             pm2 flush

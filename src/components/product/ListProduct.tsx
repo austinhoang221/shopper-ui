@@ -7,6 +7,7 @@ import {
   ProductOffsetPageStaticQuery,
   ProductOffsetPageStaticResponse,
   ProductStaticFilter,
+  ProductStaticSortBy,
 } from "@/app/api/services/api";
 import { defaultPageSize } from "@/utils/constants";
 import { Skeleton } from "../ui/skeleton";
@@ -14,13 +15,15 @@ import Product from "./Product";
 import { useSearchParams } from "next/navigation";
 import Empty from "@/app/[locale]/(pages)/category/[category]/Empty";
 import { CriteriaContext } from "@/app/[locale]/(pages)/category/[category]/CriteriaContext";
+import debounce from "lodash.debounce";
 
 type Props = {
   category: string;
 };
 
 const ListProduct = (props: Props) => {
-  const { criteriaValues, priceRangeValue } = useContext(CriteriaContext);
+  const { criteriaValues, priceRangeValue, sortBy } =
+    useContext(CriteriaContext);
   const page = React.useRef(1);
   const hasMore = React.useRef(true);
   const itemCount = React.useRef(0);
@@ -30,11 +33,21 @@ const ListProduct = (props: Props) => {
   >([]);
   const searchParams = useSearchParams();
   const searchValue = searchParams.get("q");
+  const [isWindow, setIsWindow] = React.useState<boolean>(
+    window.innerWidth < 768
+  );
 
-  // React.useEffect(() => {
-  //   if (props.category) fetchData();
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [props.category]);
+  React.useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setIsWindow(true);
+      } else {
+        setIsWindow(false);
+      }
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const fetchData = React.useCallback(async () => {
     setLoading(true);
@@ -52,9 +65,13 @@ const ListProduct = (props: Props) => {
           ?.map((criteria) => criteria.key),
         priceRange: priceRangeValue,
       });
+      const sortByModel = ProductStaticSortBy.fromJS({
+        sellingPrice: 1,
+      });
       const model = ProductOffsetPageStaticQuery.fromJS({
         page: pageModel,
         filter: modelFilter,
+        sortBy: sortByModel,
       });
       const data = await service.client.offset3(model);
       if (itemCount.current + defaultPageSize >= data.totalItemsCount!) {
@@ -66,17 +83,32 @@ const ListProduct = (props: Props) => {
     }
 
     setLoading(false);
-  }, [searchValue, criteriaValues, priceRangeValue]);
+  }, [props.category, searchValue, criteriaValues, priceRangeValue]);
+
+  const debouncedFetchData = debounce(() => {
+    page.current = 1;
+    setProducts([]);
+    itemCount.current = 0;
+    hasMore.current = true;
+    fetchData();
+  }, 500);
 
   React.useEffect(() => {
     if (props.category) {
-      page.current = 1;
-      setProducts([]);
-      itemCount.current = 0;
-      hasMore.current = true;
-      fetchData();
+      debouncedFetchData();
     }
-  }, [searchValue, criteriaValues, priceRangeValue]);
+
+    return () => {
+      debouncedFetchData.cancel();
+    };
+  }, [
+    searchValue,
+    criteriaValues,
+    priceRangeValue,
+    sortBy,
+    props.category,
+    isWindow,
+  ]);
 
   return (
     <>
@@ -96,7 +128,7 @@ const ListProduct = (props: Props) => {
             >
               {hasMore.current && (
                 <div className="grid grid-cols-2 lg:grid-cols-4 md:gap-y-4 gap-2 md:gap-4 mt-6">
-                  {Array.from({ length: 4 }).map((_, index) => (
+                  {Array.from({ length: isWindow ? 2 : 4 }).map((_, index) => (
                     <div key={index} className="shadow-lg rounded-lg p-4">
                       <Skeleton className="h-[14rem] rounded-lg bg-gray-200" />
                       <div className="space-y-2 mt-2">

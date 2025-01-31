@@ -6,6 +6,7 @@ import { ListCriteria } from "./CategoryFilters";
 import { createContext } from "react";
 
 interface ICriteriaContextProps {
+  sortBy?: number;
   priceRange?: GetFilterByIdPriceRangeResponse;
   criterias?: GetFilterByIdCriteriaResponse[];
   criteriaValues?: ListCriteria[];
@@ -20,6 +21,7 @@ interface ICriteriaContextProps {
 
 export const CriteriaContext = createContext<ICriteriaContextProps>({
   criterias: [],
+  sortBy: 0,
   criteriaValues: [],
   priceRange: undefined,
   priceRangeValue: [0, 0],

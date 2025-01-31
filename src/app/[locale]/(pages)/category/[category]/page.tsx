@@ -31,6 +31,7 @@ import {
 import Empty from "./Empty";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CriteriaContext } from "./CriteriaContext";
+import { Button } from "@/components/ui/button";
 
 export default function ProductByCategory({
   params,
@@ -47,6 +48,7 @@ export default function ProductByCategory({
   const [priceRangeValue, setPriceRangeValue] = React.useState<number[]>([
     0, 0,
   ]);
+  const [sortBy, setSortBy] = React.useState<number>(0);
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
   React.useEffect(() => {
     const fetchData = async () => {
@@ -80,6 +82,7 @@ export default function ProductByCategory({
     <CriteriaContext.Provider
       value={{
         priceRange,
+        sortBy,
         criterias,
         criteriaValues,
         priceRangeValue,
@@ -97,20 +100,23 @@ export default function ProductByCategory({
         </h1>
         <div className="flex gap-2">
           <DropdownMenu>
-            <DropdownMenuTrigger type="button">
-              <FontAwesomeIcon
-                className="ml-2"
-                icon={faChevronCircleDown}
-                width={18}
-                height={18}
-              />
+            <DropdownMenuTrigger asChild type="button">
+              <Button variant="outline">
+                Sort by
+                <FontAwesomeIcon
+                  className="ml-2"
+                  icon={faChevronCircleDown}
+                  width={18}
+                  height={18}
+                />
+              </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent aria-label="Static Actions">
               <DropdownMenuGroup>
-                <DropdownMenuItem key="asc">
+                <DropdownMenuItem key="asc" onClick={() => setSortBy(0)}>
                   Price: Low to High
                 </DropdownMenuItem>
-                <DropdownMenuItem key="dsc">
+                <DropdownMenuItem key="dsc" onClick={() => setSortBy(1)}>
                   Price: High to Low
                 </DropdownMenuItem>
               </DropdownMenuGroup>
@@ -118,19 +124,22 @@ export default function ProductByCategory({
           </DropdownMenu>
 
           <Sheet>
-            <SheetTrigger className="block sm:hidden">
-              <FontAwesomeIcon
-                className="ml-2"
-                icon={faFilter}
-                width={18}
-                height={18}
-              />
+            <SheetTrigger asChild className="block sm:hidden">
+              <Button variant="outline">
+                Filter
+                <FontAwesomeIcon
+                  className="ml-2"
+                  icon={faFilter}
+                  width={18}
+                  height={18}
+                />
+              </Button>
             </SheetTrigger>
+
             <SheetContent>
               <SheetHeader>
                 <SheetTitle>Filters</SheetTitle>
               </SheetHeader>
-              <h1 className="font-bold my-2">Price</h1>
               <Separator className="bg-[#d5dbdb]" />
               <CategoryFilters />
             </SheetContent>
