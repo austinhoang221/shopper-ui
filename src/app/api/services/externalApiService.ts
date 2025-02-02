@@ -5,6 +5,7 @@ const mapboxAccessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
 export interface Place {
   geonameId: number;
+  id: string;
   name: string;
   lat: number;
   lng: number;
@@ -53,24 +54,26 @@ export const getCities = async (regionId: string): Promise<Place[]> => {
 export const autocomplete = async (query: string): Promise<A[]> => {
   if (!query) return [];
 
-    const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${mapboxAccessToken}&autocomplete=true&limit=5&types=place`;
-    try {
-        const response = await fetch(url);
-        const data = await response.json();
+  const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
+    query
+  )}.json?access_token=${mapboxAccessToken}&autocomplete=true&limit=5&types=place`;
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
 
-        if (data.features) {
-            return data.features.map((feature: A) => ({
-                id: feature.id,
-                name: feature.place_name,
-                coordinates: feature.geometry.coordinates,
-            }));
-        }
-
-        return [];
-    } catch (error) {
-        console.error("Error fetching places:", error);
-        return [];
+    if (data.features) {
+      return data.features.map((feature: A) => ({
+        id: feature.id,
+        name: feature.place_name,
+        coordinates: feature.geometry.coordinates,
+      }));
     }
+
+    return [];
+  } catch (error) {
+    console.error("Error fetching places:", error);
+    return [];
+  }
 };
 
 export const reverseGeocode = async (

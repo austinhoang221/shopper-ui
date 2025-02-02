@@ -9,6 +9,7 @@ import { faCreditCard, faMoneyBills } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 type Props = {
   order: CreateOrderRequest;
+  formValid: boolean;
 };
 const PaymentOption = (props: Props) => {
   return (
@@ -39,7 +40,7 @@ const PaymentOption = (props: Props) => {
         <TabsContent value="paypal">
           <CardHeader></CardHeader>
           <CardContent className="space-y-2">
-            <PaypalPayment order={props.order} />
+            <PaypalPayment order={props.order} formValid={props.formValid} />
           </CardContent>
         </TabsContent>
       </Tabs>

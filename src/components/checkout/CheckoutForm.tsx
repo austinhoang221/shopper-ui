@@ -4,7 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import "./CheckoutForm.scss";
-import { toast } from "@/components/hooks/use-toast";
 import {
   Form,
   FormControl,
@@ -58,6 +57,7 @@ import { faLocationDot } from "@fortawesome/free-solid-svg-icons";
 import UpdateAddressModal from "./update-address-modal/UpdateAddressModal";
 import Loading from "../motion/Loading";
 import PaymentOption from "./payment-option/PaymentOption";
+import toast from "react-hot-toast";
 
 const FormSchema = z.object({
   username: z.string().trim().min(1, {
@@ -270,10 +270,7 @@ const CheckoutForm = () => {
       const model = buildOrderRequest();
       await service.client.ordersPOST(userId, model);
     } else {
-      toast({
-        title: "Please input all required fields",
-        variant: "destructive",
-      });
+      toast.error("Please input all required fields");
     }
   };
 
@@ -629,7 +626,10 @@ const CheckoutForm = () => {
                     )}
                   />
                   <CardTitle className="py-6">Payment Option</CardTitle>
-                  <PaymentOption order={buildOrderRequest()} />
+                  <PaymentOption
+                    order={buildOrderRequest()}
+                    formValid={form.formState.isValid}
+                  />
                 </form>
               </Form>
             )}

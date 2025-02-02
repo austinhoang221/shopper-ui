@@ -7,6 +7,7 @@ import { config } from "@fortawesome/fontawesome-svg-core";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import { cn } from "@/lib/utils";
 import StoreProvider from "./store/storeProvider";
+import { Toaster } from "react-hot-toast";
 
 config.autoAddCss = false;
 
@@ -36,6 +37,7 @@ export default function RootLayout({ children, params: { lng } }: A) {
       <body
         className={cn("antialiased", fontHeading.variable, fontBody.variable)}
       >
+        <Toaster />
         <StoreProvider>{children}</StoreProvider>
       </body>
     </html>

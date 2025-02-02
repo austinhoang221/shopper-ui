@@ -12,13 +12,13 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { service } from "@/app/api/services/service";
 import { getCookie } from "cookies-next";
-import { toast } from "@/components/hooks/use-toast";
 import { UpdateUserRequest } from "@/app/api/services/api";
 import withAuth from "@/hoc/Auth";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
+import toast from "react-hot-toast";
 
 const FormSchema = z.object({
   name: z.string(),
@@ -72,19 +72,14 @@ const UserInfo = () => {
             email: formValue?.email,
           },
         });
-        toast({
-          title: "Successfully updated profile",
-        });
+        toast.success("Successfully updated profile");
       } catch (error) {
         console.log(error);
       } finally {
         setIsLoadingBtn(false);
       }
     } else {
-      toast({
-        title: "Please input all required fields",
-        variant: "destructive",
-      });
+      toast.error("Please input all required fields");
     }
   };
 

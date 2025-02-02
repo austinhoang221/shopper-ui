@@ -12,12 +12,12 @@ import {
 import CreateModal from "./createModal/CreateModal";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { toast } from "@/components/hooks/use-toast";
 import { useSession } from "next-auth/react";
 
 import { Dialog, DialogContent, DialogFooter } from "@/components/ui/dialog";
 import Empty from "../../category/[category]/Empty";
 import Loading from "@/components/motion/Loading";
+import toast from "react-hot-toast";
 
 const Address = () => {
   const userId = getCookie(userIdCookie);
@@ -56,9 +56,9 @@ const Address = () => {
     if (deleteIndex !== -1) {
       addresses.splice(deleteIndex, 1);
       await service.client.addresses(userId as string, [...addresses]);
-      toast({
-        title: "Successfully delete an address",
-      });
+
+      toast.success("Deleted an address");
+
       setDeleteId("");
       setIsOpenConfirmModal(false);
       setIsLoadingDeleteBtn(false);
@@ -83,9 +83,8 @@ const Address = () => {
         UserUpdateAddressesRequest.fromJS({ ...address, isDefault: true })
       );
       await service.client.addresses(userId as string, [...request]);
-      toast({
-        title: "Successfully delete an address",
-      });
+      toast.success("Deleted an address");
+
       fetchData();
     }
     fetchData();

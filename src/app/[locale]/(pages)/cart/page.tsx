@@ -6,7 +6,6 @@ import {
 import { service } from "@/app/api/services/service";
 import { removeFromCart, updateQuantity } from "@/app/store/cartSlice";
 import { useAppDispatch, useAppSelector } from "@/components/hooks/redux";
-import { toast } from "@/components/hooks/use-toast";
 import { OrderSummary } from "@/components/order-summary/OrderSummary";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -36,6 +35,7 @@ import React from "react";
 import { IconButton } from "@/components/ui/icon-button";
 import { ArrowRightIcon } from "lucide-react";
 import { useSession } from "next-auth/react";
+import toast from "react-hot-toast";
 
 const ListCart = () => {
   const router = useRouter();
@@ -99,12 +99,12 @@ const ListCart = () => {
     });
     try {
       await service.client.cartsDELETE(userId, cartItem);
-      toast({
-        title: "Successfully delete from cart",
-      });
+      toast.success("Deleted from cart");
+
       dispatch(removeFromCart(id));
     } catch (error) {
       console.log("Failed to remove item to cart");
+      toast.error("Failed to delete from cart");
     }
     setIsLoadingDeleteBtn(false);
   };

@@ -50,7 +50,6 @@ const ListProduct = (props: Props) => {
   }, []);
 
   const fetchData = React.useCallback(async () => {
-    setLoading(true);
     if (hasMore.current) {
       const pageModel = OffsetPage.fromJS({
         pageSize: defaultPageSize,
@@ -81,16 +80,16 @@ const ListProduct = (props: Props) => {
       setProducts((prev) => [...prev, ...data.items!]);
       page.current++;
     }
-
-    setLoading(false);
   }, [props.category, searchValue, criteriaValues, priceRangeValue]);
 
-  const debouncedFetchData = debounce(() => {
+  const debouncedFetchData = debounce(async () => {
+    setLoading(true);
     page.current = 1;
     setProducts([]);
     itemCount.current = 0;
     hasMore.current = true;
-    fetchData();
+    await fetchData();
+    setLoading(false);
   }, 500);
 
   React.useEffect(() => {
@@ -101,14 +100,7 @@ const ListProduct = (props: Props) => {
     return () => {
       debouncedFetchData.cancel();
     };
-  }, [
-    searchValue,
-    criteriaValues,
-    priceRangeValue,
-    sortBy,
-    props.category,
-    isWindow,
-  ]);
+  }, [searchValue, criteriaValues, priceRangeValue, sortBy, props.category]);
 
   return (
     <>

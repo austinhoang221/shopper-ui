@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronCircleDown } from "@fortawesome/free-solid-svg-icons";
+import { Button } from "@/components/ui/button";
 
 const Orders = () => {
   const { status } = useSession();
@@ -40,6 +41,7 @@ const Orders = () => {
     []
   );
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const [sortBy, setSortBy] = React.useState<boolean>(false);
   const { data: userData } = useSession();
   React.useEffect(() => {
     page.current = 1;
@@ -81,24 +83,33 @@ const Orders = () => {
 
   return (
     <Card>
-      <CardHeader className="flex justify-between">
-        <CardTitle>Orders</CardTitle>
-        <DropdownMenu>
-          <DropdownMenuTrigger type="button">
-            <FontAwesomeIcon
-              className="ml-2"
-              icon={faChevronCircleDown}
-              width={18}
-              height={18}
-            />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent aria-label="Static Actions">
-            <DropdownMenuGroup>
-              <DropdownMenuItem key="asc">Price: Low to High</DropdownMenuItem>
-              <DropdownMenuItem key="dsc">Price: High to Low</DropdownMenuItem>
-            </DropdownMenuGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
+      <CardHeader className="flex ">
+        <CardTitle className="flex justify-between">
+          <h1>Order</h1>
+          <DropdownMenu>
+            <DropdownMenuTrigger type="button">
+            <Button variant="outline">
+                Sort by
+                <FontAwesomeIcon
+                  className="ml-2"
+                  icon={faChevronCircleDown}
+                  width={18}
+                  height={18}
+                />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent aria-label="Static Actions">
+              <DropdownMenuGroup>
+                <DropdownMenuItem key="asc" onClick={() => }>
+                  Price: Low to High
+                </DropdownMenuItem>
+                <DropdownMenuItem key="dsc" onClick={() => }>
+                  Price: High to Low
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </CardTitle>
       </CardHeader>
       <CardContent className="min-h-[50vh] ">
         <>

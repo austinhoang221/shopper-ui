@@ -19,6 +19,7 @@ import { useParams, useRouter } from "next/navigation";
 import { clearCart } from "@/app/store/cartSlice";
 type Props = {
   order: CreateOrderRequest;
+  formValid: boolean;
 };
 export default function PaypalPayment(props: Props) {
   const router = useRouter();
@@ -84,6 +85,7 @@ export default function PaypalPayment(props: Props) {
         createOrder={createOrder}
         onApprove={onApprove}
         onError={onError}
+        disabled={!props.formValid}
         className="z-[1] relative"
       />
       <SeparatorWithText>Or</SeparatorWithText>

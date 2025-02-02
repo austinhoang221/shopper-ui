@@ -6,7 +6,6 @@ import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { IconButton } from "@/components/ui/icon-button";
 import { Input } from "@/components/ui/input";
-import { toast } from "@/hooks/use-toast";
 import { PASSWORD_REGEX } from "@/utils/constants";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -17,6 +16,7 @@ import { AlertCircle } from "lucide-react";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import toast from "react-hot-toast";
 const FormSchema = z
   .object({
     newPassword: z.string().trim().regex(PASSWORD_REGEX),
@@ -62,10 +62,7 @@ const ResetPassword = () => {
         setErrorMsg(errors?.errors?.[0]?.message);
       }
     } else {
-      toast({
-        title: "Please input all required fields",
-        variant: "destructive",
-      });
+      toast.error("Please input all required fields");
     }
   };
 

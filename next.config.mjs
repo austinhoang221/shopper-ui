@@ -16,6 +16,10 @@ const nextConfig = {
       },
       {
         protocol: "https",
+        hostname: "fastly.picsum.photos",
+      },
+      {
+        protocol: "https",
         hostname: "picsum.photos",
       },
       {
@@ -34,6 +38,7 @@ const nextConfig = {
         protocol: "http",
         hostname: "localhost:3000",
       },
+
       {
         protocol: "http",
         hostname: "api.xtnginternational.com",

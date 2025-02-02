@@ -9,13 +9,13 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { service } from "@/app/api/services/service";
-import { toast } from "@/components/hooks/use-toast";
 import { UserChangePasswordRequest } from "@/app/api/services/api";
 import { PASSWORD_REGEX, userIdCookie } from "@/utils/constants";
 import withAuth from "@/hoc/Auth";
 import { getCookie } from "cookies-next";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
+import toast from "react-hot-toast";
 
 const FormSchema = z
   .object({
@@ -64,10 +64,8 @@ const ChangePass = () => {
         setIsLoadingBtn(false);
       }
     } else {
-      toast({
-        title: "Please input all required fields",
-        variant: "destructive",
-      });
+      toast.error("Please input all required fields");
+
       setIsLoadingBtn(false);
     }
   };

@@ -48,7 +48,7 @@ export default async function ProductDetail({
 
       <Card className="mt-4">
         <CardHeader>
-          <CardTitle>Product description</CardTitle>
+          <CardTitle>Description</CardTitle>
         </CardHeader>
         <CardContent>
           <p>{product.i18nTxDesc}</p>

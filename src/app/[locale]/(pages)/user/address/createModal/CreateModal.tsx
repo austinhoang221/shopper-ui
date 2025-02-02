@@ -35,7 +35,6 @@ import { Button } from "@/components/ui/button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { service } from "@/app/api/services/service";
-import { toast } from "@/components/hooks/use-toast";
 import { z } from "zod";
 import {
   autocomplete,
@@ -53,6 +52,7 @@ import { getCookie } from "cookies-next";
 import { PHONE_NUMBER_REGEX, userIdCookie } from "@/utils/constants";
 import debounce from "lodash.debounce";
 import MapComponent from "@/components/ui/map";
+import toast from "react-hot-toast";
 
 const FormSchema = z.object({
   name: z.string().min(1, {
@@ -86,6 +86,8 @@ type Props = {
 const CreateModal = (props: Props) => {
   const userId = getCookie(userIdCookie);
   const [isLoadingBtn, setIsLoadingBtn] = React.useState<boolean>(false);
+  const [isOpenSelectAddress, setIsOpenSelectAddress] =
+    React.useState<boolean>(false);
   const [selectedCountry, setSelectedCountry] = React.useState<string | null>(
     "3017382"
   );
@@ -100,7 +102,9 @@ const CreateModal = (props: Props) => {
       if (query.length > 2) {
         try {
           const places = await autocomplete(query);
+          setIsOpenSelectAddress(true);
           setResults(places);
+          console.log(places);
         } catch (error) {
           console.error("Error fetching autocomplete results:", error);
         }
@@ -227,15 +231,10 @@ const CreateModal = (props: Props) => {
       setIsLoadingBtn(false);
       props.onOpenChange(false);
       props.onUpdate();
-      toast({
-        title: "Successfully",
-        variant: "destructive",
-      });
+
+      toast.success("Added an address");
     } else {
-      toast({
-        title: "Please input all required fields",
-        variant: "destructive",
-      });
+      toast.error("Please input all required fields");
     }
   };
 
@@ -306,7 +305,7 @@ const CreateModal = (props: Props) => {
                                 {field.value
                                   ? regions.find(
                                       (language) =>
-                                        language.geonameId.toString() ===
+                                        language.geonameId?.toString() ===
                                         field.value
                                     )?.name
                                   : "Select region"}
@@ -333,10 +332,10 @@ const CreateModal = (props: Props) => {
                                     onSelect={() => {
                                       form.setValue(
                                         "region",
-                                        region.geonameId.toString()
+                                        region.geonameId?.toString()
                                       );
                                       setSelectedRegion(
-                                        region.geonameId.toString()
+                                        region.geonameId?.toString()
                                       );
                                     }}
                                   >
@@ -345,7 +344,7 @@ const CreateModal = (props: Props) => {
                                       width={20}
                                       className={cn(
                                         "ml-auto",
-                                        region.geonameId.toString() ===
+                                        region.geonameId?.toString() ===
                                           field.value
                                           ? "opacity-100"
                                           : "opacity-0"
@@ -381,7 +380,7 @@ const CreateModal = (props: Props) => {
                                 {field.value
                                   ? cities.find(
                                       (city) =>
-                                        city.geonameId.toString() ===
+                                        city.geonameId?.toString() ===
                                         field.value
                                     )?.name
                                   : "Select city"}
@@ -404,12 +403,12 @@ const CreateModal = (props: Props) => {
                                 <CommandGroup>
                                   {cities.map((city) => (
                                     <CommandItem
-                                      value={city.name.toString()}
+                                      value={city?.name?.toString()}
                                       key={city.geonameId}
                                       onSelect={() => {
                                         form.setValue(
                                           "city",
-                                          city.geonameId.toString()
+                                          city.geonameId?.toString()
                                         );
                                       }}
                                     >
@@ -418,7 +417,7 @@ const CreateModal = (props: Props) => {
                                         width={20}
                                         className={cn(
                                           "ml-auto",
-                                          city.geonameId.toString() ===
+                                          city.geonameId?.toString() ===
                                             field.value
                                             ? "opacity-100"
                                             : "opacity-0"
@@ -441,7 +440,10 @@ const CreateModal = (props: Props) => {
                     render={({ field }) => (
                       <FormItem className="mb-3">
                         <div className="gap-4">
-                          <Popover open={true}>
+                          <Popover
+                            open={isOpenSelectAddress}
+                            onOpenChange={setIsOpenSelectAddress}
+                          >
                             <PopoverTrigger asChild>
                               <FormControl className="col-span-1">
                                 <div>
@@ -462,8 +464,8 @@ const CreateModal = (props: Props) => {
                                   <CommandGroup>
                                     {results.map((place) => (
                                       <CommandItem
-                                        value={place.geonameId.toString()}
-                                        key={place.geonameId}
+                                        value={place.id?.toString()}
+                                        key={place.id}
                                         onSelect={() => {
                                           form.setValue(
                                             "detailedAddress",
@@ -476,7 +478,7 @@ const CreateModal = (props: Props) => {
                                           width={20}
                                           className={cn(
                                             "ml-auto",
-                                            place.name.toString() ===
+                                            place.name?.toString() ===
                                               field.value
                                               ? "opacity-100"
                                               : "opacity-0"

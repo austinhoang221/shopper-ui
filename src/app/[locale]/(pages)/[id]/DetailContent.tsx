@@ -22,6 +22,7 @@ import { getCookie } from "cookies-next";
 import { useSession } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";
 import React from "react";
+import toast from "react-hot-toast";
 
 type Props = {
   product: GetProductResponse;
@@ -36,7 +37,6 @@ const DetailContent = (props: Props) => {
   const { product } = props;
   const userId = getCookie(userIdCookie);
   const { data: userData } = useSession();
-  const { toast } = useToast();
   const router = useRouter();
   const params = useParams();
   const dispatch = useAppDispatch();
@@ -110,9 +110,7 @@ const DetailContent = (props: Props) => {
       userId,
       AddCartItemRequest.fromJS({ productId: id, qty: quantity })
     );
-    toast({
-      title: "Successfully added to cart",
-    });
+    toast.success("Added to cart");
     setIsLoadingButton(false);
   };
 
